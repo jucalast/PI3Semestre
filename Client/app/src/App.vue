@@ -10,7 +10,10 @@ export default {
 </script>
 
 <style>
+@import '@/assets/css/variables.css';
 body {
 margin: 0;
+background: var(--bacground-color);
+font-family:Arial, Helvetica, sans-serif;
 }
 </style>
