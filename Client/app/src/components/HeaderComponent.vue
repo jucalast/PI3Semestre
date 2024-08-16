@@ -1,6 +1,7 @@
 <!-- src/components/HeaderComponent.vue -->
 <template>
   <header>
+    <div class="header">
     <h1>My E-commerce</h1>
     <nav>
       <ul>
@@ -9,6 +10,7 @@
         <li><router-link to="/cart">Cart</router-link></li>
       </ul>
     </nav>
+  </div>
   </header>
 </template>
 
@@ -22,11 +24,16 @@ export default {
 @import '@/assets/css/variables.css';
 
 header {
-  background-color: var(--bacground-color);
+  background-color: var(--header-color);
   color: var(  --accent-color);
-  padding: 2rem;
+  padding: 1rem;
   margin: 0;
 
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
 }
 
 nav ul {
@@ -36,5 +43,9 @@ nav ul {
 
 nav ul li {
   margin-right: 20px;
+  background: var(--accent-color);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: var(--accent-color);
 }
 </style>
