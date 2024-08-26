@@ -1,6 +1,8 @@
 package com.app.service;
 
-import com.app.model.User;
+import com.app.model.Endereco;
+import com.app.model.Usuario;
+import com.app.repository.EnderecoRepository;
 import com.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,36 +10,93 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Serviço para gerenciar usuários no sistema de e-commerce.
+ *
+ * <p>Esta classe fornece métodos para realizar operações CRUD (Create, Read, Update, Delete)
+ * no repositório de usuários.</p>
+ */
 @Service
 public class UserService {
 
+    private final UserRepository userRepository;
+    private final EnderecoRepository enderecoRepository;
+
+    /**
+     * Construtor para injeção de dependência dos repositórios de usuários e endereços.
+     *
+     * @param userRepository O repositório de usuários a ser injetado.
+     * @param enderecoRepository O repositório de endereços a ser injetado.
+     */
     @Autowired
-    private UserRepository userRepository;
+    public UserService(UserRepository userRepository, EnderecoRepository enderecoRepository) {
+        this.userRepository = userRepository;
+        this.enderecoRepository = enderecoRepository;
+    }
 
-//    public UserService(UserRepository userRepository) {
-//        this.userRepository = userRepository;
-//    }
-
-    public List<User> getAllUsers() {
+    /**
+     * Obtém todos os usuários do sistema.
+     *
+     * @return Uma lista contendo todos os usuários.
+     */
+    public List<Usuario> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
+    /**
+     * Obtém um usuário específico pelo seu identificador.
+     *
+     * @param id O identificador do usuário.
+     * @return Um {@link Optional} contendo o usuário se encontrado, ou vazio se não encontrado.
+     */
+    public Optional<Usuario> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    /**
+     * Cria um novo usuário no sistema. Também persiste o endereço associado, se fornecido.
+     *
+     * @param usuario O usuário a ser criado.
+     * @return O usuário criado.
+     */
+    public Usuario createUser(Usuario usuario) {
+        if (usuario.getEndereco() != null) {
+            Endereco endereco = usuario.getEndereco();
+            if (endereco.getId() == null) {
+                enderecoRepository.save(endereco);
+            }
+        }
+        return userRepository.save(usuario);
     }
 
-    public Optional<User> updateUser(Long id, User user) {
+    /**
+     * Atualiza um usuário existente com o novo valor fornecido.
+     *
+     * @param id O identificador do usuário a ser atualizado.
+     * @param usuario O usuário com as novas informações.
+     * @return Um {@link Optional} contendo o usuário atualizado se o identificador existir, ou vazio se não encontrado.
+     */
+    public Optional<Usuario> updateUser(Long id, Usuario usuario) {
         if (userRepository.existsById(id)) {
-            user.setId(id);
-            return Optional.of(userRepository.save(user));
+            // Atualiza o endereço se estiver presente
+            if (usuario.getEndereco() != null) {
+                Endereco endereco = usuario.getEndereco();
+                if (endereco.getId() == null) {
+                    enderecoRepository.save(endereco);
+                }
+            }
+            usuario.setId(id);
+            return Optional.of(userRepository.save(usuario));
         }
         return Optional.empty();
     }
 
+    /**
+     * Exclui um usuário pelo seu identificador.
+     *
+     * @param id O identificador do usuário a ser excluído.
+     * @return {@code true} se o usuário foi excluído com sucesso, {@code false} caso contrário.
+     */
     public boolean deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
