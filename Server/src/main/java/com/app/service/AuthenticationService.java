@@ -13,6 +13,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Serviço de autenticação responsável por gerenciar o registro e autenticação de usuários.
+ * Utiliza o {@link PasswordEncoder} para codificação de senhas e o {@link JwtService} para gerar tokens JWT.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -21,7 +25,13 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    
+
+    /**
+     * Registra um novo usuário no sistema.
+     *
+     * @param request A solicitação de registro contendo informações do usuário.
+     * @return Um {@link AuthenticateionResponse} contendo o token JWT gerado para o novo usuário.
+     */
     public AuthenticateionResponse register(RegisterRequest request) {
         var user = User.builder()
                 .firstName(request.getFirstName())
@@ -36,40 +46,21 @@ public class AuthenticationService {
         return AuthenticateionResponse.builder().token(jwtToken).build();
     }
 
+    /**
+     * Autentica um usuário e gera um token JWT.
+     *
+     * @param request A solicitação de autenticação contendo email e senha do usuário.
+     * @return Um {@link AuthenticateionResponse} contendo o token JWT gerado para o usuário autenticado.
+     * @throws org.springframework.security.authentication.BadCredentialsException Se as credenciais fornecidas estiverem incorretas.
+     */
     public AuthenticateionResponse authenticate(AuthenticationRequest request) {
 
-        // Logs de entrada
-        System.out.println("Email: " + request.getEmail());
-        System.out.println("Password: " + request.getPassword());
-
-        // Verifica se o usuário foi encontrado
-        var userOptional = userRepository.findByEmail(request.getEmail());
-        System.out.println("Founded: " + userOptional.isPresent());
-
-        // Loga informações adicionais sobre o usuário, se encontrado
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            System.out.println("Stored Password: " + user.getPassword());
-            System.out.println("User Account Non Expired: " + user.isAccountNonExpired());
-            System.out.println("User Account Non Locked: " + user.isAccountNonLocked());
-            System.out.println("User Credentials Non Expired: " + user.isCredentialsNonExpired());
-            System.out.println("User Enabled: " + user.isEnabled());
-        }
-
-        try {
-            // Tenta autenticar o usuário
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
-            System.out.println("Authenticated");
-        } catch (Exception e) {
-            // Loga a exceção e retorna uma mensagem amigável
-            System.out.println("Authentication failed: " + e.getClass().getSimpleName() + " - " + e.getMessage());
-            throw e; // Re-throw para permitir que o Spring trate a exceção
-        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
 
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();

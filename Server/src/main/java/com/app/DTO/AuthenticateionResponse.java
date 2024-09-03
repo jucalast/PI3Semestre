@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Representa a resposta de autenticação.
+ */
 @Data
 @Builder
 @AllArgsConstructor

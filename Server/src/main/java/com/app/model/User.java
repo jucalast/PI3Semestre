@@ -23,66 +23,57 @@ import java.util.List;
 @AllArgsConstructor
 public class User implements UserDetails {
 
-    /**
-     * O identificador único do usuário.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * O nome do usuário.
-     */
     private String firstName;
-
-    /**
-     * O segondo nome do usuário.
-     */
     private String lastName;
-
-    /**
-     * O email do usuário.
-     */
     private String email;
-
-    /**
-     * A senha do usuário, usada para autenticação.
-     */
     private String password;
 
-    /**
-     * A permissão do usuário no sistema.
-     */
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    /**
-     * O endereço do usuário.
-     */
     @OneToOne
     @JoinColumn(name = "endereco_id")
     private Endereco endereco;
 
+    /**
+     * Enumeração dos possíveis papéis de um usuário.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority((role.name())));
     }
 
+    /**
+     * Retorna a senha do usuário.
+     */
     @Override
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Retorna o nome de usuário do usuário.
+     */
     @Override
     public String getUsername() {
         return email;
     }
 
+    /**
+     * Verifica se a conta do usuário não expirou.
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    /**
+     * Verifica se a conta do usuário não está bloqueada.
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
