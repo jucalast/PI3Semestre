@@ -1,7 +1,7 @@
 package com.app.service;
 
 import com.app.model.Endereco;
-import com.app.model.Usuario;
+import com.app.model.User;
 import com.app.repository.EnderecoRepository;
 import com.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class UserService {
      *
      * @return Uma lista contendo todos os usuários.
      */
-    public List<Usuario> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -49,44 +49,44 @@ public class UserService {
      * @param id O identificador do usuário.
      * @return Um {@link Optional} contendo o usuário se encontrado, ou vazio se não encontrado.
      */
-    public Optional<Usuario> getUserById(Long id) {
+    public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
     /**
      * Cria um novo usuário no sistema. Também persiste o endereço associado, se fornecido.
      *
-     * @param usuario O usuário a ser criado.
+     * @param user O usuário a ser criado.
      * @return O usuário criado.
      */
-    public Usuario createUser(Usuario usuario) {
-        if (usuario.getEndereco() != null) {
-            Endereco endereco = usuario.getEndereco();
+    public User createUser(User user) {
+        if (user.getEndereco() != null) {
+            Endereco endereco = user.getEndereco();
             if (endereco.getId() == null) {
                 enderecoRepository.save(endereco);
             }
         }
-        return userRepository.save(usuario);
+        return userRepository.save(user);
     }
 
     /**
      * Atualiza um usuário existente com o novo valor fornecido.
      *
      * @param id O identificador do usuário a ser atualizado.
-     * @param usuario O usuário com as novas informações.
+     * @param user O usuário com as novas informações.
      * @return Um {@link Optional} contendo o usuário atualizado se o identificador existir, ou vazio se não encontrado.
      */
-    public Optional<Usuario> updateUser(Long id, Usuario usuario) {
+    public Optional<User> updateUser(Long id, User user) {
         if (userRepository.existsById(id)) {
             // Atualiza o endereço se estiver presente
-            if (usuario.getEndereco() != null) {
-                Endereco endereco = usuario.getEndereco();
+            if (user.getEndereco() != null) {
+                Endereco endereco = user.getEndereco();
                 if (endereco.getId() == null) {
                     enderecoRepository.save(endereco);
                 }
             }
-            usuario.setId(id);
-            return Optional.of(userRepository.save(usuario));
+            user.setId(id);
+            return Optional.of(userRepository.save(user));
         }
         return Optional.empty();
     }
