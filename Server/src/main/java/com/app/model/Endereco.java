@@ -19,45 +19,15 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class Endereco {
 
-    /**
-     * O identificador único do endereço.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Rua do endereço.
-     */
     private String rua;
-
-    /**
-     * Número da residência.
-     */
     private String numero;
-
-    /**
-     * Complemento do endereço (ex: apartamento, bloco, etc.).
-     */
     private String complemento;
-
-    /**
-     * Bairro do endereço.
-     */
     private String bairro;
-
-    /**
-     * Cidade do endereço.
-     */
     private String cidade;
-
-    /**
-     * Estado do endereço.
-     */
     private String estado;
-
-    /**
-     * CEP do endereço.
-     */
     private String cep;
 }

@@ -48,7 +48,7 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Define a política de criação de sessão
                 )
                 .authenticationProvider(authenticationProvider) // Configura o provedor de autenticação
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Adiciona o filtro JWT
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // add o filtro JWT
 
         return http.build();
     }
