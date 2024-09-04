@@ -23,11 +23,38 @@ public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Rua onde o endereço está localizado.
+     */
     private String rua;
+
+    /**
+     * Número do endereço.
+     */
     private String numero;
+
+    /**
+     * Complemento do endereço.
+     */
     private String complemento;
+
+    /**
+     * Bairro onde o endereço está localizado.
+     */
     private String bairro;
+
+    /**
+     * Cidade onde o endereço está localizado.
+     */
     private String cidade;
+
+    /**
+     * Estado onde o endereço está localizado.
+     */
     private String estado;
+
+    /**
+     * CEP do endereço.
+     */
     private String cep;
 }
