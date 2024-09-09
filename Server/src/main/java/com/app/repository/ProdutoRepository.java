@@ -1,6 +1,6 @@
-package com.seu_pacote.repository;
+package com.app.repository;
 
-import com.seu_pacote.model.Produto;
+import com.app.model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
