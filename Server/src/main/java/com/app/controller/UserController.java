@@ -1,6 +1,6 @@
 package com.app.controller;
 
-import com.app.model.Usuario;
+import com.app.model.User;
 import com.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ public class UserController {
      * @return Uma lista contendo todos os usuários.
      */
     @GetMapping
-    public List<Usuario> getAllUsers() {
+    public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
@@ -49,33 +49,33 @@ public class UserController {
      * @return Um {@link ResponseEntity} contendo o usuário se encontrado, ou um status 404 Not Found se não encontrado.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> getUserById(@PathVariable Long id) {
-        Optional<Usuario> user = userService.getUserById(id);
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        Optional<User> user = userService.getUserById(id);
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Cria um novo usuário.
      *
-     * @param usuario O usuário a ser criado.
+     * @param user O usuário a ser criado.
      * @return Um {@link ResponseEntity} contendo o usuário criado e um status 201 Created.
      */
     @PostMapping
-    public ResponseEntity<Usuario> createUser(@RequestBody Usuario usuario) {
-        Usuario savedUsuario = userService.createUser(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUsuario);
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        User savedUser = userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
     /**
      * Atualiza um usuário existente.
      *
      * @param id O identificador do usuário a ser atualizado.
-     * @param usuario O usuário com as novas informações.
+     * @param user O usuário com as novas informações.
      * @return Um {@link ResponseEntity} contendo o usuário atualizado se o identificador existir, ou um status 404 Not Found se não encontrado.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> updateUser(@PathVariable Long id, @RequestBody Usuario usuario) {
-        Optional<Usuario> updatedUser = userService.updateUser(id, usuario);
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        Optional<User> updatedUser = userService.updateUser(id, user);
         return updatedUser.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
