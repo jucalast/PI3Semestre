@@ -1,7 +1,7 @@
-package com.seu_pacote.service;
+package com.app.service;
 
-import com.seu_pacote.model.Produto;
-import com.seu_pacote.repository.ProdutoRepository;
+import com.app.model.Produto;
+import com.app.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
