@@ -1,7 +1,12 @@
 package com.app.repository;
 
-import com.app.model.Usuario;
+import com.app.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<Usuario, Long> {
+/**
+ * Repositório de usuários para acesso ao banco de dados.
+ */
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
 }
