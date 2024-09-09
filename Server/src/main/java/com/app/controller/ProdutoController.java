@@ -1,7 +1,7 @@
-package com.seu_pacote.controller;
+package com.app.controller;
 
-import com.seu_pacote.model.Produto;
-import com.seu_pacote.service.ProdutoService;
+import com.app.model.Produto;
+import com.app.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
