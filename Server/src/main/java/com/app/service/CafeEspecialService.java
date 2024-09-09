@@ -1,7 +1,7 @@
-package com.seu_pacote.service;
+package com.app.service;
 
-import com.seu_pacote.model.CafeEspecial;
-import com.seu_pacote.repository.CafeEspecialRepository;
+import com.app.model.CafeEspecial;
+import com.app.repository.CafeEspecialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
