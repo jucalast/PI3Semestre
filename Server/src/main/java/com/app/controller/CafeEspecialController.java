@@ -9,29 +9,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/cafe-especial")
+@RequestMapping("/api/cafes-especiais")
 public class CafeEspecialController {
 
     @Autowired
     private CafeEspecialService cafeEspecialService;
 
-    @PostMapping
-    public ResponseEntity<CafeEspecial> createCafeEspecial(@RequestBody CafeEspecial cafeEspecial) {
-        CafeEspecial savedCafeEspecial = cafeEspecialService.saveCafeEspecial(cafeEspecial);
-        return ResponseEntity.ok(savedCafeEspecial);
+    @GetMapping("/{id}")
+    public ResponseEntity<CafeEspecial> buscarPorId(@PathVariable Long id) {
+        return cafeEspecialService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CafeEspecial> getCafeEspecialById(@PathVariable Long id) {
-        Optional<CafeEspecial> cafeEspecial = cafeEspecialService.getCafeEspecialById(id);
-        return cafeEspecial.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @PostMapping
+    public CafeEspecial criarCafeEspecial(@RequestBody CafeEspecial cafeEspecial) {
+        return cafeEspecialService.salvarCafeEspecial(cafeEspecial);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CafeEspecial> atualizarCafeEspecial(@PathVariable Long id, @RequestBody CafeEspecial cafeEspecialAtualizado) {
+        return ResponseEntity.ok(cafeEspecialService.atualizarCafeEspecial(id, cafeEspecialAtualizado));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCafeEspecial(@PathVariable Long id) {
-        cafeEspecialService.deleteCafeEspecial(id);
+    public ResponseEntity<Void> deletarCafeEspecial(@PathVariable Long id) {
+        cafeEspecialService.deletarCafeEspecial(id);
         return ResponseEntity.noContent().build();
     }
-
-    // Outros endpoints podem ser adicionados aqui
 }
