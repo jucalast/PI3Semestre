@@ -1,5 +1,6 @@
 package com.app.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class CafeEspecial {
 
     @OneToOne
     @JoinColumn(name = "produto_id", nullable = false)
+    @JsonBackReference // Evita recursão infinita na serialização JSON
     private Produto produto;
 
     @Column(nullable = true)

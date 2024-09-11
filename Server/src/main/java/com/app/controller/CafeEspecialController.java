@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/cafes-especiais")
 public class CafeEspecialController {
@@ -28,7 +26,8 @@ public class CafeEspecialController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CafeEspecial> atualizarCafeEspecial(@PathVariable Long id, @RequestBody CafeEspecial cafeEspecialAtualizado) {
+    public ResponseEntity<CafeEspecial> atualizarCafeEspecial(@PathVariable Long id,
+            @RequestBody CafeEspecial cafeEspecialAtualizado) {
         return ResponseEntity.ok(cafeEspecialService.atualizarCafeEspecial(id, cafeEspecialAtualizado));
     }
 
