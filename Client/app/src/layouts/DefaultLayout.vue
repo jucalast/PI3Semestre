@@ -1,28 +1,28 @@
-<!-- src/layouts/DefaultLayout.vue -->
 <template>
     <div>
-      <HeaderComponent />
+      <Header />
       <main>
-        <slot /> <!-- Conteúdo dinâmico -->
+        <slot></slot>
       </main>
-      <FooterComponent />
+      <Footer />
     </div>
   </template>
   
   <script>
-  import HeaderComponent from '@/components/HeaderComponent.vue';
-  import FooterComponent from '@/components/FooterComponent.vue';
+  import Header from '@/components/Header.vue';
+  import Footer from '@/components/Footer.vue';
   
   export default {
-    name: 'DefaultLayout',
     components: {
-      HeaderComponent,
-      FooterComponent,
-    },
-  };
+      Header,
+      Footer
+    }
+  }
   </script>
   
   <style scoped>
-  /* Estilos específicos para o layout */
+  main {
+    padding: 20px;
+  }
   </style>
   
