@@ -6,33 +6,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/produtos")
+@RequestMapping("/api/produtos")
 public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
 
-    @GetMapping
-    public List<Produto> listarTodos() {
-        return produtoService.listarProdutos();
-    }
-
+    /**
+     * Endpoint para criar um novo produto e associar cafés especiais a ele.
+     *
+     * @param produto         O produto a ser criado.
+     * @param cafeEspecialIds IDs dos cafés especiais a serem associados ao produto.
+     * @return Resposta com o produto criado.
+     */
     @PostMapping
-    public Produto criarProduto(@RequestBody Produto produto) {
-        return produtoService.salvarProduto(produto);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Produto> buscarProdutoPorId(@PathVariable Long id) {
-        Produto produto = produtoService.buscarProdutoPorId(id);
-        return produto != null ? ResponseEntity.ok(produto) : ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public void deletarProduto(@PathVariable Long id) {
-        produtoService.deletarProduto(id);
+    public ResponseEntity<Produto> createProduto(
+            @RequestBody Produto produto,
+            @RequestParam Set<Long> cafeEspecialIds) {
+        Produto createdProduto = produtoService.createProduto(produto, cafeEspecialIds);
+        return ResponseEntity.ok(createdProduto);
     }
 }

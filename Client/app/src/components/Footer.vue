@@ -12,7 +12,7 @@
   
   <style scoped>
   footer {
-    background-color: var(--secondary-color);
+    background-color: var(--background-color);
     color: white;
     padding: 10px;
     text-align: center;
