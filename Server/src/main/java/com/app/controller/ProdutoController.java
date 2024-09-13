@@ -1,15 +1,22 @@
 package com.app.controller;
 
-import com.app.model.Produto;
-import com.app.service.ProdutoService;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Set;
+import com.app.model.Produto;
+import com.app.service.ProdutoService;
 
 @RestController
 @RequestMapping("/api/produtos")
+@Validated
 public class ProdutoController {
 
     @Autowired

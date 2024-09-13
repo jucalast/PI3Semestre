@@ -71,7 +71,7 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>11.2.1.jre17</version> <!-- Verifique a versão mais recente disponível -->
         </dependency>
-        
+
 
         <!-- Spring Boot Validation -->
         <dependency>
@@ -155,9 +155,10 @@
             <artifactId>javax.persistence-api</artifactId>
             <version>2.2</version>
         </dependency>
-        
-    </dependencies>
 
+
+
+    </dependencies>
 
 
     <build>

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Optional;
 
 @Service
 public class ProdutoService {
@@ -26,7 +28,12 @@ public class ProdutoService {
      * @return O produto criado.
      */
     public Produto createProduto(Produto produto, Set<Long> cafeEspecialIds) {
-        Set<CafeEspecial> cafeEspeciais = cafeEspecialRepository.findAllById(cafeEspecialIds);
+        // Buscar todos os cafés especiais por ID
+        Set<CafeEspecial> cafeEspeciais = new HashSet<>();
+        Iterable<CafeEspecial> cafesEncontrados = cafeEspecialRepository.findAllById(cafeEspecialIds);
+        cafesEncontrados.forEach(cafeEspeciais::add);
+
+        // Associar cafés especiais ao produto
         produto.setCafeEspeciais(cafeEspeciais);
         return produtoRepository.save(produto);
     }

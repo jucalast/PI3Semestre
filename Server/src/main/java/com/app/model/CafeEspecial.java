@@ -24,63 +24,50 @@ public class CafeEspecial {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Origem do café, especificando a região ou país.
-     */
     private String origem;
-
-    /**
-     * Variedade do café, como Arábica ou Robusta.
-     */
     private String variedade;
-
-    /**
-     * Tipo de torrefação do café.
-     */
     private String torrefacao;
-
-    /**
-     * Notas sensoriais do café, como sabor e aroma.
-     */
     private String notasSensoriais;
-
-    /**
-     * Nível de torra do café, como clara, média ou escura.
-     */
     private String torra;
-
-    /**
-     * Método de beneficiamento do café, como natural, lavado, etc.
-     */
     private String beneficiamento;
-
-    /**
-     * Data de torra do café.
-     */
     private LocalDate dataTorra;
-
-    /**
-     * Data de validade do café.
-     */
     private LocalDate dataValidade;
-
-    /**
-     * Recomendações de preparo para o café, como método ou proporções.
-     */
     private String recomendacoesPreparo;
-
-    /**
-     * Nível de acidez do café.
-     */
     private String acidez;
 
-    /**
-     * Relacionamento muitos-para-muitos com Produto.
-     * Um café especial pode estar associado a vários produtos, e um produto pode
-     * ter vários cafés especiais.
-     */
+    // Getters and Setters
+    public String getOrigem() { return origem; }
+    public void setOrigem(String origem) { this.origem = origem; }
+
+    public String getVariedade() { return variedade; }
+    public void setVariedade(String variedade) { this.variedade = variedade; }
+
+    public String getTorrefacao() { return torrefacao; }
+    public void setTorrefacao(String torrefacao) { this.torrefacao = torrefacao; }
+
+    public String getNotasSensoriais() { return notasSensoriais; }
+    public void setNotasSensoriais(String notasSensoriais) { this.notasSensoriais = notasSensoriais; }
+
+    public String getTorra() { return torra; }
+    public void setTorra(String torra) { this.torra = torra; }
+
+    public String getBeneficiamento() { return beneficiamento; }
+    public void setBeneficiamento(String beneficiamento) { this.beneficiamento = beneficiamento; }
+
+    public LocalDate getDataTorra() { return dataTorra; }
+    public void setDataTorra(LocalDate dataTorra) { this.dataTorra = dataTorra; }
+
+    public LocalDate getDataValidade() { return dataValidade; }
+    public void setDataValidade(LocalDate dataValidade) { this.dataValidade = dataValidade; }
+
+    public String getRecomendacoesPreparo() { return recomendacoesPreparo; }
+    public void setRecomendacoesPreparo(String recomendacoesPreparo) { this.recomendacoesPreparo = recomendacoesPreparo; }
+
+    public String getAcidez() { return acidez; }
+    public void setAcidez(String acidez) { this.acidez = acidez; }
+
     @ManyToMany(mappedBy = "cafeEspeciais")
     private Set<Produto> produtos;
 
-    // Getters and setters
+
 }

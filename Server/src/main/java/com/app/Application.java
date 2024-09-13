@@ -1,10 +1,11 @@
 package com.app;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Classe principal da aplicação Spring Boot.
@@ -15,6 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * configuração automática e
  * a detecção de componentes.
  */
+
 @SpringBootApplication
 @EntityScan(basePackages = "com.app.model")
 @EnableJpaRepositories(basePackages = "com.app.repository")
