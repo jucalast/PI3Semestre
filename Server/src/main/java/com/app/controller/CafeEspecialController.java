@@ -2,42 +2,35 @@ package com.app.controller;
 
 import com.app.model.CafeEspecial;
 import com.app.service.CafeEspecialService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
-@RequestMapping("/api/cafes")
+@RequestMapping("/api/cafes-especiais")
+@Validated
 public class CafeEspecialController {
 
     @Autowired
     private CafeEspecialService cafeEspecialService;
 
     /**
-     * Endpoint para criar um novo café especial.
+     * Endpoint para criar um Café Especial.
      *
-     * @param cafeEspecial O café especial a ser criado.
-     * @return Resposta com o café especial criado.
+     * @param cafeEspecial o Café Especial a ser criado
+     * @return resposta com o Café Especial criado
      */
     @PostMapping
-    public ResponseEntity<CafeEspecial> createCafeEspecial(@RequestBody CafeEspecial cafeEspecial) {
-        System.out.println("Recebido Café Especial: " + cafeEspecial);
-        CafeEspecial createdCafeEspecial = cafeEspecialService.createCafeEspecial(cafeEspecial);
-        return ResponseEntity.ok(createdCafeEspecial);
-    }
-
-
-    /**
-     * Endpoint para obter um café especial pelo ID.
-     *
-     * @param id ID do café especial.
-     * @return Resposta com o café especial encontrado.
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<CafeEspecial> getCafeEspecialById(@PathVariable Long id) {
-        Optional<CafeEspecial> cafeEspecial = cafeEspecialService.getCafeEspecialById(id);
-        return cafeEspecial.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<CafeEspecial> criarCafeEspecial(@Valid @RequestBody CafeEspecial cafeEspecial) {
+        CafeEspecial novoCafeEspecial;
+        try {
+            novoCafeEspecial = cafeEspecialService.criarCafeEspecial(cafeEspecial);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ajuste conforme necessário
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoCafeEspecial);
     }
 }

@@ -22,7 +22,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 @EnableJpaRepositories(basePackages = "com.app.repository")
 public class Application {
     public static void main(String[] args) {
-
+        
         Dotenv dotenv = Dotenv.load();
         System.setProperty("DB_URL", dotenv.get("DB_URL"));
         System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));

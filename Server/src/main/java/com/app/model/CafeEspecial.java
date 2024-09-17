@@ -1,73 +1,74 @@
 package com.app.model;
 
-import java.time.LocalDate;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.FutureOrPresent;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-/**
- * Classe que representa um Café Especial.
- * Contém informações detalhadas sobre a origem, variedade, torrefação, notas
- * sensoriais, entre outras características do café.
- * Também possui um relacionamento muitos-para-muitos com a entidade Produto.
- */
+import java.util.Date;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "cafe_especial")
 public class CafeEspecial {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @NotNull(message = "Origem não pode ser nula")
+    @Size(max = 100, message = "Origem não pode ter mais que 100 caracteres")
+    @Column(name = "origem", nullable = false, length = 100)
     private String origem;
+
+    @NotNull(message = "Variedade não pode ser nula")
+    @Size(max = 100, message = "Variedade não pode ter mais que 100 caracteres")
+    @Column(name = "variedade", nullable = false, length = 100)
     private String variedade;
+
+    @NotNull(message = "Torrefação não pode ser nula")
+    @Size(max = 50, message = "Torrefação não pode ter mais que 50 caracteres")
+    @Column(name = "torrefacao", nullable = false, length = 50)
     private String torrefacao;
+
+    @Size(max = 500, message = "Notas sensoriais não pode ter mais que 500 caracteres")
+    @Column(name = "notas_sensoriais", length = 500)
     private String notasSensoriais;
+
+    @NotNull(message = "Torra não pode ser nula")
+    @Size(max = 50, message = "Torra não pode ter mais que 50 caracteres")
+    @Column(name = "torra", nullable = false, length = 50)
     private String torra;
+
+    @NotNull(message = "Beneficiamento não pode ser nulo")
+    @Size(max = 100, message = "Beneficiamento não pode ter mais que 100 caracteres")
+    @Column(name = "beneficiamento", nullable = false, length = 100)
     private String beneficiamento;
-    private LocalDate dataTorra;
-    private LocalDate dataValidade;
+
+    @NotNull(message = "Data de Torra não pode ser nula")
+    @Column(name = "data_torra", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date dataTorra;
+
+    @NotNull(message = "Data de Validade não pode ser nula")
+    @Column(name = "data_validade", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date dataValidade;
+
+    @Size(max = 500, message = "Recomendações de preparo não pode ter mais que 500 caracteres")
+    @Column(name = "recomendacoes_preparo", length = 500)
     private String recomendacoesPreparo;
-    private String acidez;
 
-    // Getters and Setters
-    public String getOrigem() { return origem; }
-    public void setOrigem(String origem) { this.origem = origem; }
-
-    public String getVariedade() { return variedade; }
-    public void setVariedade(String variedade) { this.variedade = variedade; }
-
-    public String getTorrefacao() { return torrefacao; }
-    public void setTorrefacao(String torrefacao) { this.torrefacao = torrefacao; }
-
-    public String getNotasSensoriais() { return notasSensoriais; }
-    public void setNotasSensoriais(String notasSensoriais) { this.notasSensoriais = notasSensoriais; }
-
-    public String getTorra() { return torra; }
-    public void setTorra(String torra) { this.torra = torra; }
-
-    public String getBeneficiamento() { return beneficiamento; }
-    public void setBeneficiamento(String beneficiamento) { this.beneficiamento = beneficiamento; }
-
-    public LocalDate getDataTorra() { return dataTorra; }
-    public void setDataTorra(LocalDate dataTorra) { this.dataTorra = dataTorra; }
-
-    public LocalDate getDataValidade() { return dataValidade; }
-    public void setDataValidade(LocalDate dataValidade) { this.dataValidade = dataValidade; }
-
-    public String getRecomendacoesPreparo() { return recomendacoesPreparo; }
-    public void setRecomendacoesPreparo(String recomendacoesPreparo) { this.recomendacoesPreparo = recomendacoesPreparo; }
-
-    public String getAcidez() { return acidez; }
-    public void setAcidez(String acidez) { this.acidez = acidez; }
-
-    @ManyToMany(mappedBy = "cafeEspeciais")
-    private Set<Produto> produtos;
-
-
+    @OneToOne(mappedBy = "cafeEspecial", fetch = FetchType.LAZY)
+    @JsonBackReference
+    private Produto produto;
 }
