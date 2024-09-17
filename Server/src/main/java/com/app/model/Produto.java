@@ -1,96 +1,67 @@
 package com.app.model;
 
-import java.math.BigDecimal;
-import java.util.Set;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * Classe que representa um produto na aplicação.
- * Contém informações sobre o nome, descrição, preço, imagem, quantidade em
- * estoque e avaliação do produto.
- * Além disso, possui relacionamentos muitos-para-muitos com outras entidades
- * como Café Especial, Método de Preparo e Outros Produtos.
- */
+import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "produto")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    /**
-     * Nome do produto.
-     */
+    @NotNull(message = "Nome não pode ser nulo")
+    @Size(max = 100, message = "Nome não pode ter mais que 100 caracteres")
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    /**
-     * Descrição detalhada do produto.
-     */
+    @Size(max = 500, message = "Descrição não pode ter mais que 500 caracteres")
+    @Column(name = "descricao", length = 500)
     private String descricao;
 
-    /**
-     * Preço do produto.
-     */
+    @NotNull(message = "Preço não pode ser nulo")
+    @Positive(message = "Preço deve ser positivo")
+    @Column(name = "preco", nullable = false)
     private BigDecimal preco;
 
-    /**
-     * URL ou caminho da imagem associada ao produto.
-     */
+    @Size(max = 255, message = "Imagem não pode ter mais que 255 caracteres")
+    @Column(name = "imagem", length = 255)
     private String imagem;
 
-    /**
-     * Quantidade disponível em estoque do produto.
-     */
+    @NotNull(message = "Quantidade em estoque não pode ser nula")
+    @Positive(message = "Quantidade em estoque deve ser positiva")
+    @Column(name = "quantidade_estoque", nullable = false)
     private Integer quantEstoque;
 
-    /**
-     * Avaliação do produto. Esse valor poderá ser substituído futuramente por uma
-     * chave estrangeira de avaliação.
-     */
+    @Column(name = "avaliacao")
     private Integer avaliacao;
 
-    /**
-     * Relacionamento muitos-para-muitos com Café Especial.
-     * Um produto pode ter vários cafés especiais associados, e um café especial
-     * pode estar associado a vários produtos.
-     */
-    @ManyToMany
-    @JoinTable(name = "produto_cafe_especial", joinColumns = @JoinColumn(name = "produto_id"), inverseJoinColumns = @JoinColumn(name = "cafe_especial_id"))
-    private Set<CafeEspecial> cafeEspeciais;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cafe_especial_id")
+    @JsonManagedReference
+    private CafeEspecial cafeEspecial;
 
-    /**
-     * Relacionamento muitos-para-muitos com Métodos de Preparo.
-     * Um produto pode estar associado a vários métodos de preparo, como Prensa
-     * Francesa, Hario V60, etc.
-     * Um método de preparo também pode estar associado a vários produtos.
-     */
-    @ManyToMany
-    @JoinTable(name = "produto_metodo_preparo", joinColumns = @JoinColumn(name = "produto_id"), inverseJoinColumns = @JoinColumn(name = "metodo_preparo_id"))
-    private Set<MetodoPreparo> metodosPreparo;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "metodo_preparo_id")
+    @JsonManagedReference
+    private MetodoPreparo metodoPreparo;
 
-    /**
-     * Relacionamento muitos-para-muitos com Outros Produtos.
-     * Representa a associação de produtos com categorias genéricas, como utensílios
-     * ou acessórios.
-     */
-    @ManyToMany
-    @JoinTable(name = "produto_outro_produto", joinColumns = @JoinColumn(name = "produto_id"), inverseJoinColumns = @JoinColumn(name = "outro_produto_id"))
-    private Set<OutrosProdutos> outrosProdutos;
-
-    // Getters and setters gerados automaticamente pelo Lombok (@Data)
+    // Remove os campos temporários
 }

@@ -1,18 +1,13 @@
 package com.app.controller;
 
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.app.model.Produto;
 import com.app.service.ProdutoService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/produtos")
@@ -23,17 +18,25 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     /**
-     * Endpoint para criar um novo produto e associar cafés especiais a ele.
+     * Endpoint para criar um Produto associado a um Café Especial ou a um
+     * Método de Preparo.
      *
-     * @param produto         O produto a ser criado.
-     * @param cafeEspecialIds IDs dos cafés especiais a serem associados ao produto.
-     * @return Resposta com o produto criado.
+     * @param produto o Produto a ser criado
+     * @return resposta com o Produto criado
      */
     @PostMapping
-    public ResponseEntity<Produto> createProduto(
-            @RequestBody Produto produto,
-            @RequestParam Set<Long> cafeEspecialIds) {
-        Produto createdProduto = produtoService.createProduto(produto, cafeEspecialIds);
-        return ResponseEntity.ok(createdProduto);
+    public ResponseEntity<Produto> criarProduto(
+            @Valid @RequestBody Produto produto,
+            @RequestParam(required = false) Long cafeEspecialId,
+            @RequestParam(required = false) Long metodoPreparoId) {
+
+        Produto novoProduto;
+        try {
+            novoProduto = produtoService.criarProduto(produto, cafeEspecialId, metodoPreparoId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ajuste conforme necessário
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoProduto);
     }
+
 }

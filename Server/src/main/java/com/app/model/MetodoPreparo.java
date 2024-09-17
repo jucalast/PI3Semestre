@@ -1,53 +1,80 @@
 package com.app.model;
 
-import java.util.Set;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 /**
- * Classe que representa um método de preparo de café, como Prensa Francesa ou
- * Hario V60.
- * Cada método possui um nome, uma descrição e o tipo de preparo.
- * Relaciona-se com a entidade Produto, permitindo que um método de preparo seja
- * usado em vários produtos e vice-versa.
+ * Representa um método de preparo de café, como Prensa Francesa ou Hario V60.
+ * Cada método possui um nome, uma descrição, o tipo de preparo, material,
+ * acessórios, complexidade e marca.
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "metodo_preparo")
 public class MetodoPreparo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    /**
-     * Nome do método de preparo, como Prensa Francesa, Hario V60, etc.
-     */
+    @NotNull(message = "Nome não pode ser nulo")
+    @Size(max = 100, message = "O nome não pode ter mais de 100 caracteres")
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    /**
-     * Descrição detalhada do método de preparo, explicando como ele funciona e suas
-     * características.
-     */
+    @Size(max = 255, message = "A descrição não pode ter mais de 255 caracteres")
+    @Column(name = "descricao", length = 255)
     private String descricao;
 
-    /**
-     * Tipo de preparo, que pode especificar detalhes adicionais, como se é manual,
-     * elétrico, etc.
-     */
+    @NotNull(message = "Tipo de preparo não pode ser nulo")
+    @Size(max = 50, message = "O tipo de preparo não pode ter mais de 50 caracteres")
+    @Column(name = "tipo_preparo", nullable = false, length = 50)
     private String tipoPreparo;
 
-    /**
-     * Relacionamento muitos-para-muitos com Produto.
-     * Um método de preparo pode estar associado a vários produtos, e um produto
-     * pode utilizar vários métodos de preparo.
-     */
-    @ManyToMany(mappedBy = "metodosPreparo")
-    private Set<Produto> produtos;
+    @Size(max = 50, message = "O material não pode ter mais de 50 caracteres")
+    @Column(name = "material", length = 50)
+    private String material;
 
-    // Getters and setters
+    @Size(max = 100, message = "Os acessórios não podem ter mais de 100 caracteres")
+    @Column(name = "acessorios", length = 100)
+    private String acessorios;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "complexidade")
+    private Complexidade complexidade;
+
+    @Size(max = 50, message = "A marca não pode ter mais de 50 caracteres")
+    @Column(name = "marca", length = 50)
+    private String marca;
+
+    // Enum para representar a complexidade
+    public enum Complexidade {
+        FACIL,
+        INTERMEDIARIO,
+        AVANCADO
+    }
+
+    @OneToOne(mappedBy = "metodoPreparo", fetch = FetchType.LAZY)
+@JsonBackReference
+private Produto produto;
+
 }
