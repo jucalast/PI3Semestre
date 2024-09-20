@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Classe principal da aplicação Spring Boot.
  *
- * Esta é a classe de inicialização da aplicação que configura e inicia o contexto Spring Boot.
+ * Esta é a classe de inicialização da aplicação que configura e inicia o contexto Spring Boot.-*9
  * Utiliza a anotação {@link SpringBootApplication} para habilitar a configuração automática e
  * a detecção de componentes.
  */
