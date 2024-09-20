@@ -2,36 +2,41 @@ package com.app.controller;
 
 import com.app.model.Produto;
 import com.app.service.ProdutoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
-@RequestMapping("/produtos")
+@RequestMapping("/api/produtos")
+@Validated
 public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
 
+    /**
+     * Endpoint para criar um Produto associado a um Café Especial ou a um
+     * Método de Preparo.
+     *
+     * @param produto o Produto a ser criado
+     * @return resposta com o Produto criado
+     */
     @PostMapping
-    public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
-        Produto savedProduto = produtoService.saveProduto(produto);
-        return ResponseEntity.ok(savedProduto);
+    public ResponseEntity<Produto> criarProduto(
+            @Valid @RequestBody Produto produto,
+            @RequestParam(required = false) Long cafeEspecialId,
+            @RequestParam(required = false) Long metodoPreparoId) {
+
+        Produto novoProduto;
+        try {
+            novoProduto = produtoService.criarProduto(produto, cafeEspecialId, metodoPreparoId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ajuste conforme necessário
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoProduto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Produto> getProdutoById(@PathVariable Long id) {
-        Optional<Produto> produto = produtoService.getProdutoById(id);
-        return produto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {
-        produtoService.deleteProduto(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // Outros endpoints podem ser adicionados aqui
 }
