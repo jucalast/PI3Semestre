@@ -1,18 +1,5 @@
 package com.app.model;
 
-<<<<<<< HEAD
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-=======
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,12 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
->>>>>>> 7dfeab19876747c14777b8b6d2f0e7bd283838c5
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -77,5 +62,5 @@ public class Produto {
     @JsonManagedReference
     private MetodoPreparo metodoPreparo;
 
-    // Remove os campos temporários
 }
+
