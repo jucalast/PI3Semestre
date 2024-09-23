@@ -13,9 +13,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Configuração de segurança para a aplicação, utilizando Spring Security.
  *
- * Esta classe define a configuração de segurança para a aplicação, incluindo o gerenciamento de sessões,
- * a configuração do provedor de autenticação e o filtro de autenticação JWT. O acesso às rotas de autenticação
- * é permitido sem autenticação, enquanto outras rotas requerem autenticação.
+ * Esta classe define a configuração de segurança para a aplicação, incluindo o
+ * gerenciamento de sessões, a configuração do provedor de autenticação e o
+ * filtro de autenticação JWT. O acesso às rotas de autenticação é permitido sem
+ * autenticação, enquanto outras rotas requerem autenticação.
  */
 @Configuration
 @EnableWebSecurity
@@ -28,9 +29,10 @@ public class SecurityConfiguration {
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.
      *
-     * Esta configuração desativa a proteção CSRF, define regras de autorização para rotas específicas,
-     * configura a política de criação de sessões e adiciona o filtro de autenticação JWT.
-     * O filtro JWT é adicionado antes do filtro padrão de autenticação por nome de usuário e senha.
+     * Esta configuração desativa a proteção CSRF, define regras de autorização
+     * para rotas específicas, configura a política de criação de sessões e
+     * adiciona o filtro de autenticação JWT. O filtro JWT é adicionado antes do
+     * filtro padrão de autenticação por nome de usuário e senha.
      *
      * @param http A configuração de segurança HTTP.
      * @return O objeto {@link SecurityFilterChain} configurado.
@@ -41,11 +43,11 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable()) // Desativa o CSRF usando lambda
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/**").permitAll() // Define as rotas públicas
-                        .anyRequest().authenticated() // Qualquer outra rota requer autenticação
+                .requestMatchers("/api/**").permitAll() // Define as rotas públicas
+                .anyRequest().authenticated() // Qualquer outra rota requer autenticação
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Define a política de criação de sessão
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Define a política de criação de sessão
                 )
                 .authenticationProvider(authenticationProvider) // Configura o provedor de autenticação
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // add o filtro JWT
@@ -53,4 +55,3 @@ public class SecurityConfiguration {
         return http.build();
     }
 }
-

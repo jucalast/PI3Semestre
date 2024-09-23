@@ -1,25 +1,34 @@
 package com.app.service;
 
-import com.app.model.CafeEspecial;
-import com.app.repository.CafeEspecialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.app.exceptions.ValidationUtil;
+import com.app.model.CafeEspecial;
+import com.app.model.Produto;
+import com.app.repository.CafeEspecialRepository;
 
 @Service
 public class CafeEspecialService {
 
     @Autowired
+    private ProdutoService produtoService;
+
+    @Autowired
     private CafeEspecialRepository cafeEspecialRepository;
 
-    /**
-     * Cria um novo Café Especial.
-     *
-     * @param cafeEspecial o Café Especial a ser criado
-     * @return o Café Especial criado
-     */
-    @Transactional
-    public CafeEspecial criarCafeEspecial(CafeEspecial cafeEspecial) {
+    public CafeEspecial createCafeEspecial(CafeEspecial cafeEspecial) {
+        // Validação do objeto inteiro
+        ValidationUtil.validarObjeto(cafeEspecial);
+
+        // Validar e salvar o produto associado
+        Produto produto = cafeEspecial.getProduto();
+        ValidationUtil.validarObjeto(produto); // Validação do produto
+
+        Produto savedProduto = produtoService.createProduto(produto);
+        cafeEspecial.setProduto(savedProduto);
+
+        // Salvar o café especial após todas as validações
         return cafeEspecialRepository.save(cafeEspecial);
     }
 }

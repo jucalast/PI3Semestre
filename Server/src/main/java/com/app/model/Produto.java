@@ -1,67 +1,52 @@
 package com.app.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "produto")
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @NotNull(message = "Nome não pode ser nulo")
-    @Size(max = 100, message = "Nome não pode ter mais que 100 caracteres")
-    @Column(name = "nome", nullable = false, length = 100)
+    @NotNull(message = "O nome do produto não pode ser nulo")
+    @Size(max = 100, message = "O nome do produto não pode ter mais de 100 caracteres")
+    @Column(nullable = false)
     private String nome;
 
-    @Size(max = 500, message = "Descrição não pode ter mais que 500 caracteres")
-    @Column(name = "descricao", length = 500)
+    @Size(max = 500, message = "A descrição não pode ter mais de 500 caracteres")
+    @Column(length = 500)
     private String descricao;
 
-    @NotNull(message = "Preço não pode ser nulo")
-    @Positive(message = "Preço deve ser positivo")
-    @Column(name = "preco", nullable = false)
+    @NotNull(message = "O preço não pode ser nulo")
+    @Column(nullable = false)
     private BigDecimal preco;
 
-    @Size(max = 255, message = "Imagem não pode ter mais que 255 caracteres")
-    @Column(name = "imagem", length = 255)
     private String imagem;
 
-    @NotNull(message = "Quantidade em estoque não pode ser nula")
-    @Positive(message = "Quantidade em estoque deve ser positiva")
+    @JsonProperty("quantidade_estoque")  // Faz o mapeamento do campo JSON para o campo Java
+    @NotNull(message = "A quantidade em estoque não pode ser nula")
     @Column(name = "quantidade_estoque", nullable = false)
-    private Integer quantEstoque;
+    private int quantidadeEstoque;
 
-    @Column(name = "avaliacao")
-    private Integer avaliacao;
+    private Integer avaliacao; // Pode ser nullable
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_especial_id")
-    @JsonManagedReference
-    private CafeEspecial cafeEspecial;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "metodo_preparo_id")
-    @JsonManagedReference
-    private MetodoPreparo metodoPreparo;
-
-    // Remove os campos temporários
+    // Os métodos abaixo podem ser removidos se não forem necessários
+    public void setCafeEspecial(CafeEspecial cafeEspecial) {
+        throw new UnsupportedOperationException("Unimplemented method 'setCafeEspecial'");
+    }
 }

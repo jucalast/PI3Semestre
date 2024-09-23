@@ -1,23 +1,22 @@
 package com.app.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 /**
  * Representa um método de preparo de café, como Prensa Francesa ou Hario V60.
@@ -36,17 +35,9 @@ public class MetodoPreparo {
     @Column(name = "id")
     private Long id;
 
-    @NotNull(message = "Nome não pode ser nulo")
-    @Size(max = 100, message = "O nome não pode ter mais de 100 caracteres")
-    @Column(name = "nome", nullable = false, length = 100)
-    private String nome;
-
-    @Size(max = 255, message = "A descrição não pode ter mais de 255 caracteres")
-    @Column(name = "descricao", length = 255)
-    private String descricao;
-
     @NotNull(message = "Tipo de preparo não pode ser nulo")
     @Size(max = 50, message = "O tipo de preparo não pode ter mais de 50 caracteres")
+    @JsonProperty("tipo_preparo")
     @Column(name = "tipo_preparo", nullable = false, length = 50)
     private String tipoPreparo;
 
@@ -66,15 +57,14 @@ public class MetodoPreparo {
     @Column(name = "marca", length = 50)
     private String marca;
 
+    @OneToOne
+    @JoinColumn(name = "produto_id")
+    private Produto produto;
+
     // Enum para representar a complexidade
     public enum Complexidade {
         FACIL,
         INTERMEDIARIO,
         AVANCADO
     }
-
-    @OneToOne(mappedBy = "metodoPreparo", fetch = FetchType.LAZY)
-@JsonBackReference
-private Produto produto;
-
 }

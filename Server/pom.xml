@@ -137,13 +137,12 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Java Servlet API (for web-related operations) -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
+        
 
         <!-- Spring Boot Actuator (optional, for monitoring and management endpoints) -->
         <dependency>
@@ -163,6 +162,13 @@
             <artifactId>javax.persistence-api</artifactId>
             <version>2.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version> <!-- Substitua pela versão desejada -->
+        </dependency>
+        
         
     </dependencies>
 

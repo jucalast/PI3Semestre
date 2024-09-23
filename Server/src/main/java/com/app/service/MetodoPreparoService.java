@@ -1,28 +1,30 @@
 package com.app.service;
 
-import com.app.model.MetodoPreparo;
-import com.app.repository.MetodoPreparoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Serviço responsável pela lógica de negócios para métodos de preparo de café.
- */
+import com.app.exceptions.ValidationUtil;
+import com.app.model.MetodoPreparo;
+import com.app.model.Produto;
+import com.app.repository.MetodoPreparoRepository;
+
 @Service
 public class MetodoPreparoService {
 
     @Autowired
+    private ProdutoService produtoService;
+    @Autowired
     private MetodoPreparoRepository metodoPreparoRepository;
 
-    /**
-     * Cria um novo método de preparo de café.
-     *
-     * @param metodoPreparo o método de preparo a ser criado
-     * @return o método de preparo criado
-     */
-    @Transactional
-    public MetodoPreparo criarMetodoPreparo(MetodoPreparo metodoPreparo) {
+    public MetodoPreparo createMetodoPreparo(MetodoPreparo metodoPreparo) {
+        // Validação do objeto inteiro
+        ValidationUtil.validarObjeto(metodoPreparo);
+
+        Produto produto = metodoPreparo.getProduto();
+        Produto savedProduto = produtoService.createProduto(produto);
+
+        metodoPreparo.setProduto(savedProduto);
+
         return metodoPreparoRepository.save(metodoPreparo);
     }
 }
