@@ -24,12 +24,8 @@ spring:
 
 logging:
   level:
-    org:
-      hibernate:
-        SQL: debug
-        tool:
-          hbm2ddl: debug
+    root: INFO
+    com.app: DEBUG
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
 
-jwt:
-  rsa-private-key: classpath:certs/privateKey.pem
-  rsa-public-key: classpath:certs/publicKey.pem
