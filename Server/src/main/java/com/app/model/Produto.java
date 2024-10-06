@@ -1,9 +1,7 @@
 package com.app.model;
 
 import java.math.BigDecimal;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,15 +36,10 @@ public class Produto {
 
     private String imagem;
 
-    @JsonProperty("quantidade_estoque")  // Faz o mapeamento do campo JSON para o campo Java
+    @JsonProperty("quantidade_estoque")
     @NotNull(message = "A quantidade em estoque não pode ser nula")
     @Column(name = "quantidade_estoque", nullable = false)
     private int quantidadeEstoque;
 
-    private Integer avaliacao; // Pode ser nullable
-
-    // Os métodos abaixo podem ser removidos se não forem necessários
-    public void setCafeEspecial(CafeEspecial cafeEspecial) {
-        throw new UnsupportedOperationException("Unimplemented method 'setCafeEspecial'");
-    }
+    private Integer avaliacao;
 }
