@@ -43,13 +43,8 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable()) // Desativa o CSRF usando lambda
                 .authorizeHttpRequests(auth -> auth
-<<<<<<< HEAD
                 .requestMatchers("/api/**").permitAll() // Define as rotas públicas
                 .anyRequest().authenticated() // Qualquer outra rota requer autenticação
-=======
-                        .requestMatchers("/api/**").permitAll() // Define as rotas públicas
-                        .anyRequest().authenticated() // Qualquer outra rota requer autenticação
->>>>>>> fc624900ecaaeb38aa94012e3dce08c3a1718ec2
                 )
                 .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Define a política de criação de sessão
