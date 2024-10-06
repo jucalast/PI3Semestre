@@ -12,13 +12,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
+@Entity
+@Table(name="Produto")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "produto")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Produto {
 
@@ -53,15 +52,6 @@ public class Produto {
     @Column(name = "avaliacao")
     private Integer avaliacao;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_especial_id")
-    @JsonManagedReference
-    private CafeEspecial cafeEspecial;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "metodo_preparo_id")
-    @JsonManagedReference
-    private MetodoPreparo metodoPreparo;
 
     // Remove os campos temporários
 }

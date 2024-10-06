@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
  * Representa um endereço associado a um usuário, fornecedor ou pedido.
  */
 @Entity
-@Table(name = "Endereco")
+@Table(name="Endereco")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

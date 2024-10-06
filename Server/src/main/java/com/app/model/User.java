@@ -16,7 +16,7 @@ import java.util.List;
  * Representa um usuário no sistema de e-commerce.
  */
 @Entity
-@Table(name = "TB_User")
+@Table(name="User")
 @Data
 @Builder
 @NoArgsConstructor

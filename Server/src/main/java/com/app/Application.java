@@ -11,7 +11,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  * Classe principal da aplicação Spring Boot.
  *
  * Esta é a classe de inicialização da aplicação que configura e inicia o
- * contexto Spring Boot.
+ * contexto Spring Boot.zz
  * Utiliza a anotação {@link SpringBootApplication} para habilitar a
  * configuração automática e
  * a detecção de componentes.
