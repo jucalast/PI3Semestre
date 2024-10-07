@@ -1,7 +1,6 @@
 <template>
     <DefaultLayout>
       <div class="home-page">
-        <h2>Welcome to Our Store!</h2>
         <div class="product-list">
           <ProductCard
             v-for="product in products"
@@ -28,7 +27,6 @@
     data() {
       return {
         products: [
-          { id: 1, image: 'path/to/image1.jpg', title: 'Product 1', description: 'Description for Product 1', price: 29.99 },
           { id: 2, image: 'path/to/image2.jpg', title: 'Product 2', description: 'Description for Product 2', price: 39.99 },
           // Add more products as needed
         ]
