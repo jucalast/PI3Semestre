@@ -2,11 +2,15 @@ package com.app.model;
 
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -42,4 +46,20 @@ public class Produto {
     private int quantidadeEstoque;
 
     private Integer avaliacao;
+
+    // Relacionamento com CafeEspecial
+    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private CafeEspecial cafeEspecial;
+
+    // Relacionamento com MetodoPreparo
+    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private MetodoPreparo metodoPreparo;
+
+    public CafeEspecial getCafeEspecial() {
+        return cafeEspecial;
+    }
+
+    public MetodoPreparo getMetodoPreparo() {
+        return metodoPreparo;
+    }
 }

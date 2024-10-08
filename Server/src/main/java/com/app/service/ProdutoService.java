@@ -2,6 +2,7 @@ package com.app.service;
 
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +42,21 @@ public class ProdutoService {
         return produtoRepository.findAll();
     }
 
-    public Produto getProdutoById(Long id) {
-        logger.info("Buscando produto com ID: {}", id);
-        return produtoRepository.findById(id)
-                .orElseThrow(() -> {
-                    logger.error("Produto não encontrado com ID: {}", id);
-                    return new RuntimeException("Produto não encontrado com ID: " + id);
-                });
-    }
+   public Produto getProdutoById(Long id) {
+    logger.info("Buscando produto com ID: {}", id);
+    Produto produto = produtoRepository.findById(id)
+            .orElseThrow(() -> {
+                logger.error("Produto não encontrado com ID: {}", id);
+                return new RuntimeException("Produto não encontrado com ID: " + id);
+            });
+
+    // Asegure-se de que as especializações estão sendo carregadas
+    Hibernate.initialize(produto.getCafeEspecial());
+    Hibernate.initialize(produto.getMetodoPreparo());
+
+    return produto;
+}
+
 
     @Transactional
     public Produto updateProduto(Long id, Produto produto) {

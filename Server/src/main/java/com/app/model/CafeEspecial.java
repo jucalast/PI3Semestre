@@ -68,6 +68,6 @@ public class CafeEspecial {
     private String recomendacoesPreparo;
 
     @OneToOne
-    @JoinColumn(name = "produto_id")
+    @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 }

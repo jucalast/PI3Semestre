@@ -58,7 +58,7 @@ public class MetodoPreparo {
     private String marca;
 
     @OneToOne
-    @JoinColumn(name = "produto_id")
+    @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
     // Enum para representar a complexidade

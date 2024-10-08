@@ -6,9 +6,10 @@
     --secondary-color: #2ecc71; /* Verde secundário */
     --accent-color: #e74c3c; /* Cor de destaque */
     --background-color: #f4f4f4; /* Cor de fundo */
-    --text-color: #333; /* Cor do texto */
+    --text-color: #292929; /* Cor do texto */
     --border-color: #ddd; /* Cor da borda */
-    --bacground-color: #222222;
-    --header-color:#282828;
+    --header-color:#ffffff;
+    --inputs-color:#d1d1d1;
+    --Btns-color:#d1d1d1;
   }
   
