@@ -51,15 +51,17 @@ export default {
       this.isModalVisible = true;
     },
     async fetchProdutos() {
-      try {
-        const response = await axios.get("http://localhost:8080/api/produtos");
-        this.produtos = response.data;
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
-      } finally {
-        this.isLoading = false;
-      }
-    },
+  try {
+    const response = await axios.get("http://localhost:8080/api/produtos");
+    this.produtos = response.data;
+    console.log(this.produtos); // Adicione esta linha
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+  } finally {
+    this.isLoading = false;
+  }
+},
+
   },
   mounted() {
     this.fetchProdutos();
