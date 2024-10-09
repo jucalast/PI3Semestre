@@ -18,10 +18,11 @@
       </div>
 
       <ProductModal
-        :product="selectedProduct"
-        :isVisible="isModalVisible"
-        @close="isModalVisible = false"
-      />
+  :product="selectedProduct"
+  :isVisible="isModalVisible"
+  @close="isModalVisible = false"
+/>
+
     </div>
     <div v-else>
       <p>Nenhum produto encontrado.</p>
@@ -46,22 +47,59 @@ export default {
     };
   },
   methods: {
-    openModal(product) {
-      this.selectedProduct = product;
-      this.isModalVisible = true;
-    },
-    async fetchProdutos() {
-  try {
-    const response = await axios.get("http://localhost:8080/api/produtos");
-    this.produtos = response.data;
-    console.log(this.produtos); // Adicione esta linha
-  } catch (error) {
-    console.error("Erro ao buscar produtos:", error);
-  } finally {
-    this.isLoading = false;
+    async openModal(product) {
+  this.selectedProduct = { ...product }; // Cria uma cópia do produto
+  await this.fetchProductDetails(product.id);
+
+  // Garantir que estamos atualizando o objeto com as informações completas
+  if (!this.selectedProduct.cafeEspecial && !this.selectedProduct.metodoPreparo) {
+    this.selectedProduct = null; // Limpa o produto se não encontrado
+    alert("Nenhum detalhe encontrado para este produto.");
+  } else {
+    this.isModalVisible = true; // Abrir o modal apenas se os detalhes foram carregados
   }
 },
 
+
+
+async fetchProductDetails(productId) {
+  try {
+    // Primeiro, tente buscar o produto em "cafes-especiais"
+    const cafeResponse = await axios.get(`http://localhost:8080/api/cafes-especiais/produto/${productId}`);
+    
+    if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
+      this.selectedProduct.cafeEspecial = cafeResponse.data;
+      console.log("Café especial encontrado:", cafeResponse.data);
+    } else {
+      console.log("Café especial não encontrado, tentando buscar método de preparo...");
+
+      // Se não encontrou café especial, tenta buscar os métodos de preparo
+      const metodoResponse = await axios.get(`http://localhost:8080/api/metodo-preparo/produto/${productId}`);
+
+      if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
+        this.selectedProduct.metodoPreparo = metodoResponse.data;
+        console.log("Método de preparo encontrado:", metodoResponse.data);
+      } else {
+        throw new Error(`Produto com ID ${productId} não encontrado em nenhum dos endpoints.`);
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao buscar detalhes do produto:", error.message);
+    this.selectedProduct = {}; // Limpa o produto se não encontrado
+    alert(`Erro: ${error.message}`);
+  }
+},
+
+    async fetchProdutos() {
+      try {
+        const response = await axios.get("http://localhost:8080/api/produtos");
+        this.produtos = response.data;
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
   },
   mounted() {
     this.fetchProdutos();
@@ -80,7 +118,7 @@ export default {
 .product-card {
   border-radius: 2rem;
   width: 200px;
-  height: 15.5rem;
+  height: 19rem;
   text-align: center;
   background: #e4bf5f;
   color: white;
@@ -119,13 +157,13 @@ export default {
   font-size: 2rem;
   position: relative;
   bottom: 6rem;
-  
+
   z-index: 2;
 }
 
 p {
   padding: 0.7rem;
-background: #49494933;
+  background: #49494933;
   backdrop-filter: blur(5px);
   border-radius: 3rem;
   margin: 0;
@@ -136,8 +174,8 @@ h2 {
   margin: 0;
   background: #e4bf5f;
   color: #fff2d2;
-  border-radius:  0 0 2rem 2rem;
- font-size: 1.5rem;
+  border-radius: 0 0 2rem 2rem;
+  font-size: 1.5rem;
   flex-direction: column;
   justify-content: flex-end;
   z-index: -1;
@@ -160,10 +198,8 @@ h2 {
   width: 4rem;
 }
 
-
-
 .favoritocard {
-  color: var(--Btns-color); 
+  color: var(--Btns-color);
   font-size: 1.5rem; /* Tamanho do ícone */
   transition: transform 0.3s ease, color 0.3s ease;
   width: 2rem !important;
@@ -171,15 +207,13 @@ h2 {
 }
 
 .favoritocard:hover {
-  color: #e4bf5f; 
+  color: #e4bf5f;
   transform: scale(1.2); /* Aumenta o ícone em 20% */
 }
-
 
 .favorire-button {
   background: none;
   border: none;
   cursor: pointer;
 }
-
 </style>

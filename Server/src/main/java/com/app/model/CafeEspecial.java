@@ -3,6 +3,7 @@ package com.app.model;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -69,5 +70,7 @@ public class CafeEspecial {
 
     @OneToOne
     @JoinColumn(name = "produto_id", nullable = false)
+    @JsonManagedReference
     private Produto produto;
+
 }

@@ -32,6 +32,7 @@ public class ProdutoService {
             throw new RuntimeException("Já existe um produto com o nome: " + produto.getNome());
         }
 
+        // Salva o produto e suas especializações
         Produto savedProduto = produtoRepository.save(produto);
         logger.info("Produto {} criado com sucesso", savedProduto.getNome());
         return savedProduto;
@@ -39,24 +40,38 @@ public class ProdutoService {
 
     public List<Produto> getAllProdutos() {
         logger.info("Listando todos os produtos");
-        return produtoRepository.findAll();
+        List<Produto> produtos = produtoRepository.findAll();
+
+        // Inicializa as especializações para cada produto
+        produtos.forEach(produto -> {
+            Hibernate.initialize(produto.getCafeEspecial());
+            Hibernate.initialize(produto.getMetodoPreparo());
+        });
+
+        return produtos;
     }
 
-   public Produto getProdutoById(Long id) {
-    logger.info("Buscando produto com ID: {}", id);
-    Produto produto = produtoRepository.findById(id)
-            .orElseThrow(() -> {
-                logger.error("Produto não encontrado com ID: {}", id);
-                return new RuntimeException("Produto não encontrado com ID: " + id);
-            });
+    public List<Produto> getAllProdutosComEspecializacoes() {
+        logger.info("Listando todos os produtos com suas especializações");
+        List<Produto> produtos = produtoRepository.findAll();
+        // Aqui, não é necessário usar Hibernate.initialize, porque estamos usando EAGER
+        return produtos;
+    }
 
-    // Asegure-se de que as especializações estão sendo carregadas
-    Hibernate.initialize(produto.getCafeEspecial());
-    Hibernate.initialize(produto.getMetodoPreparo());
+    public Produto getProdutoById(Long id) {
+        logger.info("Buscando produto com ID: {}", id);
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error("Produto não encontrado com ID: {}", id);
+                    return new RuntimeException("Produto não encontrado com ID: " + id);
+                });
 
-    return produto;
-}
+        // Asegure-se de que as especializações estão sendo carregadas
+        Hibernate.initialize(produto.getCafeEspecial());
+        Hibernate.initialize(produto.getMetodoPreparo());
 
+        return produto;
+    }
 
     @Transactional
     public Produto updateProduto(Long id, Produto produto) {

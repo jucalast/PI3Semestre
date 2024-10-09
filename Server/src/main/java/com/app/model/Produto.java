@@ -1,6 +1,9 @@
 package com.app.model;
 
 import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
@@ -48,18 +51,13 @@ public class Produto {
     private Integer avaliacao;
 
     // Relacionamento com CafeEspecial
-    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private CafeEspecial cafeEspecial;
 
-    // Relacionamento com MetodoPreparo
-    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    // Na classe Produto
+    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private MetodoPreparo metodoPreparo;
 
-    public CafeEspecial getCafeEspecial() {
-        return cafeEspecial;
-    }
-
-    public MetodoPreparo getMetodoPreparo() {
-        return metodoPreparo;
-    }
 }

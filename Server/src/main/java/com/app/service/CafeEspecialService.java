@@ -1,5 +1,7 @@
 package com.app.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,4 +33,13 @@ public class CafeEspecialService {
         // Salvar o café especial após todas as validações
         return cafeEspecialRepository.save(cafeEspecial);
     }
+
+    public List<CafeEspecial> listarCafesEspeciais() {
+        return cafeEspecialRepository.findAllByProdutoIsNotNull();
+    }
+
+    public List<CafeEspecial> findByProdutoId(Long id) {
+        return cafeEspecialRepository.findByProdutoId(id);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.app.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -59,6 +60,7 @@ public class MetodoPreparo {
 
     @OneToOne
     @JoinColumn(name = "produto_id", nullable = false)
+    @JsonBackReference
     private Produto produto;
 
     // Enum para representar a complexidade

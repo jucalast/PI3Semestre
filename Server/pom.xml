@@ -15,7 +15,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -36,12 +35,10 @@
         </dependency>
 
         <!-- Remova esta dependência -->
-<dependency>
-    <groupId>com.fasterxml.jackson.datatype</groupId>
-    <artifactId>jackson-datatype-jsr310</artifactId>
-</dependency>
-
-        
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
 
         <!-- Spring Boot Security Starter -->
         <dependency>
@@ -77,9 +74,8 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>11.2.1.jre17</version> <!-- Verifique a versão mais recente disponível -->
+            <version>11.2.1.jre17</version>
         </dependency>
-        
 
         <!-- Spring Boot Validation -->
         <dependency>
@@ -142,7 +138,6 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        
 
         <!-- Spring Boot Actuator (optional, for monitoring and management endpoints) -->
         <dependency>
@@ -166,13 +161,10 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.33</version> <!-- Substitua pela versão desejada -->
+            <version>8.0.33</version>
         </dependency>
-        
-        
+
     </dependencies>
-
-
 
     <build>
         <plugins>
@@ -180,7 +172,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.1.0</version> <!-- Defina a versão correta aqui -->
+                <version>${spring-boot.version}</version>
             </plugin>
 
             <!-- Maven Compiler Plugin -->
@@ -191,6 +183,9 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

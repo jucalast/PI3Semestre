@@ -13,6 +13,7 @@ public class MetodoPreparoService {
 
     @Autowired
     private ProdutoService produtoService;
+
     @Autowired
     private MetodoPreparoRepository metodoPreparoRepository;
 
@@ -26,5 +27,10 @@ public class MetodoPreparoService {
         metodoPreparo.setProduto(savedProduto);
 
         return metodoPreparoRepository.save(metodoPreparo);
+    }
+
+    // Método para buscar método de preparo pelo id do produto
+    public MetodoPreparo buscarMetodoPreparoPorProdutoId(Long id) {
+        return metodoPreparoRepository.findByProdutoId(id);
     }
 }
