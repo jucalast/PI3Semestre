@@ -102,7 +102,7 @@ a {
 }
 
 a img {
-  width: 30px;
+  width: 1.5rem;
   margin-right: 0.5rem;
 }
 

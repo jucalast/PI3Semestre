@@ -5,6 +5,7 @@
     </div>
     <div v-else-if="produtos.length > 0" class="card-container">
       <div v-for="produto in produtos" :key="produto.id" class="product-card" @click="openModal(produto)">
+        <div>
         <img :src="produto.imagem" :alt="produto.nome" class="product-image" />
         <div class="elements-card">
           <div class="priceandfav">
@@ -14,7 +15,9 @@
             </button>
           </div>
         </div>
-        <h2>{{ produto.nome }}</h2>
+        
+      </div>
+      <h2>{{ produto.nome }}</h2>
       </div>
 
       <ProductModal
@@ -112,15 +115,16 @@ async fetchProductDetails(productId) {
 .card-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 2rem;
+  justify-content: center;
 }
 
 .product-card {
   border-radius: 2rem;
-  width: 200px;
-  height: 19rem;
+  width: 13rem;
+  height: 21.5rem;
   text-align: center;
-  background: #e4bf5f;
+  background: #cacaca;
   color: white;
   margin-bottom: 5rem;
   transition: transform 0.3s ease, color 0.3s ease;
@@ -145,6 +149,8 @@ async fetchProductDetails(productId) {
   height: auto;
   border-radius: 2rem;
   z-index: 2;
+
+    
 }
 
 .elements-card {
@@ -156,7 +162,7 @@ async fetchProductDetails(productId) {
   margin: 0;
   font-size: 2rem;
   position: relative;
-  bottom: 6rem;
+  bottom: 7rem;
 
   z-index: 2;
 }
@@ -180,7 +186,9 @@ h2 {
   justify-content: flex-end;
   z-index: -1;
   position: relative;
-  bottom: 6rem;
+  bottom: 19rem;
+  height: 16.5rem;
+  padding-bottom: 1rem;
 }
 
 .favorire-button {
