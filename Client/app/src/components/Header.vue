@@ -12,18 +12,19 @@
         </router-link>
       </nav>
 
-      <div id="searchandnav">
+      <form @submit.prevent="fetchFilteredProducts">
         <div class="search-container">
           <input
             type="text"
             placeholder="Buscar grãos, métodos e muito mais..."
             class="search-input"
-            v-model="searchQuery" 
-            @input="onSearchInput"
-            @keypress.enter="goToProducts"
+            v-model="searchQuery"
+            @input="handleSearch"
           />
+          <button type="submit">Buscar</button>
         </div>
-      </div>
+      </form>
+
       <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
@@ -45,35 +46,37 @@
 
 <script>
 export default {
-  name: "Header",
   data() {
     return {
-      searchQuery: '', // Propriedade para armazenar o valor do input
+      searchQuery: "", 
+      produtos: [],    
     };
   },
-  created() {
-    // Recupera o valor do localStorage se existir
-    const savedQuery = localStorage.getItem('searchQuery');
-    if (savedQuery) {
-      this.searchQuery = savedQuery;
-    }
-  },
   methods: {
-    onSearchInput(event) {
-      this.searchQuery = event.target.value; // Atualiza searchQuery
-      localStorage.setItem('searchQuery', this.searchQuery); // Salva no localStorage
-      this.$emit('search', this.searchQuery); // Emite o valor da busca
+    async fetchFilteredProducts() {
+      try {
+        console.log("Realizando busca com a query:", this.searchQuery);
+        const response = await fetch(`http://localhost:8080/api/produtos/search?search=${this.searchQuery}`);
+        const data = await response.json();
+        console.log("Produtos retornados pela API:", data);
+        this.produtos = data;
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      }
     },
-    goToHome() {
-      this.$router.push('/'); // Redireciona para a página inicial
+    handleSearchSubmit() {
+      console.log("Submissão de pesquisa detectada!");
+      this.fetchFilteredProducts();
     },
-    goToProducts() {
-      // Navega para a página de produtos com a query de busca
-      this.$router.push({ name: 'products', query: { search: this.searchQuery } });
+    handleSearch() {
+      this.$emit('search', this.searchQuery);
     },
   },
 };
 </script>
+
+
+
 
 <style scoped>
 @import "@/assets/css/variables.css";

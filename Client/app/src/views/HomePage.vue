@@ -41,6 +41,7 @@ export default {
 
 .sessionone {
   background: #c2cdff;
+  display: flex;
 }
 
 /* .sessiontwo {
