@@ -63,6 +63,12 @@ public class ProdutoController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Produto>> searchProdutos(@RequestParam String nome) {
+        List<Produto> produtos = produtoService.searchProdutosByNome(nome);
+        return ResponseEntity.ok(produtos);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {
         if (produtoService.getProdutoById(id) != null) {

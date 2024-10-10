@@ -121,7 +121,7 @@ async fetchProductDetails(productId) {
 
 .product-card {
   border-radius: 2rem;
-  width: 13rem;
+  width: 14rem;
   height: 21.5rem;
   text-align: center;
   background: #cacaca;
@@ -140,12 +140,12 @@ async fetchProductDetails(productId) {
 }
 
 .product-card:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
   z-index: 3; /* Coloca o card acima de outros elementos ao aumentar */
 }
 
 .product-image {
-  width: 100%;
+  width: 80%;
   height: auto;
   border-radius: 2rem;
   z-index: 2;
@@ -213,6 +213,7 @@ h2 {
   width: 2rem !important;
   height: 2rem !important;
 }
+
 
 .favoritocard:hover {
   color: #e4bf5f;

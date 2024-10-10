@@ -24,35 +24,27 @@ export default {
   },
 };
 </script>
-  
-  <style scoped>
 
+<style scoped>
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 2rem;
+}
 
-  .home-page {
-    text-align: center;
-  }
-  .product-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding-top:2rem ;
-  }
+.banner {
+  width: 95%;
+  height: 15rem;
+  padding: 2rem;
+}
 
-  .banner {
-    width: 95%;
-    height: 15rem;
-    padding: 2rem;
-  }
+.sessionone {
+  background: #c2cdff;
+}
 
-  .sessionone {
-    background: #c2cdff;
-
-  }
-
-  /* .sessiontwo {
-    background: #fff2d2;
-    z-index: -2;
-  } */
-
-  </style>
-  
+/* .sessiontwo {
+  background: #fff2d2;
+  z-index: -2;
+} */
+</style>

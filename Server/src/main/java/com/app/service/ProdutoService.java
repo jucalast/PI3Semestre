@@ -58,6 +58,23 @@ public class ProdutoService {
         return produtos;
     }
 
+    public List<Produto> searchProdutosByNome(String nome) {
+        logger.info("Buscando produtos com o nome: {}", nome);
+        List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCase(nome);
+
+        if (produtos.isEmpty()) {
+            logger.warn("Nenhum produto encontrado com o nome: {}", nome);
+        }
+
+        // Inicializa as especializações para cada produto
+        produtos.forEach(produto -> {
+            Hibernate.initialize(produto.getCafeEspecial());
+            Hibernate.initialize(produto.getMetodoPreparo());
+        });
+
+        return produtos;
+    }
+
     public Produto getProdutoById(Long id) {
         logger.info("Buscando produto com ID: {}", id);
         Produto produto = produtoRepository.findById(id)

@@ -2,26 +2,33 @@
   <header class="header">
     <div class="topheader">
       <nav class="nav">
-        <a  href="/products"><img src="@/assets/icons8-coffee-beans-90(1).png" alt="Produtos" /> Produtos</a>
-        <a href="/cart"><img src="@/assets/icons8-repository-64.png" alt="Receitas" />receitas</a>
+        <router-link to="/products" active-class="active-link" exact-active-class="exact-active-link">
+          <img src="@/assets/icons8-coffee-beans-90(1).png" alt="Produtos" />
+          Produtos
+        </router-link>
+        <router-link to="/cart" active-class="active-link" exact-active-class="exact-active-link">
+          <img src="@/assets/icons8-repository-64.png" alt="Receitas" />
+          Receitas
+        </router-link>
       </nav>
+
       <div id="searchandnav">
         <div class="search-container">
           <input
             type="text"
             placeholder="Buscar grãos, métodos e muito mais..."
             class="search-input"
+            v-model="searchQuery" 
+            @input="onSearchInput"
+            @keypress.enter="goToProducts"
           />
         </div>
       </div>
-      <div class="logo-container">
+      <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
       <div class="action-buttons">
-        <button
-          class="action-button favorite-button"
-          @click="handleFavoriteClick"
-        >
+        <button class="action-button favorite-button" @click="handleFavoriteClick">
           <img src="@/assets/estrela.png" alt="Favorites" />
         </button>
         <button class="action-button cart-button" @click="handleCartClick">
@@ -39,8 +46,36 @@
 <script>
 export default {
   name: "Header",
+  data() {
+    return {
+      searchQuery: '', // Propriedade para armazenar o valor do input
+    };
+  },
+  created() {
+    // Recupera o valor do localStorage se existir
+    const savedQuery = localStorage.getItem('searchQuery');
+    if (savedQuery) {
+      this.searchQuery = savedQuery;
+    }
+  },
+  methods: {
+    onSearchInput(event) {
+      this.searchQuery = event.target.value; // Atualiza searchQuery
+      localStorage.setItem('searchQuery', this.searchQuery); // Salva no localStorage
+      this.$emit('search', this.searchQuery); // Emite o valor da busca
+    },
+    goToHome() {
+      this.$router.push('/'); // Redireciona para a página inicial
+    },
+    goToProducts() {
+      // Navega para a página de produtos com a query de busca
+      this.$router.push({ name: 'products', query: { search: this.searchQuery } });
+    },
+  },
 };
 </script>
+
+
 
 <style scoped>
 @import "@/assets/css/variables.css";
@@ -74,31 +109,27 @@ export default {
   width: 15%;
 }
 
-.nav {
-  gap: 0.1rem;
-}
-
+/* Remova ou mantenha o estilo do a e do router-link como necessário */
 a {
-
   display: flex;
   flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   color: var(--text-color);
   padding: 0.5rem;
   padding-left: 0.7rem;
   padding-right: 1rem;
-
   border-radius: 2rem;
-
+  transition: transform 0.3s ease, color 0.3s ease;
   font-size: 1rem !important;
 }
 
-.nav  {
+.nav {
   display: flex;
   margin: 0 15px;
-  flex-direction: row ;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 a img {
@@ -108,6 +139,12 @@ a img {
 
 a:hover {
   background: var(--inputs-color);
+  transform: scale(1.1); /* Aumenta o ícone em 20% */
+}
+
+/* Estilo para o link ativo */
+.active-link {
+  background: #c4ceff; /* Cor azul quando ativo */
 }
 
 #searchandnav {
@@ -141,11 +178,10 @@ a:hover {
   color: #3f3f3f;
 }
 
-.action-buttons {
+header .action-buttons {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background: #c6c6c6;
   border-radius: 2rem;
   height: 3rem;
   width: 13%;
