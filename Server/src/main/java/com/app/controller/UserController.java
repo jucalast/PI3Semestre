@@ -1,31 +1,36 @@
 package com.app.controller;
 
-import com.app.model.User;
 import com.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * Controlador API REST para gerenciar operações relacionadas aos usuários.
+ * Controlador responsável pela gestão das rotas relacionadas ao usuário.
  *
- * <p>Esta classe fornece endpoints para realizar operações CRUD (Create, Read, Update, Delete)
- * sobre os usuários do sistema de e-commerce.</p>
+ * Este controlador lida com a autenticação de usuários via OAuth2 e a exibição de perfis de usuário.
+ *
+ * A anotação @Controller indica que esta classe é um componente do Spring que
+ * trata as requisições web e retorna as respostas apropriadas.
+ *
+ * @author Giovanni
+ * @version 1.0
+ * @since 2024-10-05
  */
-@RestController
-@RequestMapping("/api/users")
+@Controller
 public class UserController {
 
+    /**
+     * Serviço de usuário utilizado para lógica de negócios relacionada a usuários.
+     */
     private final UserService userService;
 
     /**
-     * Construtor para injeção de dependência do serviço de usuários.
+     * Construtor que injeta o serviço de usuário via autowired (injeção de dependência do Spring).
      *
-     * @param userService O serviço de usuários a ser injetado.
+     * @param userService O serviço de usuário a ser injetado.
      */
     
     public UserController(UserService userService) {
@@ -33,63 +38,52 @@ public class UserController {
     }
 
     /**
-     * Obtém todos os usuários.
+     * Rota que exibe o perfil do usuário autenticado.
      *
-     * @return Uma lista contendo todos os usuários.
+     * Este método obtém informações do usuário a partir do token de autenticação
+     * e as adiciona ao modelo para exibição na página de perfil.
+     *
+     * @param token O token de autenticação do usuário autenticado.
+     * @param model O modelo para passar dados à view.
+     * @return O nome da view que renderiza o perfil do usuário.
      */
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("/profile")
+    public String profile(OAuth2AuthenticationToken token, Model model) {
+        model.addAttribute("name", token.getPrincipal().getAttribute("name"));
+        model.addAttribute("email", token.getPrincipal().getAttribute("email"));
+        model.addAttribute("picture", token.getPrincipal().getAttribute("picture"));
+        return "userProfile";
     }
 
     /**
-     * Obtém um usuário específico pelo seu identificador.
+     * Rota que exibe a página de login personalizada.
      *
-     * @param id O identificador do usuário.
-     * @return Um {@link ResponseEntity} contendo o usuário se encontrado, ou um status 404 Not Found se não encontrado.
+     * @return O nome da view que renderiza a página de login.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        Optional<User> user = userService.getUserById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/login")
+    public String login() {
+        return "customLogin";
     }
 
     /**
-     * Cria um novo usuário.
+     * Rota que processa as informações do usuário após a autenticação com OAuth2.
      *
-     * @param user O usuário a ser criado.
-     * @return Um {@link ResponseEntity} contendo o usuário criado e um status 201 Created.
+     * Este método salva o usuário no banco de dados se ele não existir e redireciona
+     * para o perfil do usuário.
+     *
+     * @param token O token de autenticação do usuário autenticado.
+     * @param model O modelo para passar dados à view.
+     * @return Um redirecionamento para a rota de perfil do usuário.
      */
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
+    @GetMapping("/process-user")
+    public String processUser(OAuth2AuthenticationToken token, Model model) {
+        String name = token.getPrincipal().getAttribute("name");
+        String email = token.getPrincipal().getAttribute("email");
 
-    /**
-     * Atualiza um usuário existente.
-     *
-     * @param id O identificador do usuário a ser atualizado.
-     * @param user O usuário com as novas informações.
-     * @return Um {@link ResponseEntity} contendo o usuário atualizado se o identificador existir, ou um status 404 Not Found se não encontrado.
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        Optional<User> updatedUser = userService.updateUser(id, user);
-        return updatedUser.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
+        userService.saveUserIfNotExists(name, email);
 
-    /**
-     * Exclui um usuário pelo seu identificador.
-     *
-     * @param id O identificador do usuário a ser excluído.
-     * @return Um {@link ResponseEntity} com status 204 No Content se a exclusão for bem-sucedida, ou um status 404 Not Found se o usuário não for encontrado.
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        if (userService.deleteUser(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        model.addAttribute("name", name);
+        model.addAttribute("email", email);
+        return "redirect:/profile";
     }
 }

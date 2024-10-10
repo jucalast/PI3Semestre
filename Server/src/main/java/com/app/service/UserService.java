@@ -1,107 +1,55 @@
 package com.app.service;
 
-import com.app.model.Endereco;
-import com.app.model.User;
-import com.app.repository.EnderecoRepository;
+import com.app.model.UserModel;
 import com.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
- * Serviço para gerenciar usuários no sistema de e-commerce.
+ * Classe de serviço responsável pela lógica de negócios relacionada à entidade UserModel.
  *
- * <p>Esta classe fornece métodos para realizar operações CRUD (Create, Read, Update, Delete)
- * no repositório de usuários.</p>
+ * A anotação @Service indica que esta classe é um componente de serviço do Spring,
+ * gerenciado pelo container de injeção de dependências.
+ *
+ * @author Giovanni
+ * @version 1.0
+ * @since 2024-10-05
  */
 @Service
 public class UserService {
 
+    /**
+     * Repositório de dados do usuário, utilizado para operações de persistência.
+     */
     private final UserRepository userRepository;
-    private final EnderecoRepository enderecoRepository;
 
     /**
-     * Construtor para injeção de dependência dos repositórios de usuários e endereços.
+     * Construtor que injeta o repositório de usuários via autowired (injeção de dependência do Spring).
      *
-     * @param userRepository O repositório de usuários a ser injetado.
-     * @param enderecoRepository O repositório de endereços a ser injetado.
+     * @param userRepository O repositório que será utilizado para interações com o banco de dados.
      */
     @Autowired
-    public UserService(UserRepository userRepository, EnderecoRepository enderecoRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.enderecoRepository = enderecoRepository;
     }
 
     /**
-     * Obtém todos os usuários do sistema.
+     * Salva um novo usuário no banco de dados se ele não existir.
      *
-     * @return Uma lista contendo todos os usuários.
-     */
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    /**
-     * Obtém um usuário específico pelo seu identificador.
+     * O método verifica se já existe um usuário com o e-mail fornecido.
+     * Se não existir, ele cria um novo usuário com o nome e e-mail fornecidos e atribui a função padrão 'ROLE_USER'.
      *
-     * @param id O identificador do usuário.
-     * @return Um {@link Optional} contendo o usuário se encontrado, ou vazio se não encontrado.
+     * @param name O nome do usuário.
+     * @param email O e-mail do usuário.
      */
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    /**
-     * Cria um novo usuário no sistema. Também persiste o endereço associado, se fornecido.
-     *
-     * @param user O usuário a ser criado.
-     * @return O usuário criado.
-     */
-    public User createUser(User user) {
-        if (user.getEndereco() != null) {
-            Endereco endereco = user.getEndereco();
-            if (endereco.getId() == null) {
-                enderecoRepository.save(endereco);
-            }
+    public void saveUserIfNotExists(String name, String email) {
+        UserModel user = userRepository.findByEmailId(email);
+        if (user == null) {
+            user = new UserModel();
+            user.setUserName(name);
+            user.setEmailId(email);
+            user.setRoles("ROLE_USER");
+            userRepository.save(user);
         }
-        return userRepository.save(user);
-    }
-
-    /**
-     * Atualiza um usuário existente com o novo valor fornecido.
-     *
-     * @param id O identificador do usuário a ser atualizado.
-     * @param user O usuário com as novas informações.
-     * @return Um {@link Optional} contendo o usuário atualizado se o identificador existir, ou vazio se não encontrado.
-     */
-    public Optional<User> updateUser(Long id, User user) {
-        if (userRepository.existsById(id)) {
-            // Atualiza o endereço se estiver presente
-            if (user.getEndereco() != null) {
-                Endereco endereco = user.getEndereco();
-                if (endereco.getId() == null) {
-                    enderecoRepository.save(endereco);
-                }
-            }
-            user.setId(id);
-            return Optional.of(userRepository.save(user));
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Exclui um usuário pelo seu identificador.
-     *
-     * @param id O identificador do usuário a ser excluído.
-     * @return {@code true} se o usuário foi excluído com sucesso, {@code false} caso contrário.
-     */
-    public boolean deleteUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
-        }
-        return false;
     }
 }
