@@ -12,10 +12,16 @@
   
   <style scoped>
   footer {
-    background-color: var(--background-color);
+    background-color: #1a1a1a;
     color: white;
     padding: 10px;
     text-align: center;
   }
+
+  footer p {
+    background: transparent;
+  }
+
+
   </style>
   

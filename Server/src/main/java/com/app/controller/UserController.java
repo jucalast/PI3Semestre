@@ -32,7 +32,7 @@ public class UserController {
      *
      * @param userService O serviço de usuário a ser injetado.
      */
-    @Autowired
+    
     public UserController(UserService userService) {
         this.userService = userService;
     }
