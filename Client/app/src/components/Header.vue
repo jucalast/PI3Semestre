@@ -75,8 +75,6 @@ export default {
 };
 </script>
 
-
-
 <style scoped>
 @import "@/assets/css/variables.css";
 
@@ -162,7 +160,7 @@ a:hover {
   background: var(--inputs-color);
   border-radius: 2rem;
   width: 100%;
-  color: #3f3f3f;
+  color: var(--text-color);
   height: 3rem;
   padding-left: 1rem !important;
   font-size: 1rem !important;
@@ -171,11 +169,11 @@ a:hover {
 }
 
 .search-input:focus {
-  color: #292929; /* Altere a cor do contorno conforme necessário */
+  color: var(--text-color); /* Altere a cor do contorno conforme necessário */
 }
 
 .search-input::placeholder {
-  color: #3f3f3f;
+  color: var(--text-color);
 }
 
 header .action-buttons {

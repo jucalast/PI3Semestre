@@ -2,14 +2,21 @@
 
 /* Definindo variáveis de cor */
 :root {
-    --primary-color: #3498db; /* Azul primário */
-    --secondary-color: #2ecc71; /* Verde secundário */
-    --accent-color: #e74c3c; /* Cor de destaque */
-    --background-color: #f4f4f4; /* Cor de fundo */
-    --text-color: #292929; /* Cor do texto */
-    --border-color: #ddd; /* Cor da borda */
-    --header-color:#ffffff;
-    --inputs-color:#d1d1d1;
-    --Btns-color:#d1d1d1;
-  }
-  
+  --primary-color: #3498db; /* Azul primário */
+  --secondary-color: #2ecc71; /* Verde secundário */
+  --accent-color: #e74c3c; /* Cor de destaque */
+  --background-color: #f4f4f4; /* Cor de fundo */
+  --text-color: #292929; /* Cor do texto */
+  --border-color: #ddd; /* Cor da borda */
+  --header-color: #ffffff; /* Cor do cabeçalho */
+  --inputs-color: #d1d1d1; /* Cor dos inputs */
+  --btns-color: #d1d1d1; /* Cor dos botões */
+  --card-background: #cacaca; /* Cor de fundo do card */
+  --card-text-color: white; /* Cor do texto no card */
+  --element-background: rgba(59, 59, 59, 0.26); /* Cor do fundo dos elementos do card */
+  --price-background: #49494933; /* Cor do fundo do preço */
+  --header-background: #e4bf5f; /* Cor de fundo do cabeçalho do card */
+  --header-text-color: #fff2d2; /* Cor do texto no cabeçalho do card */
+  --favoritocard-color: var(--btns-color); /* Cor do ícone de favorito */
+  --favoritocard-hover-color: #e4bf5f; /* Cor do ícone de favorito ao passar o mouse */
+}
