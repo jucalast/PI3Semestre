@@ -1,6 +1,7 @@
 package com.app.controller;
 
 import com.app.service.ProdutoService;
+import com.app.model.MetodoPreparo;
 import com.app.model.Produto;
 
 import org.hibernate.Hibernate;
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,6 +20,32 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
+
+
+    // Rota para listar os valores dos campos solicitados
+    @GetMapping("/atributos")
+    public ResponseEntity<List<Map<String, Object>>> listarAtributos() {
+        List<Map<String, Object>> atributos = produtoService.listarAtributos();
+        return ResponseEntity.ok(atributos);
+    }
+
+    // Rota para buscar produtos com filtros
+    @GetMapping("/filtro")
+    public ResponseEntity<List<Produto>> filtrarProdutos(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) BigDecimal precoMin,
+            @RequestParam(required = false) BigDecimal precoMax,
+            @RequestParam(required = false) String origem,
+            @RequestParam(required = false) String variedade,
+            @RequestParam(required = false) String torrefacao,
+            @RequestParam(required = false) String tipoPreparo,
+            @RequestParam(required = false) MetodoPreparo.Complexidade complexidade) {
+
+        List<Produto> produtos = produtoService.filtrarProdutos(
+                nome, precoMin, precoMax, origem, variedade, torrefacao, tipoPreparo, complexidade);
+
+        return ResponseEntity.ok(produtos);
+    }
 
     @GetMapping
     public List<Produto> getAllProdutos() {

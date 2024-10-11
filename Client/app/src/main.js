@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import '@fortawesome/fontawesome-free/css/all.css'; // Importação do CSS
 import './plugins/fontawesome'; // Certifique-se de que este arquivo adiciona os ícones à biblioteca
 
+
 const app = createApp(App);
 
 app.use(router);
