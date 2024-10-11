@@ -235,9 +235,15 @@ export default {
   margin-top: 1rem;
   border-radius: 5px;
   width: 30%;
+  height: 80%;
   max-height: 80%; /* Define a altura máxima */
   overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo ultrapassar a altura máxima */
   overflow-x: hidden; /* Adiciona rolagem vertical se o conteúdo ultrapassar a altura máxima */
+}
+
+.accordion p font{
+  font-size: 1.5rem !important;
+  color: var(--text-color) !important;
 }
 
 .accordion-item {
@@ -273,7 +279,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 20;
   backdrop-filter: blur(5px);
 }
 
@@ -334,6 +340,8 @@ export default {
 
 .modalimage {
   width: 100% !important;
+  position: relative;
+
 }
 
 .modal-content p {
@@ -344,6 +352,15 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+}
+
+h4 {
+  font-size: 2rem;
+  font-weight: lighter;
+}
+
+span {
+  font-size: 2rem;
 }
 
 .modal-content .action-buttons {
