@@ -17,11 +17,12 @@
 
 <script>
 // In your component script
-import { defineDirective } from '@vue/runtime-core';
+
 
 export default {
   directives: {
-    connectTo: defineDirective({
+    connectTo: {
+      // Definindo a diretiva sem usar defineDirective
       mounted(el, binding) {
         const header = document.querySelector(binding.value);
         if (!header) return;
@@ -33,9 +34,8 @@ export default {
         const updateLine = () => {
           const headerRect = header.getBoundingClientRect();
           const elRect = el.getBoundingClientRect();
+          const offset = 10;
 
-          // Ajustes para melhor posicionamento e responsividade
-          const offset = 10; // Ajuste para o espaçamento entre a linha e o elemento
           line.style.left = `${headerRect.left + headerRect.width / 2 - 1}px`;
           line.style.top = `${headerRect.bottom + offset}px`;
           line.style.width = '2px';
@@ -45,7 +45,7 @@ export default {
         updateLine();
         window.addEventListener('resize', updateLine);
       },
-    }),
+    },
   },
 
   data() {
