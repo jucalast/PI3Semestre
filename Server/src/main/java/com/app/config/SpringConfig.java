@@ -1,5 +1,7 @@
 package com.app.config;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,17 +42,23 @@ public class SpringConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Desabilita a proteção CSRF
-                .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/login", "/api/**").permitAll() // Permitir acesso a essas rotas
-                .anyRequest().authenticated() // Proteger todas as outras rotas
-                )
-                .oauth2Login(oauth2 -> oauth2
-                .loginPage("/login")
-                .defaultSuccessUrl("/process-user")
-                );
 
-        return http.build();
+        return http
+                .authorizeHttpRequests(registry -> {
+                    registry.requestMatchers("/", "/login", "/api/**").permitAll();
+                    registry.anyRequest().authenticated();
+                })
+                .oauth2Login(oauth2Login -> {
+                    oauth2Login
+                            .loginPage("/login")
+                            .successHandler(new AuthenticationSuccessHandler() {
+                                @Override
+
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+                            response.sendRedirect("/process-user");
+                        }
+                            });
+                })
+                .build();
     }
 }
