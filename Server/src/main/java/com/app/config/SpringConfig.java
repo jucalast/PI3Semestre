@@ -1,6 +1,5 @@
 package com.app.config;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +52,7 @@ public class SpringConfig {
                             .loginPage("/login")
                             .successHandler(new AuthenticationSuccessHandler() {
                                 @Override
-                                public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                                public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
                                     response.sendRedirect("/process-user");
                                 }
                             });

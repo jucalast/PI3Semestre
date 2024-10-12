@@ -69,7 +69,7 @@ public class ProdutoController {
         return produto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
         // Aqui você deve verificar se é um CafeEspecial ou MetodoPreparo
         if (produto.getCafeEspecial() != null) {
@@ -101,12 +101,12 @@ public class ProdutoController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/search")  
-public List<Produto> searchProdutos(@RequestParam(required = false) String search) {
-    if (search != null && !search.isEmpty()) {
-        return produtoService.searchProdutosByNome(search);
+    @GetMapping("/search")
+    public List<Produto> searchProdutos(@RequestParam(required = false) String search) {
+        if (search != null && !search.isEmpty()) {
+            return produtoService.searchProdutosByNome(search);
+        }
+        return produtoService.getAllProdutos();
     }
-    return produtoService.getAllProdutos();
-}
 
 }
