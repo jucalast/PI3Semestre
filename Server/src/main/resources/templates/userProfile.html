@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil do Usuário</title>
 
-    <!-- Adicionando estilo básico -->
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -75,18 +74,14 @@
 </header>
 
 <div class="container">
-    <!-- Exibe a foto do usuário -->
     <img th:src="${picture}" alt="Foto do perfil do usuário">
 
-    <!-- Exibe o nome do usuário -->
     <h1 th:text="${name}">Nome do Usuário</h1>
 
-    <!-- Exibe o email do usuário -->
     <h2 th:text="${email}">email@exemplo.com</h2>
 
     <p>Você está autenticado com sua conta do Google.</p>
 
-    <!-- Botão de logout -->
     <a class="logout" th:href="@{/logout}">Sair</a>
 </div>
 

@@ -10,11 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 /**
  * Classe principal da aplicação Spring Boot.
- *
+ * <p>
  * Esta é a classe de inicialização da aplicação que configura e inicia o
  * contexto Spring Boot. Utiliza a anotação {@link SpringBootApplication} para habilitar a
  * configuração automática e a detecção de componentes.
- *
+ * <p>
  * Além disso, a classe carrega variáveis de ambiente usando a biblioteca Dotenv
  * e as define como propriedades do sistema, permitindo que a aplicação acesse
  * configurações sensíveis, como credenciais de banco de dados e configurações do cliente Google.
@@ -32,7 +32,7 @@ public class Application {
 
     /**
      * Método principal que inicia a aplicação Spring Boot.
-     *
+     * <p>
      * Este método carrega as variáveis de ambiente a partir de um arquivo .env
      * e as define como propriedades do sistema. Ele também registra as informações
      * de configuração carregadas e inicia o contexto da aplicação.
