@@ -1,6 +1,11 @@
 package com.app.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -10,7 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.app.exceptions.ValidationUtil;
+import com.app.model.CafeEspecial;
+import com.app.model.MetodoPreparo;
 import com.app.model.Produto;
+import com.app.repository.CafeEspecialRepository;
+import com.app.repository.MetodoPreparoRepository;
 import com.app.repository.ProdutoRepository;
 
 @Service
@@ -20,6 +29,14 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+
+    public List<Produto> filtrarProdutos(String nome, BigDecimal precoMin, BigDecimal precoMax, 
+                                         String origem, String variedade, String torrefacao, 
+                                         String tipoPreparo, MetodoPreparo.Complexidade complexidade) {
+        
+        return produtoRepository.filtrarPorAtributos(nome, precoMin, precoMax, origem, variedade, torrefacao, tipoPreparo, complexidade);
+    }
 
     @Transactional
     public Produto createProduto(Produto produto) {
@@ -126,5 +143,46 @@ public class ProdutoService {
 
         produtoRepository.deleteById(id);
         logger.info("Produto com ID {} deletado com sucesso", id);
+    }
+
+
+    @Autowired
+    private CafeEspecialRepository cafeEspecialRepository;
+
+    @Autowired
+    private MetodoPreparoRepository metodoPreparoRepository;
+
+    public List<Map<String, Object>> listarAtributos() {
+        List<Produto> produtos = produtoRepository.findAll();
+        List<Map<String, Object>> listaAtributos = new ArrayList<>();
+
+        for (Produto produto : produtos) {
+            Map<String, Object> atributos = new HashMap<>();
+            atributos.put("avaliacao", produto.getAvaliacao());
+
+            // Verifica se o produto possui CafeEspecial associado
+            CafeEspecial cafeEspecial = produto.getCafeEspecial();
+            if (cafeEspecial != null) {
+                atributos.put("notasSensoriais", cafeEspecial.getNotasSensoriais());
+                atributos.put("origem", cafeEspecial.getOrigem());
+                atributos.put("recomendacoesPreparo", cafeEspecial.getRecomendacoesPreparo());
+                atributos.put("torra", cafeEspecial.getTorra());
+                atributos.put("torrefacao", cafeEspecial.getTorrefacao());
+                atributos.put("variedade", cafeEspecial.getVariedade());
+            }
+
+            // Verifica se o produto possui MetodoPreparo associado
+            MetodoPreparo metodoPreparo = produto.getMetodoPreparo();
+            if (metodoPreparo != null) {
+                atributos.put("complexidade", metodoPreparo.getComplexidade());
+                atributos.put("marca", metodoPreparo.getMarca());
+                atributos.put("material", metodoPreparo.getMaterial());
+                atributos.put("tipoPreparo", metodoPreparo.getTipoPreparo());
+            }
+
+            listaAtributos.add(atributos);
+        }
+
+        return listaAtributos;
     }
 }

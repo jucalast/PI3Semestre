@@ -1,11 +1,8 @@
 // src/plugins/fontawesome.js
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons'; // Adicione faShoppingCart aqui
 
-// Importando ícones específicos
-import { faStar } from '@fortawesome/free-solid-svg-icons'
+library.add(faShoppingCart, faStar); // Certifique-se de adicionar o ícone à biblioteca
 
-// Adicionando os ícones à biblioteca
-library.add(faStar)
-
-export default FontAwesomeIcon
+export { FontAwesomeIcon };

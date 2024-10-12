@@ -1,4 +1,3 @@
-<!-- src/components/FooterComponent.vue -->
 <template>
   <footer>
     <p>&copy; 2024 My E-commerce</p>
@@ -17,6 +16,12 @@ footer {
   color: white;
   text-align: center;
   padding: 10px;
-  margin-top: 20px;
+  /* Remova a margem superior para evitar espaçamento indesejado */
+  margin-top: 0; 
+  width: 100vw;
+}
+
+footer p {
+  background: transparent;
 }
 </style>

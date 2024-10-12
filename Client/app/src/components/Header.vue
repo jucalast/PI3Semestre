@@ -1,4 +1,5 @@
 <template>
+  
   <header class="header">
     <div class="topheader">
       <nav class="nav">
@@ -12,18 +13,23 @@
         </router-link>
       </nav>
 
-      <div id="searchandnav">
-        <div class="search-container">
-          <input
-            type="text"
-            placeholder="Buscar grãos, métodos e muito mais..."
-            class="search-input"
-            v-model="searchQuery" 
-            @input="onSearchInput"
-            @keypress.enter="goToProducts"
-          />
-        </div>
-      </div>
+      <form @submit.prevent="handleSearchSubmit">
+  <div class="search-container">
+    <button type="submit" class="search-button">
+      <i class="fas fa-search"></i> <!-- Adicionando o ícone de lupa -->
+    </button>
+    <input
+      type="text"
+      placeholder="Buscar grãos, métodos e muito mais..."
+      class="search-input"
+      v-model="searchQuery"
+      @input="handleSearch"
+    />
+    
+  </div>
+</form>
+
+
       <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
@@ -45,38 +51,29 @@
 
 <script>
 export default {
-  name: "Header",
   data() {
     return {
-      searchQuery: '', // Propriedade para armazenar o valor do input
+      searchQuery: "",
     };
   },
-  created() {
-    // Recupera o valor do localStorage se existir
-    const savedQuery = localStorage.getItem('searchQuery');
-    if (savedQuery) {
-      this.searchQuery = savedQuery;
-    }
-  },
   methods: {
-    onSearchInput(event) {
-      this.searchQuery = event.target.value; // Atualiza searchQuery
-      localStorage.setItem('searchQuery', this.searchQuery); // Salva no localStorage
-      this.$emit('search', this.searchQuery); // Emite o valor da busca
+    handleSearchSubmit() {
+      this.$emit('search', this.searchQuery);
     },
-    goToHome() {
-      this.$router.push('/'); // Redireciona para a página inicial
-    },
-    goToProducts() {
-      // Navega para a página de produtos com a query de busca
-      this.$router.push({ name: 'products', query: { search: this.searchQuery } });
+    handleSearch() {
+      this.$emit('search', this.searchQuery);
     },
   },
 };
 </script>
 
+
+
+
+
 <style scoped>
 @import "@/assets/css/variables.css";
+
 
 .header {
   display: flex;
@@ -87,8 +84,12 @@ export default {
   margin-top: 0.5rem;
   background-color: var(--background-color);
   margin: 0;
-  font-size: 1rem !important;
+  font-size: 2rem !important;
   flex-direction: column;
+  position: fixed;
+  width: 98vw;
+  height: 6.7rem;
+  z-index: 20;
 }
 .topheader {
   display: flex;
@@ -98,8 +99,8 @@ export default {
 }
 
 .logo {
-  height: 50px;
-  margin-left: 1rem;
+  height: 5rem;
+  margin-left: 5rem;
   filter: invert(1);
 }
 
@@ -120,7 +121,7 @@ a {
   padding-right: 1rem;
   border-radius: 2rem;
   transition: transform 0.3s ease, color 0.3s ease;
-  font-size: 1rem !important;
+  font-size: 2rem !important;
 }
 
 .nav {
@@ -131,7 +132,7 @@ a {
 }
 
 a img {
-  width: 1.5rem;
+  width: 2rem;
   margin-right: 0.5rem;
 }
 
@@ -150,9 +151,25 @@ a:hover {
 }
 
 .search-container {
-  flex: 2;
+  width: 100%;
   display: flex;
   justify-content: flex-end;
+}
+
+.search-button {
+  background-color: transparent; /* Fundo transparente para o botão */
+  border: none; /* Remove a borda do botão */
+  cursor: pointer; /* Muda o cursor para uma mãozinha ao passar por cima */
+  margin-right: 1rem; /* Espaçamento entre o input e o botão */
+}
+
+.search-button i {
+  font-size: 2rem; /* Tamanho do ícone */
+  color: #505050; /* Cor do ícone */
+}
+
+form {
+  width: 42%;
 }
 
 .search-input {
@@ -161,9 +178,9 @@ a:hover {
   border-radius: 2rem;
   width: 100%;
   color: var(--text-color);
-  height: 3rem;
+  height: 5rem;
   padding-left: 1rem !important;
-  font-size: 1rem !important;
+  font-size: 2rem !important;
   outline: none;
   padding: 0;
 }
@@ -200,8 +217,8 @@ header .action-buttons {
 }
 
 .action-button img {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 3rem;
+  height: 3rem;
   filter: invert(1);
 }
 </style>

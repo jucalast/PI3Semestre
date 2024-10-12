@@ -2,21 +2,21 @@
   <div v-if="isVisible" class="modal-overlay" @click.self="close">
     <div class="modal-content">
       <header>
-                <!-- Accordion para Descrição -->
-                <div class="action-buttons">
-        <button
-          class="action-button favorite-button"
-          @click="handleFavoriteClick"
-        >
-          <img src="@/assets/estrela.png" alt="Favorites" />
-        </button>
-        <button class="action-button cart-button" @click="handleCartClick">
-          <img src="@/assets/carrinho.png" alt="Cart" />
-        </button>
-        <button class="action-button user-button" @click="handleUserClick">
-          <img src="@/assets/user.png" alt="User" />
-        </button>
-      </div>
+        <!-- Accordion para Descrição -->
+        <div class="action-buttons">
+          <button
+            class="action-button favorite-button"
+            @click="handleFavoriteClick"
+          >
+            <img src="@/assets/estrela.png" alt="Favorites" />
+          </button>
+          <button class="action-button cart-button" @click="handleCartClick">
+            <img src="@/assets/carrinho.png" alt="Cart" />
+          </button>
+          <button class="action-button user-button" @click="handleUserClick">
+            <img src="@/assets/user.png" alt="User" />
+          </button>
+        </div>
       </header>
       <div class="infoprod">
         <p class="nome">
@@ -25,6 +25,8 @@
         <p class="preco">
           <strong></strong> R$ {{ product.preco?.toFixed(2) }}
         </p>
+
+
 
         <!-- Adicionar os três botões abaixo da quantidade em estoque -->
         <div class="action-buttons">
@@ -40,6 +42,9 @@
             Comprar Agora
           </button>
         </div>
+        <p class="qtdestoque">
+  <strong></strong>{{ product.quantidade_estoque }} disponíveis
+</p>
       </div>
 
       <div class="imagemproduto">
@@ -52,7 +57,6 @@
 
       <!-- Acordions para informações do produto -->
       <div class="accordion">
-
         <div class="accordion-item">
           <div class="accordion-header" @click="toggleAccordion('descricao')">
             <h4>Descrição</h4>
@@ -204,6 +208,7 @@ export default {
     },
   },
   methods: {
+    
     close() {
       this.$emit("close");
     },
@@ -230,14 +235,24 @@ export default {
 </script>
 
 <style>
+
+.product-page .cards {
+  margin-top: 0;
+}
 /* Adicione estilos para o accordion */
 .accordion {
   margin-top: 1rem;
   border-radius: 5px;
   width: 30%;
+  height: 80%;
   max-height: 80%; /* Define a altura máxima */
   overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo ultrapassar a altura máxima */
   overflow-x: hidden; /* Adiciona rolagem vertical se o conteúdo ultrapassar a altura máxima */
+}
+
+.accordion p font {
+  font-size: 1.5rem !important;
+  color: var(--text-color) !important;
 }
 
 .accordion-item {
@@ -273,7 +288,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 20;
   backdrop-filter: blur(5px);
 }
 
@@ -310,30 +325,29 @@ export default {
 }
 
 .imagemproduto {
-
   width: 25%;
   height: 25%;
-
 }
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 .modal-content {
   background-color: white;
-    padding: 20px;
-    border-radius: 2rem;
-    width: 80%;
-    height: 80%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: space-evenly;
-    align-items: flex-start;
-    font-family: 'Poppins', sans-serif;
+  padding: 20px;
+  border-radius: 2rem;
+  width: 80%;
+  height: 80%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  font-family: "Poppins", sans-serif;
 }
 
 .modalimage {
   width: 100% !important;
+  position: relative;
 }
 
 .modal-content p {
@@ -346,9 +360,18 @@ export default {
   align-items: flex-start;
 }
 
+h4 {
+  font-size: 2rem;
+  font-weight: lighter;
+}
+
+span {
+  font-size: 2rem;
+}
+
 .modal-content .action-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   margin-top: 1.5rem;
   flex-direction: column;
 }
