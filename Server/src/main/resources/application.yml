@@ -35,3 +35,7 @@ spring:
       file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  
     file:
       name: logs/application.log  
+
+frontend:
+  url: http://localhost:5173/
+
