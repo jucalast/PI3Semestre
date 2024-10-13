@@ -2,6 +2,7 @@ package com.app.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,16 +13,12 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import java.io.IOException;
 
 /**
- * Classe de configuração de segurança do Spring Security.
+ * Classe de configuração para o Spring Security.
  * <p>
- * A anotação @Configuration indica que esta classe é um componente de configuração
- * do Spring, responsável por definir beans e configurar o comportamento da segurança.
- * <p>
- * Esta configuração utiliza o login OAuth2 e define permissões de acesso às rotas.
- *
- * @author Giovanni
- * @version 1.0
- * @since 2024-10-05
+ * Esta classe define a configuração de segurança para a aplicação,
+ * especificando as permissões para diferentes rotas e configurando
+ * a autenticação OAuth2.
+ * </p>
  */
 @Configuration
 public class SpringConfig {
@@ -29,28 +26,50 @@ public class SpringConfig {
     /**
      * Configura o filtro de segurança da aplicação.
      * <p>
-     * Define as regras de autorização para requisições HTTP, permitindo o acesso
-     * público às rotas "/", "/login" e "/api/**", enquanto todas as outras rotas requerem autenticação.
-     * <p>
-     * Também configura o login com OAuth2, especificando uma página de login personalizada
-     * e um handler de sucesso que redireciona o usuário para "/process-user" após o login bem-sucedido.
+     * Este método configura a segurança HTTP da aplicação, incluindo
+     * a desativação da proteção CSRF, a definição das regras de autorização
+     * para diferentes rotas e a configuração do login OAuth2.
+     * </p>
      *
-     * @param http Instância do HttpSecurity usada para configurar a segurança da aplicação.
-     * @return O SecurityFilterChain configurado.
-     * @throws Exception Se houver algum erro na configuração.
+     * <ul>
+     *     <li>CSRF é desabilitado para simplificar a configuração.</li>
+     *     <li>Rotas específicas são configuradas para permitir o acesso
+     *         sem autenticação ou exigir a role "ADMIN".</li>
+     *     <li>Qualquer outra requisição requer autenticação.</li>
+     *     <li>Uma página de login personalizada é usada para o login com OAuth2,
+     *         e um manipulador de sucesso é configurado para redirecionar o usuário
+     *         após a autenticação.</li>
+     * </ul>
+     *
+     * @param http o objeto HttpSecurity utilizado para configurar a segurança HTTP
+     * @return um bean SecurityFilterChain que representa a configuração de segurança
+     * @throws Exception se ocorrer algum erro durante a configuração do filtro de segurança
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         return http
-                .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/", "/login", "/api/**").permitAll();
-                    registry.anyRequest().authenticated();
-                })
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/", "/login", "/api/**").permitAll()
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    .anyRequest().authenticated()
+                )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
                             .loginPage("/login")
                             .successHandler(new AuthenticationSuccessHandler() {
+                                /**
+                                 * Manipula o sucesso da autenticação.
+                                 * <p>
+                                 * Este método é chamado quando a autenticação é bem-sucedida.
+                                 * Ele redireciona o usuário autenticado para a rota "/process-user".
+                                 * </p>
+                                 *
+                                 * @param request o objeto HttpServletRequest associado à requisição
+                                 * @param response o objeto HttpServletResponse associado à resposta
+                                 * @param authentication o objeto Authentication contendo os dados da autenticação
+                                 * @throws IOException se ocorrer um erro de entrada/saída ao redirecionar a resposta
+                                 */
                                 @Override
                                 public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
                                     response.sendRedirect("/process-user");

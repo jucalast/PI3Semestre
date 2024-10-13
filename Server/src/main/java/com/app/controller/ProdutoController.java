@@ -69,7 +69,7 @@ public class ProdutoController {
         return produto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
         // Aqui você deve verificar se é um CafeEspecial ou MetodoPreparo
         if (produto.getCafeEspecial() != null) {
