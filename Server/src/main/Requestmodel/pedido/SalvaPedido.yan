@@ -1,0 +1,16 @@
+{
+  "usuario": {
+    "id": 1,
+    "dataPedido": "2024-10-12T10:15:30",
+    "statusPedido": 1,
+    "total": 150,
+    "observacoes": "Entregar após às 18h",
+    "estado": "SP",
+    "cep": "12345678",
+    "cidade": "São Paulo",
+    "bairro": "Centro",
+    "complemento": "Próximo ao parque",
+    "numero": 123,
+    "rua": "Rua das Flores"
+  }
+}

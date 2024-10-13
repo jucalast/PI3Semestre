@@ -1,0 +1,15 @@
+# Exemplo de pedido
+pedido:
+  usuario:
+    id: 1 # ID do usuário existente
+  dataPedido: "2024-10-12T10:15:30" # Data e hora do pedido
+  statusPedido: 1 # Status do pedido (1- novo, 2- processando, etc.)
+  total: 150.00 # Total do pedido
+  observacoes: "Entregar após às 18h" # Observações adicionais
+  estado: "SP" # Estado da entrega
+  cep: "12345678" # CEP da entrega
+  cidade: "São Paulo" # Cidade da entrega
+  bairro: "Centro" # Bairro da entrega
+  complemento: "Próximo ao parque" # Complemento da entrega
+  numero: 123 # Número do endereço
+  rua: "Rua das Flores" # Rua do endereço

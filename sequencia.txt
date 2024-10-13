@@ -1,0 +1,6 @@
+Model (Entidades): Define as tabelas do banco.
+Repository: Interação com o banco de dados (CRUD).
+Service: Lógica de negócio e validações.
+Controller: Endpoints da API e gerenciamento de requisições.
+DTO (Opcional): Transferência controlada de dados.
+Config (Configurações Globais): Configurações como segurança e CORS.
