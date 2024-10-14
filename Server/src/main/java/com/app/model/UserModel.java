@@ -1,25 +1,19 @@
 package com.app.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 /**
  * Representa a entidade Usuário para a aplicação.
  * Esta classe está mapeada para a tabela 'TB_USER' no banco de dados.
  *
- * A classe utiliza anotações do Lombok para gerar automaticamente
- * código boilerplate como getters, setters, construtores e o método toString.
- *
  * @author Giovanni
- * @version 1.0
- * @since 2024-10-05
+ * @version 1.3
+ * @since 2024-10-13
  */
 @Data
 @NoArgsConstructor
@@ -37,7 +31,7 @@ public class UserModel {
     private Long id;
 
     /**
-     * Nome do usuário.
+     * Nome completo do usuário.
      * Não pode ser nulo.
      */
     @Column(nullable = false, name = "USER_NAME")
@@ -45,10 +39,17 @@ public class UserModel {
 
     /**
      * Endereço de e-mail do usuário.
-     * Não pode ser nulo e deve ser único no banco de dados.
+     * Deve ser único no banco de dados.
      */
     @Column(nullable = false, name = "EMAIL_ID", unique = true)
     private String emailId;
+
+    /**
+     * CPF do usuário.
+     * Deve ser único no banco de dados.
+     */
+    @Column(nullable = true, name = "CPF", unique = true)
+    private String cpf;
 
     /**
      * Número de telefone do usuário.
@@ -58,6 +59,12 @@ public class UserModel {
     private String mobileNumber;
 
     /**
+     * Senha do usuário.
+     */
+    @Column(nullable = true, name = "PASSWORD")
+    private String password;
+
+    /**
      * Funções atribuídas ao usuário.
      * Não pode ser nulo.
      */
@@ -65,15 +72,13 @@ public class UserModel {
     private String roles;
 
     /**
-     * Construtor personalizado com nome, e-mail e funções.
-     *
-     * @param userName O nome do usuário.
-     * @param emailId O e-mail do usuário.
-     * @param roles As funções atribuídas ao usuário.
+     * Relação N:N com AddressModel.
      */
-    public UserModel(String userName, String emailId, String roles) {
-        this.userName = userName;
-        this.emailId = emailId;
-        this.roles = roles;
-    }
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "TB_USER_ADDRESS",
+            joinColumns = @JoinColumn(name = "USER_ID"), 
+            inverseJoinColumns = @JoinColumn(name = "ADDRESS_ID") 
+    )
+    private List<AddressModel> addresses; 
 }
