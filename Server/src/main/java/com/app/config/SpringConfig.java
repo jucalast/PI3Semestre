@@ -63,7 +63,7 @@ public class SpringConfig {
                             .successHandler(new AuthenticationSuccessHandler() {
                                 @Override
                                 public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-                                    response.sendRedirect("/process-user");
+                                    response.sendRedirect("/google-process");
                                 }
                             });
                 })

@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Controlador responsável pela gestão das rotas relacionadas ao usuário.
  *
  * Este controlador manipula a autenticação do usuário, incluindo login via
- * formulário e OAuth2, além de gerenciar o registro de novos usuários.
- * As rotas incluem páginas de login e cadastro, bem como o processamento
- * de credenciais de autenticação e armazenamento de informações do usuário.
- * 
+ * formulário e OAuth2, além de gerenciar o registro de novos usuários. As rotas
+ * incluem páginas de login e cadastro, bem como o processamento de credenciais
+ * de autenticação e armazenamento de informações do usuário.
+ *
  * @author Giovanni
  * @version 1.0
  * @since 2024-10-05
@@ -79,19 +79,19 @@ public class UserController {
     /**
      * Rota que processa o login do usuário via formulário.
      *
-     * Este método autentica o usuário com base no email e senha fornecidos.
-     * Se a autenticação for bem-sucedida, o usuário autenticado é armazenado
-     * na sessão e o usuário é redirecionado para a URL do frontend. Em caso
-     * de falha, a página de login é retornada com uma mensagem de erro.
+     * Este método autentica o usuário com base no email e senha fornecidos. Se
+     * a autenticação for bem-sucedida, o usuário autenticado é armazenado na
+     * sessão e o usuário é redirecionado para a URL do frontend. Em caso de
+     * falha, a página de login é retornada com uma mensagem de erro.
      *
      * @param email O email fornecido pelo usuário.
      * @param password A senha fornecida pelo usuário.
      * @param model O modelo para passar dados à view.
      * @param request O objeto HttpServletRequest para manipulação da sessão.
      * @return Um redirecionamento para a URL da home page em caso de sucesso,
-     *         ou retorno à página de login em caso de falha.
+     * ou retorno à página de login em caso de falha.
      */
-    @PostMapping("/loginForm")
+    @PostMapping("/form-process")
     public String loginUser(@RequestParam String email, @RequestParam String password, Model model, HttpServletRequest request) {
 
         try {
@@ -114,20 +114,30 @@ public class UserController {
      * Rota que processa as informações do usuário após a autenticação com
      * OAuth2.
      *
-     * Este método extrai os atributos do usuário autenticado a partir do
-     * token OAuth2 e registra o usuário no sistema, caso ainda não esteja
-     * registrado. Após o processamento, o usuário é redirecionado para a
-     * URL do frontend.
+     * Este método extrai os atributos do usuário autenticado a partir do token
+     * OAuth2, registra o usuário no sistema caso ainda não esteja registrado, e
+     * armazena o objeto `UserModel` na sessão para uso posterior. Após o
+     * processamento, o usuário é redirecionado para a URL do frontend.
      *
-     * @param token O token de autenticação do usuário autenticado.
+     * @param token O token de autenticação do usuário autenticado via OAuth2.
+     * @param request O objeto HttpServletRequest para acessar a sessão e
+     * armazenar o usuário autenticado.
      * @return Um redirecionamento para a URL do frontend.
      */
-    @GetMapping("/process-user")
-    public String processUser(OAuth2AuthenticationToken token) {
+    @GetMapping("/google-process")
+    public String processUser(OAuth2AuthenticationToken token, HttpServletRequest request) {
         String name = token.getPrincipal().getAttribute("name");
         String email = token.getPrincipal().getAttribute("email");
 
         userService.saveUserIfNotExists(name, email);
+
+        UserModel authenticatedUser = new UserModel();
+        authenticatedUser.setUserName(name);
+        authenticatedUser.setEmailId(email);
+        authenticatedUser.setRoles("ROLE_USER");
+
+        request.getSession().setAttribute("user", authenticatedUser);
+
         return "redirect:" + frontendUrl;
     }
 
@@ -150,8 +160,8 @@ public class UserController {
      * Rota que processa o cadastro de um novo usuário.
      *
      * Este método recebe os dados do formulário de registro, cria um novo
-     * usuário no sistema através do serviço de usuário e, em seguida, redireciona
-     * para a URL da home page.
+     * usuário no sistema através do serviço de usuário e, em seguida,
+     * redireciona para a URL da home page.
      *
      * @param user O objeto UserModel com os dados do formulário.
      * @return Um redirecionamento para a URL da home page.
