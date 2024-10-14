@@ -15,9 +15,9 @@ import java.util.Map;
 /**
  * Controlador principal da aplicação.
  *
- * Este controlador gerencia as rotas principais da aplicação, incluindo
- * a página inicial e a recuperação das informações do usuário autenticado.
- * Ele permite a interação com a aplicação tanto para usuários autenticados via
+ * Este controlador gerencia as rotas principais da aplicação, incluindo a
+ * página inicial e a recuperação das informações do usuário autenticado. Ele
+ * permite a interação com a aplicação tanto para usuários autenticados via
  * OAuth2 quanto para aqueles que utilizam o login por formulário.
  *
  * @author Giovanni
@@ -40,42 +40,31 @@ public class MainController {
     /**
      * Rota que retorna as informações do usuário autenticado.
      *
-     * Este método verifica se o usuário está autenticado, e se sim, coleta
-     * as informações relevantes do usuário com base no tipo de autenticação.
-     * Se a autenticação foi realizada via OAuth2, as informações são extraídas
-     * do token de autenticação. Caso contrário, os dados são recuperados da
-     * sessão do usuário autenticado via login por formulário.
+     * Este método verifica se o usuário está autenticado, recuperando as informações
+     * diretamente da sessão. Caso o usuário tenha sido autenticado via OAuth2 ou login 
+     * por formulário, seus dados (nome, e-mail e telefone) são coletados e retornados 
+     * em formato JSON. Se o usuário não estiver autenticado, a resposta será um erro 401 
+     * (Unauthorized).
      *
-     * @param request O objeto HttpServletRequest, utilizado para acessar a sessão do usuário.
-     * @param user O objeto Principal que representa o usuário autenticado, que pode ser
-     *             um token OAuth2 ou um usuário autenticado por formulário.
-     * @return Um ResponseEntity contendo um mapa com as informações do usuário em formato JSON
-     *         ou uma resposta de erro 401 (Unauthorized) se o usuário não estiver autenticado.
+     * @param request O objeto HttpServletRequest utilizado para acessar a sessão do usuário.
+     * @param user O objeto Principal que representa o usuário autenticado.
+     * @return Um ResponseEntity contendo um mapa com as informações do usuário em formato JSON, 
+     * ou uma resposta de erro 401 se o usuário não estiver autenticado.
      */
     @GetMapping("/user-info")
     public ResponseEntity<Map<String, Object>> userInfo(HttpServletRequest request, Principal user) {
         Map<String, Object> userAttributes = new HashMap<>();
 
-        if (user != null) {
-            // Verifica se o usuário autenticado é um token OAuth2
-            if (user instanceof OAuth2AuthenticationToken) {
-                OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) user;
-                userAttributes.put("name", oauthToken.getPrincipal().getAttribute("name"));
-                userAttributes.put("email", oauthToken.getPrincipal().getAttribute("email"));
-                userAttributes.put("picture", oauthToken.getPrincipal().getAttribute("picture"));
-            } else {
-                // Se não for um token OAuth2, tenta obter o usuário da sessão
-                UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
-                if (authenticatedUser != null) {
-                    userAttributes.put("name", authenticatedUser.getUserName());
-                    userAttributes.put("email", authenticatedUser.getEmailId());
-                    userAttributes.put("phone", authenticatedUser.getMobileNumber());
-                }
-            }
+        UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
 
+        if (authenticatedUser != null) {
+            userAttributes.put("name", authenticatedUser.getUserName());
+            userAttributes.put("email", authenticatedUser.getEmailId());
+            userAttributes.put("phone", authenticatedUser.getMobileNumber());
             return ResponseEntity.ok(userAttributes);
         } else {
             return ResponseEntity.status(401).build();
         }
     }
+
 }
