@@ -1,5 +1,5 @@
 <template>
-  <header class="header">
+  <Theheader class="header">
     <div class="logo-container">
       <img src="@/assets/logo.png" alt="Logo" class="logo" />
     </div>
@@ -17,24 +17,40 @@
     <button class="action-button favorite-button" @click="handleFavoriteClick">
       <img src="@/assets/estrela.png" alt="Favorites" />
     </button>
-    <button class="action-button cart-button" @click="handleCartClick">
+    <button class="action-button cart-button" @click="toogleCart">
       <img src="@/assets/carrinho.png" alt="Cart" />
     </button>
     <button class="action-button user-button" @click="handleUserClick">
       <img src="@/assets/user.png" alt="User" />
     </button>
   </div>
-  </header>
+  </Theheader>
+  <ShoppingCart v-if="showCart"/>
 </template>
 
 <script>
+import ShoppingCart from './ShoppingCart.vue';
+
 export default {
-  name: 'Header'
+  name: 'TheHeader',
+  components:{
+    ShoppingCart
+  },
+  data(){
+    return{
+      showCart: false
+    };
+  },
+  methods:{
+    toogleCart(){
+      this.showCart = !this.showCart;
+    }
+  }
 }
 </script>
 
 <style scoped>
-.header {
+.Theheader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
