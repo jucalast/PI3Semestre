@@ -2,63 +2,98 @@ package com.app.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.io.IOException;
 
 /**
- * Classe de configuração de segurança do Spring Security.
+ * Classe de configuração para o Spring Security.
  * <p>
- * A anotação @Configuration indica que esta classe é um componente de
- * configuração do Spring, responsável por definir beans e configurar o
- * comportamento da segurança.
- * <p>
- * Esta configuração utiliza o login OAuth2 e define permissões de acesso às
- * rotas.
- *
- * @author Giovanni
- * @version 1.0
- * @since 2024-10-05
+ * Esta classe define a configuração de segurança para a aplicação,
+ * especificando as permissões para diferentes rotas e configurando a
+ * autenticação OAuth2.
+ * </p>
  */
 @Configuration
+@EnableWebSecurity
 public class SpringConfig {
 
     /**
      * Configura o filtro de segurança da aplicação.
      * <p>
-     * Define as regras de autorização para requisições HTTP, permitindo o
-     * acesso público às rotas "/", "/login" e "/api/**", enquanto todas as
-     * outras rotas requerem autenticação.
-     * <p>
-     * Também configura o login com OAuth2, especificando uma página de login
-     * personalizada e um handler de sucesso que redireciona o usuário para
-     * "/process-user" após o login bem-sucedido.
+     * Este método configura a segurança HTTP da aplicação, incluindo a
+     * desativação da proteção CSRF, a definição das regras de autorização para
+     * diferentes rotas e a configuração do login OAuth2.
+     * </p>
      *
-     * @param http Instância do HttpSecurity usada para configurar a segurança
-     * da aplicação.
-     * @return O SecurityFilterChain configurado.
-     * @throws Exception Se houver algum erro na configuração.
+     * @param http o objeto HttpSecurity utilizado para configurar a segurança
+     * HTTP
+     * @return um bean SecurityFilterChain que representa a configuração de
+     * segurança
+     * @throws Exception se ocorrer algum erro durante a configuração do filtro
+     * de segurança
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         return http
-                .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/", "/login", "/api/**").permitAll();
-                    registry.anyRequest().authenticated();
-                })
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/**", "/login", "/register", "/api/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                .loginPage("/login")
+                .permitAll()
+                )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
                             .loginPage("/login")
                             .successHandler(new AuthenticationSuccessHandler() {
                                 @Override
-
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-                            response.sendRedirect("/process-user");
-                        }
+                                public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+                                    response.sendRedirect("/google-process");
+                                }
                             });
                 })
                 .build();
+    }
+
+    /**
+     * Bean para o AuthenticationManager utilizado na autenticação de usuários.
+     *
+     * @param http o objeto HttpSecurity utilizado para construir o
+     * AuthenticationManager
+     * @return um bean AuthenticationManager que representa o gerenciador de
+     * autenticação
+     * @throws Exception se ocorrer algum erro durante a configuração do
+     * AuthenticationManager
+     */
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder
+                = http.getSharedObject(AuthenticationManagerBuilder.class);
+        return authenticationManagerBuilder.build();
+    }
+
+    /**
+     * Bean para o PasswordEncoder utilizado na criptografia de senhas.
+     *
+     * @return uma instância de BCryptPasswordEncoder
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
