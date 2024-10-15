@@ -1,107 +1,117 @@
 package com.app.service;
 
-import com.app.model.Endereco;
-import com.app.model.User;
-import com.app.repository.EnderecoRepository;
+import com.app.model.UserModel;
 import com.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
- * Serviço para gerenciar usuários no sistema de e-commerce.
- *
- * <p>Esta classe fornece métodos para realizar operações CRUD (Create, Read, Update, Delete)
- * no repositório de usuários.</p>
+ * Classe de serviço responsável pela lógica de negócios relacionada à entidade
+ * UserModel. Esta classe implementa a interface UserDetailsService para permitir
+ * a autenticação de usuários com base no email.
  */
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final EnderecoRepository enderecoRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
-     * Construtor para injeção de dependência dos repositórios de usuários e endereços.
+     * Construtor que injeta o repositório de usuários e o PasswordEncoder.
      *
-     * @param userRepository O repositório de usuários a ser injetado.
-     * @param enderecoRepository O repositório de endereços a ser injetado.
+     * @param userRepository O repositório de usuários.
+     * @param passwordEncoder O encoder de senha.
      */
     @Autowired
-    public UserService(UserRepository userRepository, EnderecoRepository enderecoRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.enderecoRepository = enderecoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
-     * Obtém todos os usuários do sistema.
+     * Carrega um usuário pelo nome de usuário (email). Esta implementação é
+     * utilizada pelo Spring Security para autenticar usuários.
      *
-     * @return Uma lista contendo todos os usuários.
+     * @param username O email do usuário a ser carregado.
+     * @return Um objeto UserDetails representando o usuário.
+     * @throws UsernameNotFoundException Se o usuário não for encontrado.
      */
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserModel user = userRepository.findByEmailId(username);
 
-    /**
-     * Obtém um usuário específico pelo seu identificador.
-     *
-     * @param id O identificador do usuário.
-     * @return Um {@link Optional} contendo o usuário se encontrado, ou vazio se não encontrado.
-     */
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    /**
-     * Cria um novo usuário no sistema. Também persiste o endereço associado, se fornecido.
-     *
-     * @param user O usuário a ser criado.
-     * @return O usuário criado.
-     */
-    public User createUser(User user) {
-        if (user.getEndereco() != null) {
-            Endereco endereco = user.getEndereco();
-            if (endereco.getId() == null) {
-                enderecoRepository.save(endereco);
-            }
+        if (user == null) {
+            throw new UsernameNotFoundException("Usuário não encontrado: " + username);
         }
-        return userRepository.save(user);
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmailId())
+                .password(user.getPassword())
+                .authorities("ROLE_USER")
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
+                .build();
     }
 
     /**
-     * Atualiza um usuário existente com o novo valor fornecido.
+     * Salva um novo usuário no banco de dados se ele não existir.
      *
-     * @param id O identificador do usuário a ser atualizado.
-     * @param user O usuário com as novas informações.
-     * @return Um {@link Optional} contendo o usuário atualizado se o identificador existir, ou vazio se não encontrado.
+     * @param name  O nome do usuário.
+     * @param email O e-mail do usuário.
      */
-    public Optional<User> updateUser(Long id, User user) {
-        if (userRepository.existsById(id)) {
-            // Atualiza o endereço se estiver presente
-            if (user.getEndereco() != null) {
-                Endereco endereco = user.getEndereco();
-                if (endereco.getId() == null) {
-                    enderecoRepository.save(endereco);
-                }
-            }
-            user.setId(id);
-            return Optional.of(userRepository.save(user));
+    public void saveUserIfNotExists(String name, String email) {
+        UserModel user = userRepository.findByEmailId(email);
+        if (user == null) {
+            user = new UserModel();
+            user.setUserName(name);
+            user.setEmailId(email);
+            user.setRoles("ROLE_USER");
+            userRepository.save(user);
         }
-        return Optional.empty();
     }
 
     /**
-     * Exclui um usuário pelo seu identificador.
+     * Salva um usuário fornecido com verificação de e-mail e criptografia de
+     * senha.
      *
-     * @param id O identificador do usuário a ser excluído.
-     * @return {@code true} se o usuário foi excluído com sucesso, {@code false} caso contrário.
+     * @param user O objeto UserModel a ser salvo.
+     * @throws RuntimeException Se o e-mail já estiver cadastrado.
      */
-    public boolean deleteUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
+    public void registerUser(UserModel user) {
+        UserModel existingUser = userRepository.findByEmailId(user.getEmailId());
+        if (existingUser == null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRoles("ROLE_USER");
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("Email já cadastrado.");
         }
-        return false;
+    }
+
+    /**
+     * Salva um usuário fornecido.
+     *
+     * @param user O objeto UserModel a ser salvo.
+     */
+    public void saveUser(UserModel user) {
+        userRepository.save(user);
+    }
+
+    /**
+     * Obtém um usuário a partir da autenticação fornecida.
+     *
+     * @param authentication O objeto Authentication que contém as informações do usuário autenticado.
+     * @return O objeto UserModel correspondente ao usuário autenticado.
+     */
+    public UserModel getUserFromAuthentication(Authentication authentication) {
+        String email = authentication.getName();
+        return userRepository.findByEmailId(email);
     }
 }

@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    database-platform: org.hibernate.dialect.SQLServerDialect
+    hibernate:
+      ddl-auto: update  
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    packages-to-scan: com.app.model
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+
+  output:
+    ansi:
+      enabled: ALWAYS  # Habilita a saída ANSI para cores
+  logging:
+    level:
+      root: INFO 
+      com.app: DEBUG 
+      org.hibernate: ERROR  
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %highlight(%msg)%n"  
+      file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  
+    file:
+      name: logs/application.log  
+
+frontend:
+  url: http://localhost:5173/
+

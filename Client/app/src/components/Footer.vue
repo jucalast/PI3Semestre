@@ -1,21 +1,27 @@
 <template>
-    <thefooter>
+    <footer>
       <p>&copy; 2024 My E-Commerce</p>
-    </thefooter>
+    </footer>
   </template>
   
   <script>
   export default {
-    name: 'TheFooter'
+    name: 'Footer'
   }
   </script>
   
   <style scoped>
-  Thefooter {
-    background-color: var(--background-color);
+  footer {
+    background-color: #1a1a1a;
     color: white;
     padding: 10px;
     text-align: center;
   }
+
+  footer p {
+    background: transparent;
+  }
+
+
   </style>
   
