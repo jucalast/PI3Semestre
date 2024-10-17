@@ -175,7 +175,7 @@ export default {
   align-items: center;
   align-content: center;
   gap: 2rem;
-  width: 80%;
+  width: 70%;
 }
 
 

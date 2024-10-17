@@ -21,7 +21,6 @@ public class ProdutoController {
     @Autowired
     private ProdutoService produtoService;
 
-
     // Rota para listar os valores dos campos solicitados
     @GetMapping("/atributos")
     public ResponseEntity<List<Map<String, Object>>> listarAtributos() {
