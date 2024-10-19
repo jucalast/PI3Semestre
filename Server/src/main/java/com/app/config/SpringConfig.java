@@ -49,13 +49,13 @@ public class SpringConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**", "/login", "/register", "/api/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                .requestMatchers("/**", "/login", "/register", "/api/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") 
-                        .permitAll() 
+                .loginPage("/login")
+                .permitAll()
                 )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
@@ -72,21 +72,24 @@ public class SpringConfig {
 
     /**
      * Bean para o AuthenticationManager utilizado na autenticação de usuários.
-     * 
-     * @param http o objeto HttpSecurity utilizado para construir o AuthenticationManager
-     * @return um bean AuthenticationManager que representa o gerenciador de autenticação
-     * @throws Exception se ocorrer algum erro durante a configuração do AuthenticationManager
+     *
+     * @param http o objeto HttpSecurity utilizado para construir o
+     * AuthenticationManager
+     * @return um bean AuthenticationManager que representa o gerenciador de
+     * autenticação
+     * @throws Exception se ocorrer algum erro durante a configuração do
+     * AuthenticationManager
      */
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = 
-                http.getSharedObject(AuthenticationManagerBuilder.class);
+        AuthenticationManagerBuilder authenticationManagerBuilder
+                = http.getSharedObject(AuthenticationManagerBuilder.class);
         return authenticationManagerBuilder.build();
     }
 
     /**
      * Bean para o PasswordEncoder utilizado na criptografia de senhas.
-     * 
+     *
      * @return uma instância de BCryptPasswordEncoder
      */
     @Bean

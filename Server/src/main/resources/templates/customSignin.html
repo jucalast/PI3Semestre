@@ -5,142 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Let's Coffee - Cadastro</title>
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap" rel="stylesheet" />
 
+    <!-- intl-tel-input CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
+
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: transparent;
+        }
+
+        body {
+            
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: 'Poppins', sans-serif !important;
+            /* Aplicando Poppins à citação */
+            height: 100vh;
+            display: flex;
+        }
+
+        .imgdireita {
+            position: absolute;
+            width: 65vw;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        .left-side {
+      
+            background-size: cover;
+            background-position: left;
+            height: 100vh;
+            width: 40% !important;
+            border: none !important;
+            background-image: url('http://localhost:8080/assets/logo(3).png');
+        }
+
+        .right-side {
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: transparent !important;
+        }
+
+        .form-container {
+            margin-top: 40px;
+            width: 100%;
+            max-width: 300px;
+            background: transparent;
+        }
+
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: transparent !important;
+        }
+
+        .form-container input {
+            color: #ff4d4d;
+            border: solid 1px #aeaeaeb6;
+            background: #ededed;
+            border-radius: 2rem;
+            width: 100%;
+            height: 5rem;
+            padding-left: 1rem !important;
+            font-size: 2rem !important;
+            outline: none;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            /* Aplicando Poppins aos inputs */
+        }
+
+        .form-container input::placeholder {
+            color: #6d6d6d;
+        }
+
+        .form-container input:focus {
+            outline: none;
+            border: 1px solid #ff4d4d;
+            box-shadow: 1px 0px 20px 1px #ff4d4d54;
+        }
+
+        .melhorescafes {
+            font-weight: bold;
+        }
+
+        .login-button {
+            width: 100%;
+            height: 5rem !important;
+            padding: 12px;
+            border: none;
+            border-radius: 2rem;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: #5271ff;
+            transition: background-color .3s;
+            font-family: 'Poppins', sans-serif;
+            /* Aplicando Poppins ao botão */
+        }
+
+        .login-button:hover {
+            background-color: #3d58ce;
+        }
+
+        .login-with-google-btn {
+            width: 100%;
+    height: 5rem;
+    padding: 12px 16px 12px 42px;
+    border: none;
+    border-radius: 2rem;
+    box-shadow: 0 1px 3px rgba(77, 77, 77, 0.12), 0 1px 2px rgba(0, 0, 0, .24);
+    color: #3e3e3e;
+    font-size: 16px;
+    font-weight: 500;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
+    background-color: #ffffff;
+    background-repeat: no-repeat;
+    background-position: 12px 11px;
+    background-size: 38px 38px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-content: center;
+    align-items: center;
+        }
+
+
+        .login-with-google-btn:hover {
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.44);
+        }
+
+        .login-with-google-btn:active {
+            background-color: #eeeeee;
+        }
+
+        .login-with-google-btn:focus {
+            outline: none;
+        }
+
+        .form-placeholder {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #757575;
+            font-family: 'Poppins', sans-serif;
+            /* Aplicando Poppins ao placeholder */
+        }
+
+        .main-title {
+            font-size: 36px;
+            color: #2d2d2d;
+            text-align: left;
+            line-height: 1.3;
+            max-width: 90%;
+            margin: 0 auto;
+            font-weight: lighter;
+        }
+
+      #phone {
+        width: 30rem;
+        padding-left: 8rem !important;
       }
 
-      body {
-        background-image: url("http://localhost:8080/assets/login_bg3.jpg");
-        background-size: 100% 100%;
-        background-position: center;
-        background-repeat: no-repeat;
-        font-family: "Roboto", sans-serif;
-        height: 100vh;
-        display: flex;
-      }
 
-      .container {
-        display: flex;
-        width: 100%;
-      }
-
-      .left-side {
-        flex: 1;
-        background-size: cover;
-        background-position: left;
-      }
-
-      .right-side {
-        flex: 1;
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .form-container {
-        margin-top: 40px;
-        width: 100%;
-        max-width: 600px;
-      }
-
-      .form-container form {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .form-container input {
-        background-color: #2a2a2a;
-        color: white;
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #f60202;
-        box-shadow: 2px 2px 2px rgb(255, 0, 0);
-        border-radius: 16px;
-        font-size: 14px;
-      }
-
-      .form-container input:focus {
-        outline: none;
-        border-color: #000000;
-      }
-
-      .login-button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 5px;
-        color: white;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        background-color: #4caf50;
-        transition: background-color 0.3s;
-      }
-
-      .login-button:hover {
-        background-color: #45a049;
-      }
-
-      .login-with-google-btn {
-        width: 100%;
-        padding: 12px 16px 12px 42px;
-        border: none;
-        border-radius: 5px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-        color: #757575;
-        font-size: 16px;
-        font-weight: 500;
-        background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
-        background-color: #2a2a2a;
-        background-repeat: no-repeat;
-        background-position: 12px 11px;
-        cursor: pointer;
-      }
-
-      .login-with-google-btn:hover {
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-      }
-
-      .login-with-google-btn:active {
-        background-color: #eeeeee;
-      }
-
-      .login-with-google-btn:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(72, 133, 237, 0.4);
-      }
-
-      .form-placeholder {
-        margin-top: 20px;
-        font-size: 14px;
-        color: #757575;
-      }
-
-      .main-title {
-        font-family: "Oswald", sans-serif;
-        font-size: 36px;
-        font-weight: 600;
-        color: #ffffff;
-        text-align: left;
-        line-height: 1.2;
-        max-width: 90%;
-        margin: 0 auto;
-      }
-
-      .quote {
-        font-weight: 650;
-        font-size: 48px;
-        color: #e4cc2c;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      .iti--separate-dial-code .iti__selected-flag {
+        background: #eeeeee;
+        border-radius: 2rem 0 0 2rem;
+        padding: 1rem;
+        border-right: 1px solid #b6b6b6;
       }
     </style>
   </head>
@@ -151,13 +203,16 @@
 
       <!-- Lado direito -->
       <div class="right-side">
-        <h1 class="main-title">Crie sua conta<br /><span class="quote">e aproveite os melhores cafés</span> do Brasil</h1>
+        <h1 class="main-title">A um passo dos<br><strong class="melhorescafes">melhores cafés</strong><br> Brasil</h1>
         <div class="form-container">
           <!-- Formulário de cadastro -->
           <form action="/register" method="POST">
             <input type="text" name="userName" placeholder="Nome Completo" required />
             <input type="email" name="emailId" placeholder="E-mail" required />
-            <input type="text" name="mobileNumber" placeholder="Número de Telefone" />
+
+            <!-- Campo de número de telefone com intl-tel-input -->
+            <input type="tel" id="phone" name="mobileNumber" placeholder="(XX) XXXXX-XXXX" required />
+
             <input type="text" name="cpf" placeholder="CPF" required />
             <input type="password" name="password" placeholder="Senha" required />
 
@@ -171,5 +226,24 @@
         </div>
       </div>
     </div>
+
+    <!-- intl-tel-input JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script>
+      // Inicializar intl-tel-input no campo de telefone
+      const phoneInputField = document.querySelector("#phone");
+      const phoneInput = window.intlTelInput(phoneInputField, {
+        initialCountry: "br", // País inicial Brasil
+        preferredCountries: ["br", "us", "gb", "ca"], // Países preferenciais
+        separateDialCode: true, // Mostrar o DDD separado do número
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js", // Para validação e formatação
+      });
+
+      // Capturar o número de telefone completo ao enviar o formulário
+      document.querySelector("form").addEventListener("submit", function (event) {
+        const phoneNumber = phoneInput.getNumber();
+        console.log("Número completo:", phoneNumber); // Pode enviar este valor para o backend
+      });
+    </script>
   </body>
 </html>
