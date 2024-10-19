@@ -1,5 +1,4 @@
 <template>
-  
   <header class="header">
     <div class="topheader">
       <nav class="nav">
@@ -14,21 +13,27 @@
       </nav>
 
       <form @submit.prevent="handleSearchSubmit">
-  <div class="search-container">
-    <button type="submit" class="search-button">
-      <i class="fas fa-search"></i> <!-- Adicionando o ícone de lupa -->
-    </button>
-    <input
-      type="text"
-      placeholder="Buscar grãos, métodos e muito mais..."
-      class="search-input"
-      v-model="searchQuery"
-      @input="handleSearch"
-    />
-    
-  </div>
-</form>
-
+        <div class="search-container">
+          <button type="submit" class="search-button">
+            <i class="fas fa-search"></i> <!-- Adicionando o ícone de lupa -->
+          </button>
+          <input
+            type="text"
+            placeholder="Buscar grãos, métodos e muito mais..."
+            class="search-input"
+            v-model="searchQuery"
+            @input="handleSearch"
+          />
+          <button
+            type="button"
+            class="clear-button"
+            v-if="searchQuery"
+            @click="clearSearch"
+          >
+            <i class="fas fa-times"></i> <!-- Ícone de limpar -->
+          </button>
+        </div>
+      </form>
 
       <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
@@ -63,17 +68,16 @@ export default {
     handleSearch() {
       this.$emit('search', this.searchQuery);
     },
+    clearSearch() {
+      this.searchQuery = ""; // Limpa a busca
+      this.handleSearch(); // Atualiza a busca
+    },
   },
 };
 </script>
 
-
-
-
-
 <style scoped>
 @import "@/assets/css/variables.css";
-
 
 .header {
   display: flex;
@@ -91,6 +95,7 @@ export default {
   height: 6.7rem;
   z-index: 20;
 }
+
 .topheader {
   display: flex;
   width: 100%;
@@ -108,7 +113,6 @@ export default {
   width: 15%;
 }
 
-/* Remova ou mantenha o estilo do a e do router-link como necessário */
 a {
   display: flex;
   flex-direction: row;
@@ -138,34 +142,30 @@ a img {
 
 a:hover {
   background: var(--inputs-color);
-  transform: scale(1.1); /* Aumenta o ícone em 20% */
+  transform: scale(1.1);
 }
 
-/* Estilo para o link ativo */
 .active-link {
-  background: #c4ceff; /* Cor azul quando ativo */
-}
-
-#searchandnav {
-  width: 30%;
+  background: #c4ceff;
 }
 
 .search-container {
   width: 100%;
   display: flex;
   justify-content: flex-end;
+  position: relative; /* Adicionando posição relativa para o container */
 }
 
 .search-button {
-  background-color: transparent; /* Fundo transparente para o botão */
-  border: none; /* Remove a borda do botão */
-  cursor: pointer; /* Muda o cursor para uma mãozinha ao passar por cima */
-  margin-right: 1rem; /* Espaçamento entre o input e o botão */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 1rem;
 }
 
 .search-button i {
-  font-size: 2rem; /* Tamanho do ícone */
-  color: #505050; /* Cor do ícone */
+  font-size: 2rem;
+  color: #505050;
 }
 
 form {
@@ -173,8 +173,8 @@ form {
 }
 
 .search-input {
-  border: none;
-  background: var(--inputs-color);
+  border: solid 1px #aeaeaeb6;
+  background: #ededed;
   border-radius: 2rem;
   width: 100%;
   color: var(--text-color);
@@ -185,12 +185,28 @@ form {
   padding: 0;
 }
 
+.search-input::placeholder {
+  color: #9d9d9d !important;
+}
+
 .search-input:focus {
-  color: var(--text-color); /* Altere a cor do contorno conforme necessário */
+  color: var(--text-color);
 }
 
 .search-input::placeholder {
   color: var(--text-color);
+}
+
+.clear-button {
+  background-color: transparent; /* Fundo transparente para o botão de limpar */
+  border: none; /* Remove a borda do botão */
+  cursor: pointer; /* Muda o cursor para uma mãozinha ao passar por cima */
+  position: absolute; /* Posiciona o botão de limpar */
+  right: 10px; /* Espaço do lado direito */
+  top: 50%; /* Centraliza verticalmente */
+  transform: translateY(-50%); /* Ajusta o alinhamento vertical */
+  color: #505050; /* Cor do ícone */
+  font-size: 1.5rem; /* Tamanho do ícone */
 }
 
 header .action-buttons {
