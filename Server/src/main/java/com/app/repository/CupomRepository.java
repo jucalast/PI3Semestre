@@ -1,6 +1,6 @@
 package com.app.repository;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,7 +45,7 @@ public interface CupomRepository extends JpaRepository<CupomModel, Integer> {
      * @param dataValidade A data de validade a ser utilizada na busca.
      * @return Uma lista de CupomModel cuja data de validade corresponda à fornecida.
      */
-    List<CupomModel> findByDataValidade(LocalDateTime dataValidade);
+    List<CupomModel> findByDataValidade(String dataValidade);
     /**
      * Este metodo lista todos os cupons dentro de um intervalo de tempo especificado.
      * @param dataInicio A data de inicio do intervalo de tempo.
@@ -53,6 +53,6 @@ public interface CupomRepository extends JpaRepository<CupomModel, Integer> {
      * @return Uma lista de CupomModel dentro do intervalo de tempo especificado.
      */
     @Query("SELECT c FROM CupomModel c WHERE c.dataValidade BETWEEN :dataInicio AND :dataFim")
-    List<CupomModel> findByDataValidadeBetween(LocalDateTime dataInicio, LocalDateTime dataFim);
+    List<CupomModel> findByDataValidadeBetween(String dataInicio, String dataFim);
 }
 

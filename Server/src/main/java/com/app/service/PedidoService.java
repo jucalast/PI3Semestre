@@ -1,6 +1,6 @@
 package com.app.service;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class PedidoService {
      * @param dataFim Data de fim do intervalo.
      * @return Uma lista de pedidos com data dentro do intervalo especificado.
      */
-    public List<PedidoModel> buscarPedidosPorIntervaloDeDatas(LocalDateTime dataInicio, LocalDateTime dataFim) {
+    public List<PedidoModel> buscarPedidosPorIntervaloDeDatas(String dataInicio, String dataFim) {
         return pedidoRepository.findByDataPedidoBetween(dataInicio, dataFim);
     }
 
@@ -94,7 +94,7 @@ public class PedidoService {
      * @param dataFim Data de fim do intervalo.
      * @return Uma lista de pedidos com data dentro do intervalo especificado.
      */
-    public List<PedidoModel> buscarPedidosPorConsultaCustomizada(LocalDateTime dataInicio, LocalDateTime dataFim) {
+    public List<PedidoModel> buscarPedidosPorConsultaCustomizada(String dataInicio, String dataFim) {
         return pedidoRepository.findPedidosByDataInterval(dataInicio, dataFim);
     }
 }

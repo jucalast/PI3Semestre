@@ -1,6 +1,6 @@
 package com.app.repository;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,7 +28,7 @@ public interface PedidoRepository extends JpaRepository<PedidoModel, Integer> {
      * @param dataFim Data de fim do intervalo.
      * @return Uma lista de pedidos com data dentro do intervalo especificado.
      */
-    List<PedidoModel> findByDataPedidoBetween(LocalDateTime dataInicio, LocalDateTime dataFim);
+    List<PedidoModel> findByDataPedidoBetween(String dataInicio, String dataFim);
 
     /**
      * Encontra pedidos pelo status.
@@ -46,5 +46,5 @@ public interface PedidoRepository extends JpaRepository<PedidoModel, Integer> {
      * @return Uma lista de pedidos com data dentro do intervalo especificado.
      */
     @Query("SELECT p FROM PedidoModel p WHERE p.dataPedido BETWEEN :dataInicio AND :dataFim")
-    List<PedidoModel> findPedidosByDataInterval(LocalDateTime dataInicio, LocalDateTime dataFim);
+    List<PedidoModel> findPedidosByDataInterval(String dataInicio, String dataFim);
 }

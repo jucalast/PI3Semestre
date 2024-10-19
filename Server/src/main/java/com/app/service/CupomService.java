@@ -1,6 +1,5 @@
 package com.app.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,7 +88,7 @@ public class CupomService {
      * @return Lista de cupons dentro do intervalo de datas.
      * 
      */
-    public List<CupomModel> buscarCuponsPorData(LocalDateTime dataInicio, LocalDateTime dataFim) {
+    public List<CupomModel> buscarCuponsPorData(String dataInicio, String dataFim) {
         return cupomRepository.findByDataValidadeBetween(dataInicio, dataFim);
     }
 }

@@ -1,6 +1,5 @@
 package com.app.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,11 +108,10 @@ public class CupomController {
      */
     @GetMapping("/por-data")
     public ResponseEntity<List<CupomModel>> buscarCuponsPorData(
-            @RequestParam("dataInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
-            @RequestParam("dataFim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
+            @RequestParam("dataInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String dataInicio,
+            @RequestParam("dataFim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String dataFim) {
 
         List<CupomModel> cupons = cupomService.buscarCuponsPorData(dataInicio, dataFim);
-
         if (cupons.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }

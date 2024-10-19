@@ -1,7 +1,7 @@
 package com.app.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -43,7 +43,7 @@ public class PedidoModel {
      * Data e hora em que o pedido foi realizado. Este campo é obrigatório.
      */
     @Column(name = "dataPedido", nullable = false)
-    private LocalDateTime dataPedido;
+    private String dataPedido;
 
     /**
      * Status do pedido. Este campo é obrigatório e armazena um valor inteiro

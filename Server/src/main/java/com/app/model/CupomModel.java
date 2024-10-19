@@ -1,6 +1,6 @@
 package com.app.model;
 
-import java.time.LocalDateTime;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -75,7 +75,7 @@ public class CupomModel {
      */
     @NotNull(message = "A data de validade não pode ser nula")
     @Column(nullable = false)
-    private LocalDateTime dataValidade;
+    private String dataValidade;
 
     // Getters e Setters
 
@@ -111,11 +111,11 @@ public class CupomModel {
         this.descricao = descricao;
     }
 
-    public LocalDateTime getDataValidade() {
+    public String getDataValidade() {
         return dataValidade;
     }
 
-    public void setDataValidade(LocalDateTime dataValidade) {
+    public void setDataValidade(String dataValidade) {
         this.dataValidade = dataValidade;
     }
 }
