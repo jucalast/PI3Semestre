@@ -30,7 +30,7 @@ import com.app.service.CupomService;
  * @since 2024-10-15
  */
 @RestController
-@RequestMapping("/api/cupons")
+@RequestMapping("/api/cupom")
 public class CupomController {
 
     private final CupomService cupomService;
@@ -100,6 +100,8 @@ public class CupomController {
 
     /**
      * Endpoint para buscar cupons com base em um intervalo de datas de validade.
+     * 
+     * A URL para esta rota será algo como `/cupons/por-data`.
      * 
      * @param dataInicio A data de início do intervalo de busca (no formato `yyyy-MM-dd'T'HH:mm:ss`).
      * @param dataFim A data de fim do intervalo de busca (no formato `yyyy-MM-dd'T'HH:mm:ss`).

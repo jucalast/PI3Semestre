@@ -6,10 +6,7 @@
     <groupId>com.app</groupId>
     <artifactId>PI3Semestre</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <modules>
-        <module>demo</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>17</java.version>
