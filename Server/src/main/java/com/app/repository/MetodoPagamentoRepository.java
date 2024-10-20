@@ -20,6 +20,9 @@ import com.app.model.MetodoPagamentoModel;
  * 
  * Estende JpaRepository, o que fornece métodos prontos para operações CRUD (create, read, update, delete) e consultas no banco de dados.
  * 
+ * <p>Este repositório oferece métodos para buscar métodos de pagamento com base no nome e listar métodos de pagamento
+ * com detalhes específicos, como nome e taxa.</p>
+ * 
  * @author Kairo Chácara
  * @version 1.0
  * @since 2024-10-14
@@ -35,6 +38,7 @@ public interface MetodoPagamentoRepository extends JpaRepository<MetodoPagamento
      * @return Uma lista de MetodoPagamentoModel que correspondem ao nome fornecido.
      */
     List<MetodoPagamentoModel> findByNome(String nome);
+
     /**
      * Retorna uma lista de métodos de pagamento contendo apenas os campos 'nome' e 'taxa',
      * ordenados em ordem crescente de nome e taxa.

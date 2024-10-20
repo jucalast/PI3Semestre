@@ -1,5 +1,21 @@
 package com.app.service;
 
+/**
+ * Bibliotecas utilizadas:
+ * 
+ * - java.util.List: Interface que representa uma coleção ordenada de elementos, permitindo
+ *   operações como adição, remoção e acesso a elementos por índice.
+ * - java.util.Optional: Classe que representa um valor que pode ou não estar presente,
+ *   evitando NullPointerExceptions e fornecendo métodos para lidar com a ausência de valor.
+ * - org.springframework.beans.factory.annotation.Autowired: Anotação utilizada para injeção
+ *   de dependência em classes do Spring, facilitando a gestão de objetos e seus ciclos de vida.
+ * - org.springframework.stereotype.Service: Anotação que marca a classe como um serviço,
+ *   permitindo que o Spring a detecte e a registre como um bean.
+ * - com.app.model.ProdutoPedidoModel: Classe que representa a associação entre um pedido e um produto, incluindo quantidade
+ *   e subtotal.
+ * - com.app.repository.ProdutoPedidoRepository: Interface que fornece métodos para interagir com o banco de dados
+ *   relacionados à entidade ProdutoPedidoModel.
+ */
 import java.util.List;
 import java.util.Optional;
 

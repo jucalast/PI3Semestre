@@ -1,12 +1,19 @@
 package com.app.model;
 
+/* 
+* Importa a classe BigDecimal para manipulação de valores decimais
+* import java.math.BigDecimal;
+* 
+* Importa as anotações para mapeamento objeto-relacional
+* import jakarta.persistence.*;
+* 
+* Importa a anotação @Data do Lombok para geração automática de métodos
+* import lombok.Data;
+*/
 import java.math.BigDecimal;
 
-
-
-
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.*; 
+import lombok.Data; 
 
 /**
  * Entidade que representa a tabela 'pedidos' no banco de dados.
@@ -19,7 +26,7 @@ import lombok.Data;
  * 
  * @author Kairo Chácara
  * @version 1.0
- * @since 2024-10-15
+ * @since 2024-10-19
  */
 @Data
 @Entity

@@ -1,6 +1,5 @@
 package com.app.repository;
 
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +17,7 @@ import com.app.model.CupomModel;
  * <ul>
  *   <li>**findByNome**: Permite buscar cupons pelo nome.</li>
  *   <li>**findByDataValidade**: Permite buscar cupons com base na data de validade.</li>
+ *   <li>**findByDataValidadeBetween**: Permite buscar cupons que estão válidos dentro de um intervalo de datas.</li>
  * </ul>
  * 
  * <p>Esses métodos utilizam convenções de nomenclatura do Spring Data JPA, que automaticamente cria as consultas com base nos nomes dos métodos.</p>
@@ -46,13 +46,14 @@ public interface CupomRepository extends JpaRepository<CupomModel, Integer> {
      * @return Uma lista de CupomModel cuja data de validade corresponda à fornecida.
      */
     List<CupomModel> findByDataValidade(String dataValidade);
+
     /**
-     * Este metodo lista todos os cupons dentro de um intervalo de tempo especificado.
-     * @param dataInicio A data de inicio do intervalo de tempo.
+     * Lista todos os cupons dentro de um intervalo de tempo especificado.
+     * 
+     * @param dataInicio A data de início do intervalo de tempo.
      * @param dataFim A data de fim do intervalo de tempo.
      * @return Uma lista de CupomModel dentro do intervalo de tempo especificado.
      */
     @Query("SELECT c FROM CupomModel c WHERE c.dataValidade BETWEEN :dataInicio AND :dataFim")
     List<CupomModel> findByDataValidadeBetween(String dataInicio, String dataFim);
 }
-

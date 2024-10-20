@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.model.CupomModel;
 import com.app.repository.CupomRepository;
+
 /**
  * Serviço responsável por implementar a lógica de negócios relacionada a cupons.
  * Inclui operações de criação, leitura, atualização e remoção de cupons.
@@ -15,6 +16,12 @@ import com.app.repository.CupomRepository;
  * @author Kairo Chácara
  * @version 1.0
  * @since 2024-10-15
+ * 
+ * @see CupomRepository
+ * @see CupomModel
+ * @see CupomService
+ * @see CupomController
+ * 
  */
 @Service
 public class CupomService {
@@ -80,13 +87,13 @@ public class CupomService {
     public void deletarCupom(Integer id) {
         cupomRepository.deleteById(id);
     }
+
     /**
-     * Este metodo gera umka lista de mtodos dentro de um intervalo de datas.
+     * Busca uma lista de cupons dentro de um intervalo de datas.
      * 
-     * @param dataInicio A data de inicio do intervalo.
+     * @param dataInicio A data de início do intervalo.
      * @param dataFim A data de fim do intervalo.
      * @return Lista de cupons dentro do intervalo de datas.
-     * 
      */
     public List<CupomModel> buscarCuponsPorData(String dataInicio, String dataFim) {
         return cupomRepository.findByDataValidadeBetween(dataInicio, dataFim);

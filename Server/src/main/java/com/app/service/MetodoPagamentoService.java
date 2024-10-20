@@ -1,4 +1,5 @@
 package com.app.service;
+
 /**
  * Bibliotecas utilizadas:
  * 
@@ -12,12 +13,12 @@ package com.app.service;
  *   de dependência em classes do Spring, facilitando a gestão de objetos e seus ciclos de vida.
  * - org.springframework.stereotype.Service: Anotação que marca a classe como um serviço,
  *   permitindo que o Spring a detecte e a registre como um bean.
+ * - com.app.DTO.MetodoPagamentoNomeTaxaDTO: Classe DTO (Data Transfer Object) usada para transferir
+ *   dados entre camadas, especificamente contendo informações sobre nome e taxa de métodos de pagamento.
  * - com.app.model.MetodoPagamentoModel: Classe que representa o modelo de dados para métodos
  *   de pagamento, contendo atributos e comportamentos relacionados a um método de pagamento específico.
  * - com.app.repository.MetodoPagamentoRepository: Interface que fornece métodos para interagir
  *   com o banco de dados relacionados à entidade MetodoPagamentoModel, estendendo JpaRepository.
- * - com.app.DTO.MetodoPagamentoNomeTaxaDTO: Classe DTO (Data Transfer Object) usada para transferir
- *   dados entre camadas, especificamente contendo informações sobre nome e taxa de métodos de pagamento.
  */
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +31,16 @@ import com.app.DTO.MetodoPagamentoNomeTaxaDTO;
 import com.app.model.MetodoPagamentoModel;
 import com.app.repository.MetodoPagamentoRepository;
 
-
 /**
  * Classe de serviço responsável por realizar operações relacionadas à entidade MetodoPagamentoModel.
  * Esta classe contém a lógica de negócios para métodos de pagamento, incluindo criação, consulta, atualização e remoção.
+ * 
+ * @author Kairo Chácarra
+ * @version 1.0
+ * @since 2024-10-14
+ * 
+ * @see com.app.repository.MetodoPagamentoRepository
+ * 
  */
 @Service
 public class MetodoPagamentoService {
@@ -113,6 +120,7 @@ public class MetodoPagamentoService {
     public List<MetodoPagamentoModel> buscarPorNome(String nome) {
         return metodoPagamentoRepository.findByNome(nome);
     }
+
     /**
      * Lista métodos de pagamento com os campos 'nome' e 'taxa', ordenados em ordem crescente.
      *

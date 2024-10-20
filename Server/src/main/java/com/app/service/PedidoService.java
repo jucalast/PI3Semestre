@@ -1,8 +1,35 @@
 package com.app.service;
 
+/**
+ * Bibliotecas utilizadas:
+ * 
+ * - java.math.BigDecimal: Classe que representa um número de ponto fixo e que permite operações aritméticas
+ *   com precisão arbitrária, ideal para operações financeiras.
+ * - java.util.List: Interface que representa uma coleção ordenada de elementos, permitindo
+ *   operações como adição, remoção e acesso a elementos por índice.
+ * - org.springframework.beans.factory.annotation.Autowired: Anotação utilizada para injeção
+ *   de dependência em classes do Spring, facilitando a gestão de objetos e seus ciclos de vida.
+ * - org.springframework.stereotype.Service: Anotação que marca a classe como um serviço,
+ *   permitindo que o Spring a detecte e a registre como um bean.
+ * - org.springframework.transaction.annotation.Transactional: Anotação que indica que o método deve ser executado
+ *   dentro de uma transação, garantindo a atomicidade das operações.
+ * - com.app.DTO.PedidoDTO: Classe DTO (Data Transfer Object) usada para transferir dados de pedidos entre camadas.
+ * - com.app.DTO.ProdutoPedidoDTO: Classe DTO que representa informações sobre produtos em um pedido.
+ * - com.app.model.PedidoModel: Classe que representa o modelo de dados para pedidos, contendo atributos e comportamentos
+ *   relacionados a um pedido específico.
+ * - com.app.model.Produto: Classe que representa o modelo de dados para produtos, contendo atributos e comportamentos
+ *   relacionados a um produto específico.
+ * - com.app.model.ProdutoPedidoModel: Classe que representa a associação entre um pedido e um produto, incluindo quantidade
+ *   e subtotal.
+ * - com.app.repository.PedidoRepository: Interface que fornece métodos para interagir com o banco de dados relacionados
+ *   à entidade PedidoModel, estendendo JpaRepository.
+ * - com.app.repository.ProdutoPedidoRepository: Interface que fornece métodos para interagir com o banco de dados
+ *   relacionados à entidade ProdutoPedidoModel.
+ * - com.app.repository.ProdutoRepository: Interface que fornece métodos para interagir com o banco de dados
+ *   relacionados à entidade Produto.
+ */
 import java.math.BigDecimal;
 import java.util.List;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,7 +131,8 @@ public class PedidoService {
         }
         return total;
     }
-   /**
+
+    /**
      * Este método irá listar todos os pedidos.
      * 
      * @return Lista de todos os pedidos.
@@ -123,7 +151,6 @@ public class PedidoService {
         return pedidoRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + id));
     }
-    
 
     /**
      * Este método atualiza um pedido existente.
@@ -160,6 +187,4 @@ public class PedidoService {
         PedidoModel pedido = getPedidoById(id); // Busca o pedido para garantir que existe
         pedidoRepository.delete(pedido); // Deleta o pedido
     }
-    
-
 }

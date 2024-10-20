@@ -22,9 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
-
-
-
 /**
  * Classe que representa um método de pagamento.
  * Esta classe está mapeada para a tabela 'metodosDePagamentos' no banco de dados.

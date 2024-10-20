@@ -24,6 +24,18 @@ import com.app.service.CupomService;
  * Controlador responsável por expor endpoints para operações relacionadas a cupons.
  * Inclui endpoints para criar, consultar, atualizar e deletar cupons.
  * 
+ * Bibliotecas utilizadas:
+ * 
+ * - org.springframework.beans.factory.annotation.Autowired: Anotação para injeção
+ *   de dependência, permitindo a injeção do serviço de cupons no controlador.
+ * - org.springframework.format.annotation.DateTimeFormat: Anotação para formatar
+ *   datas nos parâmetros da requisição.
+ * - org.springframework.http.HttpStatus: Enum que representa os códigos de status HTTP.
+ * - org.springframework.http.ResponseEntity: Classe que representa a resposta HTTP
+ *   que pode incluir um corpo e o código de status.
+ * - org.springframework.web.bind.annotation.*: Conjunto de anotações para definir
+ *   controladores REST e mapear endpoints.
+ * 
  * @author Kairo Chácara
  * @version 1.0
  * @since 2024-10-15
@@ -100,7 +112,7 @@ public class CupomController {
     /**
      * Endpoint para buscar cupons com base em um intervalo de datas de validade.
      * 
-     * A URL para esta rota será algo como `/cupons/por-data`.
+     * A URL para esta rota será algo como `/api/cupom/por-data`.
      * 
      * @param dataInicio A data de início do intervalo de busca (no formato `yyyy-MM-dd'T'HH:mm:ss`).
      * @param dataFim A data de fim do intervalo de busca (no formato `yyyy-MM-dd'T'HH:mm:ss`).
