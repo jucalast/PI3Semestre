@@ -1,13 +1,21 @@
 package com.app.service;
 
-
+import java.math.BigDecimal;
 import java.util.List;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.app.DTO.PedidoDTO;
+import com.app.DTO.ProdutoPedidoDTO;
 import com.app.model.PedidoModel;
+import com.app.model.Produto;
+import com.app.model.ProdutoPedidoModel;
 import com.app.repository.PedidoRepository;
+import com.app.repository.ProdutoPedidoRepository;
+import com.app.repository.ProdutoRepository;
 
 /**
  * Serviço responsável por realizar as operações de negócios
@@ -21,80 +29,137 @@ import com.app.repository.PedidoRepository;
 @Service
 public class PedidoService {
 
-    private final PedidoRepository pedidoRepository;
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     @Autowired
-    public PedidoService(PedidoRepository pedidoRepository) {
-        this.pedidoRepository = pedidoRepository;
+    private ProdutoPedidoRepository produtoPedidoRepository;
+
+    @Autowired
+    private ProdutoRepository produtoRepository;
+
+    /**
+     * Cria um novo pedido e os produtos associados a ele.
+     * 
+     * @param pedidoDTO O DTO contendo as informações do pedido e dos produtos.
+     * @return O pedido salvo com os produtos associados.
+     */
+    @Transactional
+    public PedidoModel criarPedidoComProdutos(PedidoDTO pedidoDTO) {
+        // Criar o pedido
+        PedidoModel pedido = new PedidoModel();
+        pedido.setUsuarioId(pedidoDTO.getUsuarioId());
+        pedido.setDataPedido(pedidoDTO.getDataPedido());
+        pedido.setStatusPedido(pedidoDTO.getStatusPedido());
+        pedido.setTotal(calcularTotal(pedidoDTO.getProdutos()));
+        pedido.setObservacoes(pedidoDTO.getObservacoes());
+        pedido.setEstado(pedidoDTO.getEstado());
+        pedido.setCep(pedidoDTO.getCep());
+        pedido.setCidade(pedidoDTO.getCidade());
+        pedido.setBairro(pedidoDTO.getBairro());
+        pedido.setComplemento(pedidoDTO.getComplemento());
+        pedido.setNumero(pedidoDTO.getNumero());
+        pedido.setRua(pedidoDTO.getRua());
+
+        // Salvar o pedido
+        PedidoModel pedidoSalvo = pedidoRepository.save(pedido);
+
+        // Criar os produtos do pedido
+        for (ProdutoPedidoDTO produtoDTO : pedidoDTO.getProdutos()) {
+            Produto produto = produtoRepository.findById(produtoDTO.getProdutoId())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + produtoDTO.getProdutoId()));
+
+            // Verifique se a quantidade solicitada está disponível no estoque
+            if (produto.getQuantidadeEstoque() < produtoDTO.getQuantidade()) {
+                throw new RuntimeException("Quantidade solicitada para o produto " + produto.getNome() + " não está disponível no estoque.");
+            }
+
+            ProdutoPedidoModel produtoPedido = new ProdutoPedidoModel();
+            produtoPedido.setPedido(pedidoSalvo);
+            produtoPedido.setProduto(produto);
+            produtoPedido.setQuantidade(produtoDTO.getQuantidade());
+            produtoPedido.setSubtotal(produto.getPreco().multiply(BigDecimal.valueOf(produtoDTO.getQuantidade())));
+
+            // Salvar o produto do pedido
+            produtoPedidoRepository.save(produtoPedido);
+
+            // Atualiza a quantidade no estoque do produto
+            produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - produtoDTO.getQuantidade());
+            produtoRepository.save(produto); // Salva as alterações no produto
+        }
+
+        return pedidoSalvo;
     }
 
     /**
-     * Busca todos os pedidos armazenados no banco de dados.
+     * Calcula o total do pedido com base nos produtos.
      * 
-     * @return Uma lista com todos os pedidos.
+     * @param produtos A lista de produtos do pedido.
+     * @return O total calculado.
      */
-    public List<PedidoModel> listarTodosPedidos() {
+    private BigDecimal calcularTotal(List<ProdutoPedidoDTO> produtos) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (ProdutoPedidoDTO produtoDTO : produtos) {
+            total = total.add(produtoDTO.getSubtotal());
+        }
+        return total;
+    }
+   /**
+     * Este método irá listar todos os pedidos.
+     * 
+     * @return Lista de todos os pedidos.
+     */
+    public List<PedidoModel> getAllPedidos() {
         return pedidoRepository.findAll();
     }
 
     /**
-     * Busca um pedido pelo seu ID.
+     * Este método busca um pedido por ID.
      * 
-     * @param id O ID do pedido.
-     * @return O pedido correspondente ao ID, ou null se não encontrado.
+     * @param id ID do pedido.
+     * @return O pedido encontrado ou null se não encontrado.
      */
-    public PedidoModel buscarPedidoPorId(Integer id) {
-        return pedidoRepository.findById(id).orElse(null);
+    public PedidoModel getPedidoById(Long id) {
+        return pedidoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + id));
+    }
+    
+
+    /**
+     * Este método atualiza um pedido existente.
+     * 
+     * @param id ID do pedido a ser atualizado.
+     * @param pedido Os dados do pedido para atualização.
+     * @return O pedido atualizado.
+     */
+    @Transactional
+    public PedidoModel updatePedido(Long id, PedidoModel pedido) {
+        PedidoModel pedidoExistente = getPedidoById(id); // Busca o pedido existente
+        pedidoExistente.setUsuarioId(pedido.getUsuarioId());
+        pedidoExistente.setDataPedido(pedido.getDataPedido());
+        pedidoExistente.setStatusPedido(pedido.getStatusPedido());
+        pedidoExistente.setTotal(pedido.getTotal());
+        pedidoExistente.setObservacoes(pedido.getObservacoes());
+        pedidoExistente.setEstado(pedido.getEstado());
+        pedidoExistente.setCep(pedido.getCep());
+        pedidoExistente.setCidade(pedido.getCidade());
+        pedidoExistente.setBairro(pedido.getBairro());
+        pedidoExistente.setComplemento(pedido.getComplemento());
+        pedidoExistente.setNumero(pedido.getNumero());
+        pedidoExistente.setRua(pedido.getRua());
+
+        return pedidoRepository.save(pedidoExistente); // Salva as alterações
     }
 
     /**
-     * Salva ou atualiza um pedido no banco de dados.
+     * Este método deleta um pedido por ID.
      * 
-     * @param pedido O pedido a ser salvo ou atualizado.
-     * @return O pedido salvo ou atualizado.
+     * @param id ID do pedido a ser deletado.
      */
-    public PedidoModel salvarOuAtualizarPedido(PedidoModel pedido) {
-        return pedidoRepository.save(pedido);
+    public void deletePedido(Long id) {
+        PedidoModel pedido = getPedidoById(id); // Busca o pedido para garantir que existe
+        pedidoRepository.delete(pedido); // Deleta o pedido
     }
+    
 
-    /**
-     * Exclui um pedido pelo seu ID.
-     * 
-     * @param id O ID do pedido a ser excluído.
-     */
-    public void excluirPedido(Integer id) {
-        pedidoRepository.deleteById(id);
-    }
-
-    /**
-     * Busca todos os pedidos dentro de um intervalo de datas.
-     * 
-     * @param dataInicio Data de início do intervalo.
-     * @param dataFim Data de fim do intervalo.
-     * @return Uma lista de pedidos com data dentro do intervalo especificado.
-     */
-    public List<PedidoModel> buscarPedidosPorIntervaloDeDatas(String dataInicio, String dataFim) {
-        return pedidoRepository.findByDataPedidoBetween(dataInicio, dataFim);
-    }
-
-    /**
-     * Busca todos os pedidos com o status especificado.
-     * 
-     * @param statusPedido O status do pedido.
-     * @return Uma lista de pedidos com o status especificado.
-     */
-    public List<PedidoModel> buscarPedidosPorStatus(Integer statusPedido) {
-        return pedidoRepository.findByStatusPedido(statusPedido);
-    }
-
-    /**
-     * Busca todos os pedidos dentro de um intervalo de datas utilizando uma consulta customizada.
-     * 
-     * @param dataInicio Data de início do intervalo.
-     * @param dataFim Data de fim do intervalo.
-     * @return Uma lista de pedidos com data dentro do intervalo especificado.
-     */
-    public List<PedidoModel> buscarPedidosPorConsultaCustomizada(String dataInicio, String dataFim) {
-        return pedidoRepository.findPedidosByDataInterval(dataInicio, dataFim);
-    }
 }

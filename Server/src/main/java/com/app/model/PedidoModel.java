@@ -3,6 +3,8 @@ package com.app.model;
 import java.math.BigDecimal;
 
 
+
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -30,7 +32,7 @@ public class PedidoModel {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     /**
      * ID do usuário que fez o pedido. Este campo referencia a tabela 'usuarios',
