@@ -37,13 +37,16 @@ public class MainController {
 
     /**
      * Rota que retorna as informações do usuário autenticado.
-     *
+     * <p>
      * Este método verifica se o usuário está autenticado, recuperando as
      * informações diretamente da sessão. Caso o usuário tenha sido autenticado
-     * via OAuth2 ou login por formulário, seus dados (nome, e-mail e telefone)
+     * via OAuth2 ou login por formulário, seus dados (id, nome, e-mail e telefone)
      * são coletados e retornados em formato JSON. Se o usuário não estiver
      * autenticado, a resposta será um erro 401 (Unauthorized).
-     *
+     * <p>
+     * -> Este método é útil para entender como funciona a obtenção de informações
+     * por meio de uma sessão de usuário. <-
+     * <p>
      * @param request O objeto HttpServletRequest utilizado para acessar a
      * sessão do usuário.
      * @param user O objeto Principal que representa o usuário autenticado.
