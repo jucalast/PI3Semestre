@@ -2,9 +2,7 @@ package com.app.controller;
 
 import com.app.model.UserModel;
 import com.app.service.UserService;
-
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -102,6 +100,7 @@ public class UserController {
 
             UserModel user = userService.getUserFromAuthentication(authentication);
             request.getSession().setAttribute("user", user);
+            request.getSession().setAttribute("userId", user.getId());
 
             return "redirect:" + frontendUrl;
         } catch (AuthenticationException e) {
@@ -137,6 +136,7 @@ public class UserController {
         authenticatedUser.setRoles("ROLE_USER");
 
         request.getSession().setAttribute("user", authenticatedUser);
+        request.getSession().setAttribute("userId", authenticatedUser.getId());
 
         return "redirect:" + frontendUrl;
     }
