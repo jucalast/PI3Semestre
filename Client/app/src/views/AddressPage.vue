@@ -9,7 +9,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="col-span-1">
                         <label class="block text-gray-700" for="zipCode">CEP</label>
-                        <input type="text" v-model="address.zipCode" id="zipCode" required class="input-cep" />
+                        <input type="text" v-model="address.zipCode" id="zipCode" @blur="fetchAddressByZipCode" required class="input-cep" />
                     </div>
 
                     <div>
@@ -24,8 +24,7 @@
 
                     <div>
                         <label class="block text-gray-700" for="neighborhood">Bairro</label>
-                        <input type="text" v-model="address.neighborhood" id="neighborhood" required
-                            class="input-field" />
+                        <input type="text" v-model="address.neighborhood" id="neighborhood" required class="input-field" />
                     </div>
 
                     <div>
@@ -61,8 +60,7 @@
                     </div>
                     <div>
                         <button @click="editAddress(addr)" class="text-blue-600 hover:underline">Editar</button>
-                        <button @click="deleteAddress(addr.id)"
-                            class="ml-4 text-red-600 hover:underline">Remover</button>
+                        <button @click="deleteAddress(addr.id)" class="ml-4 text-red-600 hover:underline">Remover</button>
                     </div>
                 </li>
             </ul>
@@ -72,6 +70,7 @@
 
 <script>
 import axiosInstance from '@/utils/axiosInstance';
+import axios from 'axios';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 export default {
@@ -105,6 +104,23 @@ export default {
                 console.error('Erro ao buscar endereços:', error);
             }
         },
+        async fetchAddressByZipCode() {
+            if (this.address.zipCode.length === 8) { 
+                try {
+                    const response = await axios.get(`https://viacep.com.br/ws/${this.address.zipCode}/json/`);
+                    if (response.data && !response.data.erro) {
+                        this.address.street = response.data.logradouro;
+                        this.address.neighborhood = response.data.bairro;
+                        this.address.city = response.data.localidade;
+                        this.address.state = response.data.uf;
+                    } else {
+                        alert('CEP não encontrado.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar endereço:', error);
+                }
+            }
+        },
         async submitAddress() {
             try {
                 if (this.isEditing) {
@@ -121,7 +137,7 @@ export default {
         editAddress(address) {
             this.address = { ...address };
             this.currentAddressId = address.id;
-            this.isEditing = true; 
+            this.isEditing = true;
         },
         async deleteAddress(id) {
             if (confirm('Tem certeza que deseja remover este endereço?')) {
@@ -142,11 +158,11 @@ export default {
                 state: '',
                 zipCode: '',
             };
-            this.isEditing = false; 
+            this.isEditing = false;
             this.currentAddressId = null;
         },
         cancelEdit() {
-            this.resetForm(); 
+            this.resetForm();
         },
     },
 };
