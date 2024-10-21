@@ -7,7 +7,7 @@
 
         <!-- SUPERIOR -->
         <div class="section bg-gray-200 flex-1 p-4 rounded-lg shadow-md h-1/2">
-          <p>Esquerda, cima</p>
+          <p>Métodos de pagamento (A fazer)</p>
         </div>
 
         <!-- INFERIOR -->
@@ -19,7 +19,7 @@
       <!-- DIREITA -->
       <div class="right-section w-full md:w-2/5 pl-4">
         <div class="section bg-gray-400 h-full p-4 rounded-lg shadow-md">
-          <p>Direita</p>
+          <p>Detalhes da compra (A fazer)</p>
         </div>
       </div>
     </div>

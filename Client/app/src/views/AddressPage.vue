@@ -8,7 +8,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="col-span-1">
                         <label class="block text-gray-700" for="zipCode">CEP</label>
-                        <input type="text" v-model="address.zipCode" id="zipCode" @blur="fetchAddressByZipCode" required
+                        <input type="text" v-model="address.zipCode" v-mask="'#####-###'" id="zipCode" @blur="fetchAddressByZipCode" required
                             class="input-cep" />
                         <p class="mt-1 text-sm text-gray-600">
                             <a href="https://www.correios.com.br/para-voce/cep" target="_blank"
@@ -41,7 +41,7 @@
 
                     <div>
                         <label class="block text-gray-700" for="state">Estado</label>
-                        <input type="text" v-model="address.state" id="state" required class="input-field" />
+                        <input type="text" v-model="address.state" v-mask="'AA'" id="state" required class="input-field" />
                     </div>
                 </div>
 
@@ -113,7 +113,7 @@ export default {
             }
         },
         async fetchAddressByZipCode() {
-            const cleanZipCode = this.address.zipCode.replace(/\D/g, '');
+            const cleanZipCode = this.address.zipCode;
 
             if (cleanZipCode.length === 8) {
                 try {
@@ -124,7 +124,7 @@ export default {
                         this.address.city = response.data.localidade;
                         this.address.state = response.data.uf;
                     } else {
-                        alert('CEP não encontrado.');
+                        //alert('CEP não encontrado.');
                     }
                 } catch (error) {
                     console.error('Erro ao buscar endereço:', error);
