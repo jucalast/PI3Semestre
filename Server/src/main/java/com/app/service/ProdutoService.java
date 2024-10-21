@@ -1,11 +1,10 @@
 package com.app.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.function.BiPredicate;
 
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -29,14 +28,6 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
-
-
-    public List<Produto> filtrarProdutos(String nome, BigDecimal precoMin, BigDecimal precoMax, 
-                                         String origem, String variedade, String torrefacao, 
-                                         String tipoPreparo, MetodoPreparo.Complexidade complexidade) {
-        
-        return produtoRepository.filtrarPorAtributos(nome, precoMin, precoMax, origem, variedade, torrefacao, tipoPreparo, complexidade);
-    }
 
     @Transactional
     public Produto createProduto(Produto produto) {
@@ -72,23 +63,6 @@ public class ProdutoService {
         logger.info("Listando todos os produtos com suas especializações");
         List<Produto> produtos = produtoRepository.findAll();
         // Aqui, não é necessário usar Hibernate.initialize, porque estamos usando EAGER
-        return produtos;
-    }
-
-    public List<Produto> searchProdutosByNome(String nome) {
-        logger.info("Buscando produtos com o nome: {}", nome);
-        List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCase(nome);
-
-        if (produtos.isEmpty()) {
-            logger.warn("Nenhum produto encontrado com o nome: {}", nome);
-        }
-
-        // Inicializa as especializações para cada produto
-        produtos.forEach(produto -> {
-            Hibernate.initialize(produto.getCafeEspecial());
-            Hibernate.initialize(produto.getMetodoPreparo());
-        });
-
         return produtos;
     }
 
@@ -145,7 +119,6 @@ public class ProdutoService {
         logger.info("Produto com ID {} deletado com sucesso", id);
     }
 
-
     @Autowired
     private CafeEspecialRepository cafeEspecialRepository;
 
@@ -185,4 +158,51 @@ public class ProdutoService {
 
         return listaAtributos;
     }
+
+    public List<Produto> buscarProdutosPorAtributo(String atributo, String valor) {
+        logger.info("Buscando produtos pelo atributo {} com valor {}", atributo, valor);
+        List<Produto> produtos = produtoRepository.findAll();
+        List<Produto> produtosFiltrados = new ArrayList<>();
+
+        // Mapeia os atributos para suas funções de verificação
+        Map<String, BiPredicate<CafeEspecial, String>> cafeEspecialChecks = new HashMap<>();
+        cafeEspecialChecks.put("variedade", (cafeEspecial, v) -> cafeEspecial.getVariedade() != null && cafeEspecial.getVariedade().equalsIgnoreCase(v));
+        cafeEspecialChecks.put("torra", (cafeEspecial, v) -> cafeEspecial.getTorra() != null && cafeEspecial.getTorra().equalsIgnoreCase(v));
+        cafeEspecialChecks.put("origem", (cafeEspecial, v) -> cafeEspecial.getOrigem() != null && cafeEspecial.getOrigem().equalsIgnoreCase(v));
+        cafeEspecialChecks.put("notassensoriais", (cafeEspecial, v) -> cafeEspecial.getNotasSensoriais() != null && cafeEspecial.getNotasSensoriais().equalsIgnoreCase(v));
+        cafeEspecialChecks.put("recomendacoespreparo", (cafeEspecial, v) -> cafeEspecial.getRecomendacoesPreparo() != null && cafeEspecial.getRecomendacoesPreparo().equalsIgnoreCase(v));
+        cafeEspecialChecks.put("torrefacao", (cafeEspecial, v) -> cafeEspecial.getTorrefacao() != null && cafeEspecial.getTorrefacao().equalsIgnoreCase(v));
+
+        Map<String, BiPredicate<MetodoPreparo, String>> metodoPreparoChecks = new HashMap<>();
+        metodoPreparoChecks.put("marca", (metodoPreparo, v) -> metodoPreparo.getMarca() != null && metodoPreparo.getMarca().equalsIgnoreCase(v));
+        metodoPreparoChecks.put("complexidade", (metodoPreparo, v)
+                -> metodoPreparo.getComplexidade() != null
+                && metodoPreparo.getComplexidade().toString().equalsIgnoreCase(v));
+        metodoPreparoChecks.put("material", (metodoPreparo, v) -> metodoPreparo.getMaterial() != null && metodoPreparo.getMaterial().equalsIgnoreCase(v));
+        metodoPreparoChecks.put("tipopreparo", (metodoPreparo, v) -> metodoPreparo.getTipoPreparo() != null && metodoPreparo.getTipoPreparo().equalsIgnoreCase(v));
+
+        for (Produto produto : produtos) {
+            boolean atendeCriterio = false;
+
+            // Verificar se o produto possui CafeEspecial e se contém o atributo correspondente
+            CafeEspecial cafeEspecial = produto.getCafeEspecial();
+            if (cafeEspecial != null && cafeEspecialChecks.containsKey(atributo.toLowerCase())) {
+                atendeCriterio = cafeEspecialChecks.get(atributo.toLowerCase()).test(cafeEspecial, valor);
+            }
+
+            // Verificar se o produto possui MetodoPreparo e se contém o atributo correspondente
+            MetodoPreparo metodoPreparo = produto.getMetodoPreparo();
+            if (metodoPreparo != null && metodoPreparoChecks.containsKey(atributo.toLowerCase())) {
+                atendeCriterio = metodoPreparoChecks.get(atributo.toLowerCase()).test(metodoPreparo, valor);
+            }
+
+            // Se algum critério for atendido, adicione o produto à lista filtrada
+            if (atendeCriterio) {
+                produtosFiltrados.add(produto);
+            }
+        }
+
+        return produtosFiltrados;
+    }
+
 }

@@ -3,10 +3,10 @@
     <div v-if="isLoading">
       <p>Carregando produtos...</p>
     </div>
-    <div v-else-if="filteredProdutos.length > 0" class="card-container">
+    <div v-else-if="produtos.length > 0" class="card-container">
       <div class="cards">
         <div
-          v-for="produto in filteredProdutos"
+          v-for="produto in (filteredProdutos.length > 0 ? filteredProdutos : produtos)"
           :key="produto.id"
           class="product-card"
           @click="openModal(produto)"
@@ -23,13 +23,13 @@
                 <p>{{ produto.preco.toFixed(2) }}</p>
                 <button
                   class="favorire-button"
-                  @click.stop="handleFavoriteClick"
+                  @click.stop="handleFavoriteClick(produto)"
                 >
                   <font-awesome-icon icon="star" class="favoritocard" />
                 </button>
                 <button
                   class="favorire-button"
-                  @click.stop="handleFavoriteClick"
+                  @click.stop="handleCartClick(produto)"
                 >
                   <font-awesome-icon
                     icon="fa-solid fa-shopping-cart"
@@ -57,7 +57,6 @@
 <script>
 import ProductModal from "@/components/ProductModal.vue";
 import axios from "axios";
-
 export default {
   props: {
     produtos: {
@@ -72,6 +71,10 @@ export default {
       type: String,
       default: "",
     },
+    selectedValues: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   components: {
     ProductModal,
@@ -84,53 +87,44 @@ export default {
   },
   computed: {
     filteredProdutos() {
-      if (!this.searchQuery) {
-        return this.produtos;
-      }
-      return this.produtos.filter((produto) =>
+      if (!this.produtos.length) return [];
+      const searchFiltered = this.produtos.filter((produto) =>
         produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
+      const finalFiltered = this.filterBySelectedAttributes(searchFiltered);
+      return finalFiltered;
     },
   },
   methods: {
     async openModal(product) {
-      this.selectedProduct = { ...product }; // Cria uma cópia do produto
+      this.selectedProduct = { ...product };
       await this.fetchProductDetails(product.id);
 
       if (
         !this.selectedProduct.cafeEspecial &&
         !this.selectedProduct.metodoPreparo
       ) {
-        this.selectedProduct = null; // Limpa o produto se não encontrado
+        this.selectedProduct = null;
         alert("Nenhum detalhe encontrado para este produto.");
       } else {
-        this.isModalVisible = true; // Abrir o modal apenas se os detalhes foram carregados
+        this.isModalVisible = true;
       }
     },
     async fetchProductDetails(productId) {
       try {
-        // Primeiro, tente buscar o produto em "cafes-especiais"
         const cafeResponse = await axios.get(
           `http://localhost:8080/api/cafes-especiais/produto/${productId}`
         );
 
         if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
           this.selectedProduct.cafeEspecial = cafeResponse.data;
-          console.log("Café especial encontrado:", cafeResponse.data);
         } else {
-          console.log(
-            "Café especial não encontrado, tentando buscar método de preparo..."
-          );
           const metodoResponse = await axios.get(
             `http://localhost:8080/api/metodo-preparo/produto/${productId}`
           );
 
-          if (
-            metodoResponse.data &&
-            Object.keys(metodoResponse.data).length > 0
-          ) {
+          if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
             this.selectedProduct.metodoPreparo = metodoResponse.data;
-            console.log("Método de preparo encontrado:", metodoResponse.data);
           } else {
             throw new Error(
               `Produto com ID ${productId} não encontrado em nenhum dos endpoints.`
@@ -139,24 +133,47 @@ export default {
         }
       } catch (error) {
         console.error("Erro ao buscar detalhes do produto:", error.message);
-        this.selectedProduct = {}; // Limpa o produto se não encontrado
+        this.selectedProduct = {};
         alert(`Erro: ${error.message}`);
       }
     },
-    async fetchProdutos() {
-      try {
-        const response = await axios.get("http://localhost:8080/api/produtos");
-        this.produtos = response.data; // Armazena os produtos apenas uma vez
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
+    filterBySelectedAttributes(produtos) {
+      const hasSelectedValues = Object.values(this.selectedValues).some(valor => valor);
+      if (!hasSelectedValues) {
+        return produtos; // Retorna todos os produtos se nenhum filtro estiver selecionado
       }
+
+      let filtered = produtos;
+      for (const [atributo, valor] of Object.entries(this.selectedValues)) {
+        if (valor) {
+          filtered = filtered.filter((produto) => produto[atributo] === valor);
+        }
+      }
+
+      return filtered;
+    },
+    handleFavoriteClick(produto) {
+      // Lógica para adicionar/remover produto aos favoritos
+    },
+    handleCartClick(produto) {
+      // Lógica para adicionar produto ao carrinho
     },
   },
-  mounted() {
-    this.fetchProdutos(); // Chama a função uma vez ao montar o componente
+
+  watch: {
+    selectedValues: {
+      handler(newValue) {
+        this.$forceUpdate(); // Força a atualização do componente
+      },
+      deep: true,
+    },
   },
 };
 </script>
+
+
+
+
 
 <style>
 .card-container {

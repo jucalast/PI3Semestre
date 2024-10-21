@@ -1,86 +1,83 @@
 <template>
   <DefaultLayout @search="updateSearchQuery">
     <div class="product-page">
+      <!-- Componente para listar os rádios selecionados -->
+      <SelectedRadios 
+        :selectedRadios="selectedValues" 
+        @update-selected-radios="updateSelectedRadios" 
+      />
       <div class="sessiontwo">
-        <!-- Adicionando o Acordeon -->
-        <AtributosProduto />
+        <!-- Adicionando o Acordeon para selecionar os filtros -->
+        <AtributosProduto
+          @produtos-filtrados-atualizados="updateFilteredProducts"
+          @update-selected-radios="updateSelectedRadios"
+        />
 
         <div class="product-list no-margin">
-          <ProductCard :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
+          <!-- Componente para exibir a lista de produtos filtrados -->
+          <ProductCard
+            :produtos="produtos"
+            :searchQuery="searchQuery"
+            :isLoading="isLoading"
+          />
         </div>
       </div>
     </div>
   </DefaultLayout>
 </template>
 
-
 <script>
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import ProductCard from '@/components/ProductCard.vue';
-import AtributosProduto  from '@/components/AtributosProduto.vue'; // Importação do acordeon
-import axios from 'axios';
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import ProductCard from "@/components/ProductCard.vue";
+import AtributosProduto from "@/components/AtributosProduto.vue";
+import SelectedRadios from "@/components/SelectedRadios.vue";  // Importando o novo componente
+import axios from "axios";
 
 export default {
   components: {
     DefaultLayout,
     ProductCard,
-    AtributosProduto , // Registro do componente
+    AtributosProduto,
+    SelectedRadios,
   },
   data() {
     return {
-      produtos: [],
-      atributos: [], // Nova propriedade para os atributos do accordion
-      isLoading: true,
-      searchQuery: "",
+      produtos: [],         // Lista de produtos
+      isLoading: true,      // Indica se a lista de produtos está carregando
+      searchQuery: "",      // Termo de busca
+      selectedValues: {},   // Para armazenar os valores selecionados dos rádios
     };
-  },
-  computed: {
-    filteredProducts() {
-      if (!this.searchQuery) {
-        return this.produtos;
-      }
-      return this.produtos.filter(produto => 
-        produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    }
   },
   methods: {
     async fetchProdutos() {
       try {
         const response = await axios.get("http://localhost:8080/api/produtos");
         this.produtos = response.data;
-        this.extractAtributos(); // Extrai os atributos dos produtos para o accordion
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
       } finally {
         this.isLoading = false;
       }
     },
-    extractAtributos() {
-      // Supondo que você quer pegar alguns atributos dos produtos
-      this.atributos = this.produtos.map(produto => ({
-        avaliacao: produto.avaliacao,
-        notasSensoriais: produto.notasSensoriais,
-        origem: produto.origem,
-        recomendacoesPreparo: produto.recomendacoesPreparo,
-        torra: produto.torra,
-        torrefacao: produto.torrefacao,
-        variedade: produto.variedade,
-        complexidade: produto.complexidade,
-        marca: produto.marca,
-        material: produto.material,
-        tipoPreparo: produto.tipoPreparo,
-      }));
-    },
+    
     updateSearchQuery(query) {
       this.searchQuery = query;
-    }
+    },
+    
+    updateFilteredProducts(produtos) {
+      this.produtos = produtos; // Atualiza a lista de produtos filtrados
+    },
+
+    updateSelectedRadios(selectedValues) {
+      this.selectedValues = selectedValues; // Atualiza os valores selecionados nos rádios
+    },
   },
   mounted() {
-    this.fetchProdutos(); // Chama a função uma vez ao montar o componente
+    this.fetchProdutos();
   },
 };
 </script>
+
 
 <style scoped>
 .product-list {
@@ -105,7 +102,6 @@ export default {
 
 .sessionone {
   background: #c2cdff;
-
 }
 
 .sessiontwo {
