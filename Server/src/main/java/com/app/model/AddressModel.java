@@ -1,5 +1,6 @@
 package com.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -75,6 +76,7 @@ public class AddressModel {
     /**
      * Relação N:N com UserModel.
      */
+    @JsonIgnore
     @ManyToMany(mappedBy = "addresses") 
     private List<UserModel> users; 
 }
