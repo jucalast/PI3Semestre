@@ -234,7 +234,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 .product-page .cards {
   margin-top: 0;
@@ -328,7 +329,6 @@ export default {
   width: 25%;
   height: 25%;
 }
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 .modal-content {
   background-color: white;
