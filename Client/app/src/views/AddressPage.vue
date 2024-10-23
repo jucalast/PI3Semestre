@@ -6,42 +6,50 @@
                 <h2 class="text-2xl font-semibold mb-4">Adicionar/Editar Endereço</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- CEP -->
                     <div class="col-span-1">
                         <label class="block text-gray-700" for="zipCode">CEP</label>
-                        <input type="text" v-model="address.zipCode" v-mask="'#####-###'" id="zipCode" @blur="fetchAddressByZipCode" required
-                            class="input-cep" />
+                        <input type="text" v-model="address.zipCode" v-mask="'########'" id="zipCode"
+                            @blur="fetchAddressByZipCode" required class="input-cep" />
                         <p class="mt-1 text-sm text-gray-600">
-                            <a href="https://www.correios.com.br/para-voce/cep" target="_blank"
+                            <a href="https://buscacepinter.correios.com.br" target="_blank"
                                 class="text-blue-600 hover:underline">
                                 Procure seu CEP
                             </a>
                         </p>
                     </div>
 
+                    <!-- Rua -->
                     <div>
                         <label class="block text-gray-700" for="street">Rua</label>
                         <input type="text" v-model="address.street" id="street" required class="input-field" />
                     </div>
 
+                    <!-- Número -->
                     <div>
                         <label class="block text-gray-700" for="number">Número</label>
                         <input type="text" v-model="address.number" id="number" required class="input-field" />
                     </div>
 
+                    <!-- Bairro -->
                     <div>
                         <label class="block text-gray-700" for="neighborhood">Bairro</label>
                         <input type="text" v-model="address.neighborhood" id="neighborhood" required
                             class="input-field" />
                     </div>
 
+                    <!-- Cidade -->
                     <div>
                         <label class="block text-gray-700" for="city">Cidade</label>
                         <input type="text" v-model="address.city" id="city" required class="input-field" />
                     </div>
 
+                    <!-- Estado -->
                     <div>
                         <label class="block text-gray-700" for="state">Estado</label>
-                        <input type="text" v-model="address.state" v-mask="'AA'" id="state" required class="input-field" />
+                        <input type="text" v-model="address.state" v-mask="'AA'" id="state" required
+                            class="input-field" />
                     </div>
                 </div>
 
@@ -67,8 +75,7 @@
                     </div>
                     <div>
                         <button @click="editAddress(addr)" class="text-blue-600 hover:underline">Editar</button>
-                        <button @click="deleteAddress(addr.id)"
-                            class="ml-4 text-red-600 hover:underline">Remover</button>
+                        <button @click="deleteAddress(addr.id)" class="ml-4 text-red-600 hover:underline">Remover</button>
                     </div>
                 </li>
             </ul>
@@ -77,8 +84,8 @@
 </template>
 
 <script>
-import axiosInstance from '@/utils/axiosInstance';
 import axios from 'axios';
+import axiosInstance from '@/utils/axiosInstance';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 export default {
@@ -173,6 +180,8 @@ export default {
         },
         cancelEdit() {
             this.resetForm();
+            this.isEditing = false;
+            this.currentAddressId = null;
         },
     },
 };

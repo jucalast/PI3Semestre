@@ -15,22 +15,12 @@
       <form @submit.prevent="handleSearchSubmit">
         <div class="search-container">
           <button type="submit" class="search-button">
-            <i class="fas fa-search"></i> <!-- Adicionando o ícone de lupa -->
+            <i class="fas fa-search"></i>
           </button>
-          <input
-            type="text"
-            placeholder="Buscar grãos, métodos e muito mais..."
-            class="search-input"
-            v-model="searchQuery"
-            @input="handleSearch"
-          />
-          <button
-            type="button"
-            class="clear-button"
-            v-if="searchQuery"
-            @click="clearSearch"
-          >
-            <i class="fas fa-times"></i> <!-- Ícone de limpar -->
+          <input type="text" placeholder="Buscar grãos, métodos e muito mais..." class="search-input"
+            v-model="searchQuery" @input="handleSearch" />
+          <button type="button" class="clear-button" v-if="searchQuery" @click="clearSearch">
+            <i class="fas fa-times"></i>
           </button>
         </div>
       </form>
@@ -45,9 +35,22 @@
         <button class="action-button cart-button" @click="handleCartClick">
           <img src="@/assets/carrinho.png" alt="Cart" />
         </button>
-        <button class="action-button user-button" @click="handleUserClick">
-          <img src="@/assets/user.png" alt="User" />
-        </button>
+        <div class="user-dropdown">
+          <button class="action-button user-button" @click="toggleDropdown">
+            <img src="@/assets/user.png" alt="User" />
+          </button>
+          <div class="dropdown-content" v-if="dropdownVisible">
+            <div v-if="isAuthenticated">
+              <router-link to="/profile">Perfil</router-link>
+              <router-link to="/settings">Configurações</router-link>
+              <button @click="handleLogout">Sair</button>
+            </div>
+            <div v-else>
+              <a :href="`${baseURL}/login`">Login</a>
+              <a :href="`${baseURL}/register`">Registrar</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="divnav"></div>
@@ -55,13 +58,21 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
+
 export default {
   data() {
     return {
       searchQuery: "",
+      dropdownVisible: false,
+      baseURL: import.meta.env.VITE_API_BASE_URL, // Mantendo o baseURL
     };
   },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated', 'user']),
+  },
   methods: {
+    ...mapActions('auth', ['checkAuthentication', 'logout']),
     handleSearchSubmit() {
       this.$emit('search', this.searchQuery);
     },
@@ -69,12 +80,25 @@ export default {
       this.$emit('search', this.searchQuery);
     },
     clearSearch() {
-      this.searchQuery = ""; // Limpa a busca
-      this.handleSearch(); // Atualiza a busca
+      this.searchQuery = "";
+      this.handleSearch();
     },
+    toggleDropdown() {
+      this.dropdownVisible = !this.dropdownVisible;
+    },
+    handleLogout() {
+      this.logout();
+    },
+    goToHome() {
+      this.$router.push('/');
+    },
+  },
+  mounted() {
+    this.checkAuthentication();
   },
 };
 </script>
+
 
 <style scoped>
 @import "@/assets/css/variables.css";
@@ -153,7 +177,8 @@ a:hover {
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  position: relative; /* Adicionando posição relativa para o container */
+  position: relative;
+  /* Adicionando posição relativa para o container */
 }
 
 .search-button {
@@ -198,15 +223,24 @@ form {
 }
 
 .clear-button {
-  background-color: transparent; /* Fundo transparente para o botão de limpar */
-  border: none; /* Remove a borda do botão */
-  cursor: pointer; /* Muda o cursor para uma mãozinha ao passar por cima */
-  position: absolute; /* Posiciona o botão de limpar */
-  right: 10px; /* Espaço do lado direito */
-  top: 50%; /* Centraliza verticalmente */
-  transform: translateY(-50%); /* Ajusta o alinhamento vertical */
-  color: #505050; /* Cor do ícone */
-  font-size: 1.5rem; /* Tamanho do ícone */
+  background-color: transparent;
+  /* Fundo transparente para o botão de limpar */
+  border: none;
+  /* Remove a borda do botão */
+  cursor: pointer;
+  /* Muda o cursor para uma mãozinha ao passar por cima */
+  position: absolute;
+  /* Posiciona o botão de limpar */
+  right: 10px;
+  /* Espaço do lado direito */
+  top: 50%;
+  /* Centraliza verticalmente */
+  transform: translateY(-50%);
+  /* Ajusta o alinhamento vertical */
+  color: #505050;
+  /* Cor do ícone */
+  font-size: 1.5rem;
+  /* Tamanho do ícone */
 }
 
 header .action-buttons {
@@ -236,5 +270,30 @@ header .action-buttons {
   width: 3rem;
   height: 3rem;
   filter: invert(1);
+}
+
+/* Estilização da parte do perfil */
+.user-dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: block;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a, .dropdown-content button {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover, .dropdown-content button:hover {
+  background-color: #ddd;
 }
 </style>
