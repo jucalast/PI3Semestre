@@ -4,7 +4,7 @@
       <!-- Exibindo os cards criados através da computed property -->
       <div class="cards-atributos">
         <div v-for="(valor, key) in filteredSelectedValues" :key="key" class="card">
-          {{ formatTitle(key) }}: {{ valor }}
+      {{ valor }}
           <button @click="removeCard(key)">X</button>
         </div>
       </div>
@@ -315,28 +315,41 @@ export default {
   display: flex;
 width: 100vw;
 gap: 1rem;
+margin-left: -2rem;
 }
 
 
 .card {
   display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    background: #c4ceff;
-    padding: 1rem;
-    font-size: 1rem;
-    border-radius: 1.5rem;
-    color: #3a5bff;
-    height: 2REM;
+  flex-direction: row;
+  justify-content: space-between;
+  background: #e4e4e4;
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  border-radius: 2rem;
+  color: #a7a7a7;
+  height: 4rem;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  box-sizing: border-box; /* Mantém o tamanho da caixa incluindo bordas e padding */
+  transition: border 0.3s ease, transform 0.3s ease; /* Adiciona animação suave para borda e transformação */
+}
 
+.card:hover {
+
+  background: #d8d8d8;
+  transform: scale(1.05); /* Aumenta ligeiramente o tamanho no hover */
 }
 
 
+
 button {
-  background: #c4ceff !important;
+  background: transparent !important;
   border: none;
   font-size: 1rem;
-  color: #3a5bff;
+  color: #8b8b8b;
+  cursor:pointer;
 }
 
 .accordion {

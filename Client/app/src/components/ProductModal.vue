@@ -238,6 +238,7 @@ export default {
 
 .product-page .cards {
   margin-top: 5rem;
+  width: 100%;
 }
 /* Adicione estilos para o accordion */
 .accordion {
@@ -288,7 +289,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 20;
+  z-index: 300;
   backdrop-filter: blur(5px);
 }
 
