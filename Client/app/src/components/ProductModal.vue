@@ -237,7 +237,7 @@ export default {
 <style>
 
 .product-page .cards {
-  margin-top: 0;
+  margin-top: 5rem;
 }
 /* Adicione estilos para o accordion */
 .accordion {

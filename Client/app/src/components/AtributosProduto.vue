@@ -1,6 +1,13 @@
 <template>
   <div class="atributos">
     <div v-if="atributos">
+      <!-- Exibindo os cards criados através da computed property -->
+      <div class="cards-atributos">
+        <div v-for="(valor, key) in filteredSelectedValues" :key="key" class="card">
+          {{ formatTitle(key) }}: {{ valor }}
+          <button @click="removeCard(key)">X</button>
+        </div>
+      </div>
       <div v-for="(valores, key) in atributos" :key="key" class="accordion">
         <h3 @click="toggle(key)">
           {{ formatTitle(key) }} <span>{{ isOpen(key) ? '-' : '+' }}</span>
@@ -52,7 +59,7 @@
             </div>
           </li>
           <li v-for="(valor) in valores" :key="valor">
-            <label :for="`${key}-${valor}`"> <!-- Usando ID dinâmico para o label -->
+            <label :for="`${key}-${valor}`" class="custom-radio"> <!-- Usando ID dinâmico para o label -->
               {{ valor }}
               <input 
                 class="radio" 
@@ -63,6 +70,7 @@
                 v-model="selectedValues[key]" 
                 @click="toggleRadio(key, valor)" 
               />
+              <span class="checkmark"></span> <!-- Adicionado span para estilo customizado -->
             </label>
           </li>
         </ul>
@@ -70,6 +78,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -89,6 +98,14 @@ export default {
       },
       produtosFiltrados: []
     };
+  },
+  computed: {
+    // Computed property para filtrar os valores selecionados
+    filteredSelectedValues() {
+      return Object.fromEntries(
+        Object.entries(this.selectedValues).filter(([key, value]) => value)
+      );
+    }
   },
   methods: {
     async fetchAtributos() {
@@ -130,17 +147,22 @@ export default {
       return atributosMap;
     },
     toggleRadio(key, valor) {
-  // Se o valor já estiver selecionado, desmarque-o
-  if (this.selectedValues[key] === valor) {
-    console.log(`Desmarcando o rádio com ID: ${key}-${valor}`);
-    this.selectedValues[key] = null; // Desmarcando
-  } else {
-    this.selectedValues[key] = valor; // Marcando
-  }
-  
-  this.updateFilteredProducts(); // Atualiza os produtos filtrados
-  this.$emit('update-selected-radios', this.selectedValues); // Atualiza o estado no pai
-},
+      // Se o valor já estiver selecionado, desmarque-o
+      if (this.selectedValues[key] === valor) {
+        console.log(`Desmarcando o rádio com ID: ${key}-${valor}`);
+        this.selectedValues[key] = null; // Desmarcando
+      } else {
+        this.selectedValues[key] = valor; // Marcando
+      }
+      
+      this.updateFilteredProducts(); // Atualiza os produtos filtrados
+      this.$emit('update-selected-radios', this.selectedValues); // Atualiza o estado no pai
+    },
+    removeCard(key) {
+      // Desmarcar o radio correspondente e remover o card
+      this.selectedValues[key] = null;
+      this.updateFilteredProducts();
+    },
     async updateFilteredProducts() {
       const selectedFilters = Object.entries(this.selectedValues).filter(([key, value]) => value);
       
@@ -163,7 +185,6 @@ export default {
         this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
       }
     },
-
     combineFilteredProducts(newProducts, existingProducts = []) {
       const uniqueProductsMap = new Map();
       
@@ -216,12 +237,7 @@ export default {
         dataValidade: 'Data da Validade',
         preco: 'Preço',
       };
-      return titleMap[key] || this.capitalize(key);
-    },
-    capitalize(text) {
-      return text.split(' ').map((word) => {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      }).join(' ');
+      return titleMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
     },
   },
   mounted() {
@@ -234,11 +250,93 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+.custom-radio {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding-left: 35px; /* Espaço para o círculo customizado */
+  user-select: none;
+}
+
+/* Esconde o botão de rádio padrão */
+.custom-radio input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Estilo para o span que atuará como o botão de rádio customizado */
+.custom-radio .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+/* Estilo quando o rádio está selecionado */
+.custom-radio input:checked + .checkmark {
+  background-color: #ffffff; /* Cor do círculo quando selecionado */
+  border-color: #3a5bff;
+}
+
+/* Círculo interior quando o rádio está selecionado */
+.custom-radio .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-radio input:checked + .checkmark:after {
+  display: block;
+}
+
+.custom-radio .checkmark:after {
+  top: 3.5px;
+  left: 3.5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #3a5bff; /* Círculo interno branco */
+}
 .atributos {
   padding-left: 2rem;
   width: 30%;
-  margin-top: 10rem;
+  margin-top: 6rem;
   font-family: 'Poppins', sans-serif;
+  z-index: 100;
+}
+
+.cards-atributos {
+  display: flex;
+width: 100vw;
+gap: 1rem;
+}
+
+
+.card {
+  display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background: #c4ceff;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 1.5rem;
+    color: #3a5bff;
+    height: 2REM;
+
+}
+
+
+button {
+  background: #c4ceff !important;
+  border: none;
+  font-size: 1rem;
+  color: #3a5bff;
 }
 
 .accordion {

@@ -2,10 +2,23 @@
   <header class="header">
     <div class="topheader">
       <nav class="nav">
+        <!-- Link para Produtos com a troca de imagem baseada na rota ativa -->
         <router-link to="/products" active-class="active-link" exact-active-class="exact-active-link">
-          <img src="@/assets/icons8-coffee-beans-90(1).png" alt="Produtos" />
+          <!-- Usando v-if para trocar a imagem baseada no estado da rota ativa -->
+          <img 
+            v-if="$route.path === '/products'" 
+            src="@/assets/produtoselected.png" 
+            alt="Produtos" 
+          />
+          <img 
+            v-else 
+            src="@/assets/icons8-coffee-beans-90(1).png" 
+            alt="Produtos" 
+          />
           Produtos
         </router-link>
+
+        <!-- Link para Receitas sem mudanças -->
         <router-link to="/cart" active-class="active-link" exact-active-class="exact-active-link">
           <img src="@/assets/icons8-repository-64.png" alt="Receitas" />
           Receitas
@@ -38,6 +51,7 @@
       <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
+
       <div class="action-buttons">
         <button class="action-button favorite-button" @click="handleFavoriteClick">
           <img src="@/assets/estrela.png" alt="Favorites" />
@@ -93,7 +107,7 @@ export default {
   position: fixed;
   width: 98vw;
   height: 6.7rem;
-  z-index: 20;
+  z-index: 200;
 }
 
 .topheader {
@@ -147,13 +161,14 @@ a:hover {
 
 .active-link {
   background: #c4ceff;
+  color: #3a5bff;
 }
 
 .search-container {
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  position: relative; /* Adicionando posição relativa para o container */
+  position: relative;
 }
 
 .search-button {
@@ -189,24 +204,16 @@ form {
   color: #9d9d9d !important;
 }
 
-.search-input:focus {
-  color: var(--text-color);
-}
-
-.search-input::placeholder {
-  color: var(--text-color);
-}
-
 .clear-button {
-  background-color: transparent; /* Fundo transparente para o botão de limpar */
-  border: none; /* Remove a borda do botão */
-  cursor: pointer; /* Muda o cursor para uma mãozinha ao passar por cima */
-  position: absolute; /* Posiciona o botão de limpar */
-  right: 10px; /* Espaço do lado direito */
-  top: 50%; /* Centraliza verticalmente */
-  transform: translateY(-50%); /* Ajusta o alinhamento vertical */
-  color: #505050; /* Cor do ícone */
-  font-size: 1.5rem; /* Tamanho do ícone */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #505050;
+  font-size: 1.5rem;
 }
 
 header .action-buttons {

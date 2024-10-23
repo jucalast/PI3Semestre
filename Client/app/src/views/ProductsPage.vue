@@ -1,11 +1,6 @@
 <template>
   <DefaultLayout @search="updateSearchQuery">
     <div class="product-page">
-      <!-- Componente para listar os rádios selecionados -->
-      <SelectedRadios 
-        :selectedRadios="selectedValues" 
-        @update-selected-radios="updateSelectedRadios" 
-      />
       <div class="sessiontwo">
         <!-- Adicionando o Acordeon para selecionar os filtros -->
         <AtributosProduto
@@ -30,7 +25,6 @@
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import ProductCard from "@/components/ProductCard.vue";
 import AtributosProduto from "@/components/AtributosProduto.vue";
-import SelectedRadios from "@/components/SelectedRadios.vue";  // Importando o novo componente
 import axios from "axios";
 
 export default {
@@ -38,14 +32,13 @@ export default {
     DefaultLayout,
     ProductCard,
     AtributosProduto,
-    SelectedRadios,
+    
   },
   data() {
     return {
       produtos: [],         // Lista de produtos
       isLoading: true,      // Indica se a lista de produtos está carregando
       searchQuery: "",      // Termo de busca
-      selectedValues: {},   // Para armazenar os valores selecionados dos rádios
     };
   },
   methods: {
@@ -67,10 +60,6 @@ export default {
     updateFilteredProducts(produtos) {
       this.produtos = produtos; // Atualiza a lista de produtos filtrados
     },
-
-    updateSelectedRadios(selectedValues) {
-      this.selectedValues = selectedValues; // Atualiza os valores selecionados nos rádios
-    },
   },
   mounted() {
     this.fetchProdutos();
@@ -87,6 +76,7 @@ export default {
   padding-top: 2rem;
   width: 80%;
 }
+
 
 .no-margin {
   margin: 0;
@@ -112,4 +102,6 @@ export default {
 .accordion {
   margin-bottom: 2rem; /* Espaço inferior entre o accordion e a lista de produtos */
 }
+
+
 </style>

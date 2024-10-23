@@ -175,7 +175,7 @@ export default {
 
 
 
-<style>
+<style >
 .card-container {
   display: flex;
   flex-wrap: wrap;
