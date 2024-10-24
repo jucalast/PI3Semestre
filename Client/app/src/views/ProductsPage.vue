@@ -72,10 +72,12 @@ export default {
 .product-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+ 
+justify-content: flex-start;
   padding-top: 2rem;
   width: 80%;
 }
+
 
 
 .no-margin {
@@ -83,16 +85,6 @@ export default {
   padding: 0;
 }
 
-.banner {
-  position: absolute;
-  width: 95%;
-  height: 15rem;
-  padding: 2rem;
-}
-
-.sessionone {
-  background: #c2cdff;
-}
 
 .sessiontwo {
   padding: 2rem; /* Adiciona espaço ao redor do conteúdo */

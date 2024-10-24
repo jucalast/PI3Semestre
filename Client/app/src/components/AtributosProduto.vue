@@ -4,7 +4,7 @@
       <!-- Exibindo os cards criados através da computed property -->
       <div class="cards-atributos">
         <div v-for="(valor, key) in filteredSelectedValues" :key="key" class="card">
-      {{ valor }}
+          {{ valor }}
           <button @click="removeCard(key)">X</button>
         </div>
       </div>
@@ -59,7 +59,7 @@
             </div>
           </li>
           <li v-for="(valor) in valores" :key="valor">
-            <label :for="`${key}-${valor}`" class="custom-radio"> <!-- Usando ID dinâmico para o label -->
+            <label :for="`${key}-${valor}`" class="custom-radio">
               {{ valor }}
               <input 
                 class="radio" 
@@ -70,7 +70,7 @@
                 v-model="selectedValues[key]" 
                 @click="toggleRadio(key, valor)" 
               />
-              <span class="checkmark"></span> <!-- Adicionado span para estilo customizado -->
+              <span class="checkmark"></span>
             </label>
           </li>
         </ul>
@@ -78,7 +78,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 export default {
@@ -100,7 +99,6 @@ export default {
     };
   },
   computed: {
-    // Computed property para filtrar os valores selecionados
     filteredSelectedValues() {
       return Object.fromEntries(
         Object.entries(this.selectedValues).filter(([key, value]) => value)
@@ -147,56 +145,42 @@ export default {
       return atributosMap;
     },
     toggleRadio(key, valor) {
-      // Se o valor já estiver selecionado, desmarque-o
       if (this.selectedValues[key] === valor) {
-        console.log(`Desmarcando o rádio com ID: ${key}-${valor}`);
-        this.selectedValues[key] = null; // Desmarcando
+        this.selectedValues[key] = null;
       } else {
-        this.selectedValues[key] = valor; // Marcando
+        this.selectedValues[key] = valor;
       }
       
-      this.updateFilteredProducts(); // Atualiza os produtos filtrados
-      this.$emit('update-selected-radios', this.selectedValues); // Atualiza o estado no pai
+      this.updateFilteredProducts();
+      this.$emit('update-selected-radios', this.selectedValues);
     },
     removeCard(key) {
-      // Desmarcar o radio correspondente e remover o card
       this.selectedValues[key] = null;
       this.updateFilteredProducts();
     },
     async updateFilteredProducts() {
-      const selectedFilters = Object.entries(this.selectedValues).filter(([key, value]) => value);
-      
-      this.$emit('update-selected-radios', this.selectedValues);
-      
-      if (selectedFilters.length > 0) {
-        const filterPromises = selectedFilters.map(([atributo, valor]) => {
-          return fetch(`http://localhost:8080/api/produtos/buscar-por-atributo/${atributo}/${valor}`)
-            .then(response => response.json());
-        });
+    const selectedFilters = Object.entries(this.selectedValues).filter(([key, value]) => value);
+    const { dataDe, dataAte } = this.dateRange;
+    const { precoDe, precoAte } = this.priceRange;
 
-        const resultados = await Promise.all(filterPromises);
-        this.produtosFiltrados = resultados.reduce((acc, produtos) => this.combineFilteredProducts(produtos, acc), []);
-        
-        this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
-        
-        console.log('Produtos filtrados:', JSON.stringify(this.produtosFiltrados, null, 2)); 
-      } else {
-        this.produtosFiltrados = [];
-        this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
-      }
-    },
-    combineFilteredProducts(newProducts, existingProducts = []) {
-      const uniqueProductsMap = new Map();
-      
-      existingProducts.forEach(produto => {
-        uniqueProductsMap.set(produto.id, produto);
-      });
-      newProducts.forEach(produto => {
-        uniqueProductsMap.set(produto.id, produto);
-      });
+    this.$emit('update-selected-radios', this.selectedValues);
 
-      return Array.from(uniqueProductsMap.values());
-    },
+    // Montando os parâmetros de consulta
+    let queryParams = selectedFilters.map(([atributo, valor]) => `${atributo}=${valor}`).join('&');
+
+    // Adicionando filtros de data
+    if (dataDe) queryParams += `&dataDe=${dataDe}`;
+    if (dataAte) queryParams += `&dataAte=${dataAte}`;
+    if (precoDe) queryParams += `&precoDe=${precoDe}`;
+    if (precoAte) queryParams += `&precoAte=${precoAte}`;
+
+    // Fazendo a requisição
+    const response = await fetch(`http://localhost:8080/api/produtos/buscar-por-atributos?${queryParams}`);
+    const produtosFiltrados = await response.json();
+    this.produtosFiltrados = produtosFiltrados;
+    this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
+  },
+
     onDateChange(type, value) {
       this.dateRange[type] = value;
       this.updateFilteredByDate();
@@ -206,7 +190,6 @@ export default {
       const response = await fetch(`http://localhost:8080/api/produtos/buscar-por-data/${dataDe}/${dataAte}`);
       const produtosFiltrados = await response.json();
       this.produtosFiltrados = this.combineFilteredProducts(produtosFiltrados);
-      console.log('Produtos filtrados por data:', JSON.stringify(this.produtosFiltrados, null, 2));
       this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
     },
     onPriceChange(type, value) {
@@ -218,7 +201,6 @@ export default {
       const response = await fetch(`http://localhost:8080/api/produtos/buscar-por-preco/${precoDe}/${precoAte}`);
       const produtosFiltrados = await response.json();
       this.produtosFiltrados = this.combineFilteredProducts(produtosFiltrados);
-      console.log('Produtos filtrados por preço:', JSON.stringify(this.produtosFiltrados, null, 2));
       this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
     },
     toggle(key) {
@@ -296,8 +278,8 @@ export default {
 }
 
 .custom-radio .checkmark:after {
-  top: 3.5px;
-  left: 3.5px;
+  top: 2px;
+  left: 2px;
   width: 13px;
   height: 13px;
   border-radius: 50%;
@@ -306,7 +288,7 @@ export default {
 .atributos {
   padding-left: 2rem;
   width: 30%;
-  margin-top: 6rem;
+  margin-top: -1rem;
   font-family: 'Poppins', sans-serif;
   z-index: 100;
 }
@@ -316,6 +298,7 @@ export default {
 width: 100vw;
 gap: 1rem;
 margin-left: -2rem;
+margin-bottom: 2rem;
 }
 
 
@@ -365,6 +348,8 @@ h3 {
   font-size: 2rem;
   margin: 0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 ul {
@@ -406,6 +391,22 @@ input[type='radio'] {
 
 .input-data::-webkit-calendar-picker-indicator {
   display: none;
+}
+
+span {
+  display:flex;
+  color: #c6c6c6;
+
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+}
+
+span:hover {
+  color: #616161;
+  background: #e0e0e0;
 }
 
 .input-data::placeholder,

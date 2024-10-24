@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.model.Produto;
@@ -87,10 +88,9 @@ public class ProdutoController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/buscar-por-atributo/{atributo}/{valor}")
-    public ResponseEntity<List<Produto>> buscarProdutosPorAtributo(
-            @PathVariable String atributo, @PathVariable String valor) {
-        List<Produto> produtos = produtoService.buscarProdutosPorAtributo(atributo, valor);
+    @GetMapping("/buscar-por-atributos")
+    public ResponseEntity<List<Produto>> buscarProdutosPorAtributos(@RequestParam Map<String, String> atributos) {
+        List<Produto> produtos = produtoService.buscarProdutosPorAtributos(atributos);
         return ResponseEntity.ok(produtos);
     }
 

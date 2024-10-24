@@ -6,18 +6,22 @@
     <div v-else-if="produtos.length > 0" class="card-container">
       <div class="cards">
         <div
-          v-for="produto in (filteredProdutos.length > 0 ? filteredProdutos : produtos)"
+          v-for="produto in filteredProdutos.length > 0
+            ? filteredProdutos
+            : produtos"
           :key="produto.id"
           class="product-card"
           @click="openModal(produto)"
         >
           <h2>{{ produto.nome }}</h2>
           <div class="backcard">
-            <img
-              :src="produto.imagem"
-              :alt="produto.nome"
-              class="product-image"
-            />
+            <div class="imgcardcont">
+              <img
+                :src="produto.imagem"
+                :alt="produto.nome"
+                class="product-image"
+              />
+            </div>
             <div class="elements-card">
               <div class="priceandfav">
                 <p>{{ produto.preco.toFixed(2) }}</p>
@@ -48,7 +52,7 @@
         @close="isModalVisible = false"
       />
     </div>
-    <div v-else>
+    <div class="not" v-else>
       <p>Nenhum produto encontrado.</p>
     </div>
   </div>
@@ -87,13 +91,20 @@ export default {
   },
   computed: {
     filteredProdutos() {
-      if (!this.produtos.length) return [];
-      const searchFiltered = this.produtos.filter((produto) =>
-        produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-      const finalFiltered = this.filterBySelectedAttributes(searchFiltered);
-      return finalFiltered;
-    },
+    if (!this.produtos.length) return [];
+    // Filtragem baseada na busca
+    const searchFiltered = this.produtos.filter((produto) =>
+      produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+
+    // Retorna todos os produtos se não houver filtros selecionados
+    if (!this.selectedValues || Object.keys(this.selectedValues).length === 0) {
+      return searchFiltered; // Retorna todos os produtos filtrados pela busca
+    }
+
+    const finalFiltered = this.filterBySelectedAttributes(searchFiltered);
+    return finalFiltered;
+  },
   },
   methods: {
     async openModal(product) {
@@ -123,7 +134,10 @@ export default {
             `http://localhost:8080/api/metodo-preparo/produto/${productId}`
           );
 
-          if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
+          if (
+            metodoResponse.data &&
+            Object.keys(metodoResponse.data).length > 0
+          ) {
             this.selectedProduct.metodoPreparo = metodoResponse.data;
           } else {
             throw new Error(
@@ -138,7 +152,9 @@ export default {
       }
     },
     filterBySelectedAttributes(produtos) {
-      const hasSelectedValues = Object.values(this.selectedValues).some(valor => valor);
+      const hasSelectedValues = Object.values(this.selectedValues).some(
+        (valor) => valor
+      );
       if (!hasSelectedValues) {
         return produtos; // Retorna todos os produtos se nenhum filtro estiver selecionado
       }
@@ -171,31 +187,37 @@ export default {
 };
 </script>
 
-
-
-
-
-<style >
+<style>
 .card-container {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
   justify-content: center;
   width: 100%;
+  margin-top: 5rem;
+}
+
+.not {
+  margin-top: 20rem ;
 }
 .cards {
-  margin-top: 22rem;
+  margin-top: -7rem;
   margin-bottom: 10rem;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   align-content: center;
   gap: 2rem;
-  width: 70%;
+  width: 100%;
 }
 
+.imgcardcont {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
 
 .product-card {
   border-radius: 2rem;
@@ -212,9 +234,6 @@ export default {
 .product-card:hover {
   transform: scale(1.05); /* Aumenta o tamanho do cartão */
 }
-
-
-
 
 .priceandfav {
   display: flex;
@@ -245,7 +264,7 @@ export default {
   margin: 0;
   font-size: 2rem;
   position: relative;
-  bottom: 6.7rem;
+  bottom: 6rem;
   z-index: 2;
 }
 
@@ -297,13 +316,11 @@ h2 {
 }
 
 .caricon {
-  
   color: var(--favoritocard-color);
   font-size: 1.5rem; /* Tamanho do ícone */
   transition: transform 0.3s ease, color 0.3s ease;
   width: 2rem !important;
   height: 2rem !important;
-
 }
 
 .caricon:hover {

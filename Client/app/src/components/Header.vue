@@ -135,8 +135,8 @@ a {
   text-decoration: none;
   color: var(--text-color);
   padding: 0.5rem;
-  padding-left: 0.7rem;
-  padding-right: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   border-radius: 2rem;
   transition: transform 0.3s ease, color 0.3s ease;
   font-size: 2rem !important;
@@ -155,8 +155,8 @@ a img {
 }
 
 a:hover {
-  background: var(--inputs-color);
-  transform: scale(1.1);
+
+  transform: scale(1.05);
 }
 
 .active-link {

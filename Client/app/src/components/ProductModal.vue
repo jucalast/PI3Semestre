@@ -267,7 +267,7 @@ export default {
   justify-content: space-between;
   padding: 1rem;
   cursor: pointer;
-  height: 2rem;
+
   flex-direction: row;
   align-content: flex-start;
   align-items: center;
@@ -377,8 +377,7 @@ span {
   flex-direction: column;
 }
 
-.add-to-cart,
-.favorire-button {
+.add-to-cart {
   background-color: #313131;
   color: #fff;
   border: none;

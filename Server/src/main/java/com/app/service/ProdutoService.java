@@ -159,8 +159,8 @@ public class ProdutoService {
         return listaAtributos;
     }
 
-    public List<Produto> buscarProdutosPorAtributo(String atributo, String valor) {
-        logger.info("Buscando produtos pelo atributo {} com valor {}", atributo, valor);
+    public List<Produto> buscarProdutosPorAtributos(Map<String, String> atributos) {
+        logger.info("Buscando produtos com os atributos {}", atributos);
         List<Produto> produtos = produtoRepository.findAll();
         List<Produto> produtosFiltrados = new ArrayList<>();
 
@@ -175,29 +175,41 @@ public class ProdutoService {
 
         Map<String, BiPredicate<MetodoPreparo, String>> metodoPreparoChecks = new HashMap<>();
         metodoPreparoChecks.put("marca", (metodoPreparo, v) -> metodoPreparo.getMarca() != null && metodoPreparo.getMarca().equalsIgnoreCase(v));
-        metodoPreparoChecks.put("complexidade", (metodoPreparo, v)
-                -> metodoPreparo.getComplexidade() != null
-                && metodoPreparo.getComplexidade().toString().equalsIgnoreCase(v));
+        metodoPreparoChecks.put("complexidade", (metodoPreparo, v) -> metodoPreparo.getComplexidade() != null && metodoPreparo.getComplexidade().toString().equalsIgnoreCase(v));
         metodoPreparoChecks.put("material", (metodoPreparo, v) -> metodoPreparo.getMaterial() != null && metodoPreparo.getMaterial().equalsIgnoreCase(v));
         metodoPreparoChecks.put("tipopreparo", (metodoPreparo, v) -> metodoPreparo.getTipoPreparo() != null && metodoPreparo.getTipoPreparo().equalsIgnoreCase(v));
 
         for (Produto produto : produtos) {
-            boolean atendeCriterio = false;
+            boolean atendeTodosCriterios = true;
 
-            // Verificar se o produto possui CafeEspecial e se contém o atributo correspondente
-            CafeEspecial cafeEspecial = produto.getCafeEspecial();
-            if (cafeEspecial != null && cafeEspecialChecks.containsKey(atributo.toLowerCase())) {
-                atendeCriterio = cafeEspecialChecks.get(atributo.toLowerCase()).test(cafeEspecial, valor);
+            // Verificar cada atributo solicitado
+            for (Map.Entry<String, String> entry : atributos.entrySet()) {
+                String atributo = entry.getKey().toLowerCase();
+                String valor = entry.getValue();
+
+                boolean atendeCriterio = false;
+
+                // Verificar se o produto possui CafeEspecial e se contém o atributo correspondente
+                CafeEspecial cafeEspecial = produto.getCafeEspecial();
+                if (cafeEspecial != null && cafeEspecialChecks.containsKey(atributo)) {
+                    atendeCriterio = cafeEspecialChecks.get(atributo).test(cafeEspecial, valor);
+                }
+
+                // Verificar se o produto possui MetodoPreparo e se contém o atributo correspondente
+                MetodoPreparo metodoPreparo = produto.getMetodoPreparo();
+                if (metodoPreparo != null && metodoPreparoChecks.containsKey(atributo)) {
+                    atendeCriterio = metodoPreparoChecks.get(atributo).test(metodoPreparo, valor);
+                }
+
+                // Se o critério não for atendido, interromper
+                if (!atendeCriterio) {
+                    atendeTodosCriterios = false;
+                    break;
+                }
             }
 
-            // Verificar se o produto possui MetodoPreparo e se contém o atributo correspondente
-            MetodoPreparo metodoPreparo = produto.getMetodoPreparo();
-            if (metodoPreparo != null && metodoPreparoChecks.containsKey(atributo.toLowerCase())) {
-                atendeCriterio = metodoPreparoChecks.get(atributo.toLowerCase()).test(metodoPreparo, valor);
-            }
-
-            // Se algum critério for atendido, adicione o produto à lista filtrada
-            if (atendeCriterio) {
+            // Se atender a todos os critérios, adicionar à lista filtrada
+            if (atendeTodosCriterios) {
                 produtosFiltrados.add(produto);
             }
         }
