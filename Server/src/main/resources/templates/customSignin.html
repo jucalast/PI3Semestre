@@ -56,18 +56,20 @@
         }
 
         .right-side {
-            width: 40%;
+            width: 50%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             background: transparent !important;
+
+
+
         }
 
         .form-container {
             margin-top: 40px;
-            width: 100%;
-            max-width: 300px;
+            width: 120%;
             background: transparent;
         }
 
@@ -76,6 +78,8 @@
             flex-direction: column;
             gap: 20px;
             background: transparent !important;
+            align-items: center;
+            width: 100% !important;
         }
 
         .form-container input {
@@ -85,13 +89,14 @@
             border-radius: 2rem;
             width: 100%;
             height: 5rem;
-            padding-left: 1rem !important;
+            padding-left: 2rem !important;
             font-size: 2rem !important;
             outline: none;
             padding: 0;
             font-family: 'Poppins', sans-serif;
             /* Aplicando Poppins aos inputs */
         }
+
 
         .form-container input::placeholder {
             color: #6d6d6d;
@@ -108,7 +113,7 @@
         }
 
         .login-button {
-            width: 100%;
+            width: 30%;
             height: 5rem !important;
             padding: 12px;
             border: none;
@@ -128,7 +133,7 @@
         }
 
         .login-with-google-btn {
-            width: 100%;
+width: 30%;
     height: 5rem;
     padding: 12px 16px 12px 42px;
     border: none;
@@ -180,11 +185,18 @@
             max-width: 90%;
             margin: 0 auto;
             font-weight: lighter;
+
+            margin-left: 10% !important;
         }
 
       #phone {
-        width: 30rem;
         padding-left: 8rem !important;
+      }
+      .cpf {
+        width: 50% !important;
+      }
+      .senha {
+        width: 30% !important;
       }
 
 
@@ -193,6 +205,12 @@
         border-radius: 2rem 0 0 2rem;
         padding: 1rem;
         border-right: 1px solid #b6b6b6;
+      }
+
+      .forms {
+        display: flex;
+        width: 70% !important;
+        gap: 1.5rem;
       }
     </style>
   </head>
@@ -207,15 +225,18 @@
         <div class="form-container">
           <!-- Formulário de cadastro -->
           <form action="/register" method="POST">
+            <div class="forms" >
             <input type="text" name="userName" placeholder="Nome Completo" required />
             <input type="email" name="emailId" placeholder="E-mail" required />
-
+          </div>
+          <div class="forms" >
             <!-- Campo de número de telefone com intl-tel-input -->
             <input type="tel" id="phone" name="mobileNumber" placeholder="(XX) XXXXX-XXXX" required />
 
-            <input type="text" name="cpf" placeholder="CPF" required />
-            <input type="password" name="password" placeholder="Senha" required />
-
+            <input class="cpf" type="text" name="cpf" placeholder="CPF" required />
+          </div>
+            <input class="senha" type="password" name="password" placeholder="Senha" required />
+          
             <button type="submit" class="login-button">Cadastrar</button>
           </form>
 
