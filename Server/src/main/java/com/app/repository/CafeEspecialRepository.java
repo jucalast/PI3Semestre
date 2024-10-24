@@ -1,12 +1,15 @@
 package com.app.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.app.model.CafeEspecial;
 
-import java.util.Set;
+public interface CafeEspecialRepository extends JpaRepository<CafeEspecial, Long> {
 
-public interface CafeEspecialRepository extends CrudRepository<CafeEspecial, Long> {
-    @SuppressWarnings("null")
-    Set<CafeEspecial> findAllById(Iterable<Long> ids);
+    // Modified to return a list
+    List<CafeEspecial> findByProdutoId(Long id);
+
+    List<CafeEspecial> findAllByProdutoIsNotNull();
 }

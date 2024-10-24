@@ -1,21 +1,25 @@
 package com.app.model;
 
-import java.time.LocalDate;
-import java.util.Set;
+import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
-/**
- * Classe que representa um Café Especial.
- * Contém informações detalhadas sobre a origem, variedade, torrefação, notas
- * sensoriais, entre outras características do café.
- * Também possui um relacionamento muitos-para-muitos com a entidade Produto.
- */
+@Data
 @Entity
 @Table(name = "cafe_especial")
 public class CafeEspecial {
@@ -24,63 +28,49 @@ public class CafeEspecial {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Origem do café, especificando a região ou país.
-     */
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(nullable = false)
     private String origem;
 
-    /**
-     * Variedade do café, como Arábica ou Robusta.
-     */
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(nullable = false)
     private String variedade;
 
-    /**
-     * Tipo de torrefação do café.
-     */
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(nullable = false)
     private String torrefacao;
 
-    /**
-     * Notas sensoriais do café, como sabor e aroma.
-     */
     private String notasSensoriais;
 
-    /**
-     * Nível de torra do café, como clara, média ou escura.
-     */
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(nullable = false)
     private String torra;
 
-    /**
-     * Método de beneficiamento do café, como natural, lavado, etc.
-     */
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(nullable = false)
     private String beneficiamento;
 
-    /**
-     * Data de torra do café.
-     */
-    private LocalDate dataTorra;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "data_torra")
+    @Temporal(TemporalType.DATE)
+    private Date dataTorra;
 
-    /**
-     * Data de validade do café.
-     */
-    private LocalDate dataValidade;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "data_validade")
+    @Temporal(TemporalType.DATE)
+    private Date dataValidade;
 
-    /**
-     * Recomendações de preparo para o café, como método ou proporções.
-     */
+    @Column(name = "recomendacoes_preparo")
     private String recomendacoesPreparo;
 
-    /**
-     * Nível de acidez do café.
-     */
-    private String acidez;
+    @OneToOne
+    @JoinColumn(name = "produto_id", nullable = false)
+    @JsonManagedReference
+    private Produto produto;
 
-    /**
-     * Relacionamento muitos-para-muitos com Produto.
-     * Um café especial pode estar associado a vários produtos, e um produto pode
-     * ter vários cafés especiais.
-     */
-    @ManyToMany(mappedBy = "cafeEspeciais")
-    private Set<Produto> produtos;
-
-    // Getters and setters
 }

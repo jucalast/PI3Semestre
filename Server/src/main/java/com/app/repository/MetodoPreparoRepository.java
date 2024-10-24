@@ -1,10 +1,11 @@
 package com.app.repository;
 
-import com.app.model.MetodoPreparo;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import com.app.model.MetodoPreparo;
+
 public interface MetodoPreparoRepository extends JpaRepository<MetodoPreparo, Long> {
-    // Métodos personalizados, se necessário
+
+    // Adicione este método
+    MetodoPreparo findByProdutoId(Long id);
 }

@@ -1,30 +1,25 @@
 package com.app.model;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-/**
- * Classe que representa um produto na aplicação.
- * Contém informações sobre o nome, descrição, preço, imagem, quantidade em
- * estoque e avaliação do produto.
- * Além disso, possui relacionamentos muitos-para-muitos com outras entidades
- * como Café Especial, Método de Preparo e Outros Produtos.
- */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "produto")
 public class Produto {
@@ -33,64 +28,36 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Nome do produto.
-     */
+    @NotNull(message = "O nome do produto não pode ser nulo")
+    @Size(max = 100, message = "O nome do produto não pode ter mais de 100 caracteres")
+    @Column(nullable = false)
     private String nome;
 
-    /**
-     * Descrição detalhada do produto.
-     */
+    @Size(max = 500, message = "A descrição não pode ter mais de 500 caracteres")
+    @Column(length = 500)
     private String descricao;
 
-    /**
-     * Preço do produto.
-     */
+    @NotNull(message = "O preço não pode ser nulo")
+    @Column(nullable = false)
     private BigDecimal preco;
 
-    /**
-     * URL ou caminho da imagem associada ao produto.
-     */
     private String imagem;
 
-    /**
-     * Quantidade disponível em estoque do produto.
-     */
-    private Integer quantEstoque;
+    @JsonProperty("quantidade_estoque")
+    @NotNull(message = "A quantidade em estoque não pode ser nula")
+    @Column(name = "quantidade_estoque", nullable = false)
+    private int quantidadeEstoque;
 
-    /**
-     * Avaliação do produto. Esse valor poderá ser substituído futuramente por uma
-     * chave estrangeira de avaliação.
-     */
     private Integer avaliacao;
 
-    /**
-     * Relacionamento muitos-para-muitos com Café Especial.
-     * Um produto pode ter vários cafés especiais associados, e um café especial
-     * pode estar associado a vários produtos.
-     */
-    @ManyToMany
-    @JoinTable(name = "produto_cafe_especial", joinColumns = @JoinColumn(name = "produto_id"), inverseJoinColumns = @JoinColumn(name = "cafe_especial_id"))
-    private Set<CafeEspecial> cafeEspeciais;
+    // Relacionamento com CafeEspecial
+    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
+    private CafeEspecial cafeEspecial;
 
-    /**
-     * Relacionamento muitos-para-muitos com Métodos de Preparo.
-     * Um produto pode estar associado a vários métodos de preparo, como Prensa
-     * Francesa, Hario V60, etc.
-     * Um método de preparo também pode estar associado a vários produtos.
-     */
-    @ManyToMany
-    @JoinTable(name = "produto_metodo_preparo", joinColumns = @JoinColumn(name = "produto_id"), inverseJoinColumns = @JoinColumn(name = "metodo_preparo_id"))
-    private Set<MetodoPreparo> metodosPreparo;
+    // Na classe Produto
+    @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private MetodoPreparo metodoPreparo;
 
-    /**
-     * Relacionamento muitos-para-muitos com Outros Produtos.
-     * Representa a associação de produtos com categorias genéricas, como utensílios
-     * ou acessórios.
-     */
-    @ManyToMany
-    @JoinTable(name = "produto_outro_produto", joinColumns = @JoinColumn(name = "produto_id"), inverseJoinColumns = @JoinColumn(name = "outro_produto_id"))
-    private Set<OutrosProdutos> outrosProdutos;
-
-    // Getters and setters gerados automaticamente pelo Lombok (@Data)
 }

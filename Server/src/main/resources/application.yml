@@ -7,7 +7,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update  
     show-sql: true
     properties:
       hibernate:
@@ -22,14 +22,20 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
 
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        tool:
-          hbm2ddl: debug
+  output:
+    ansi:
+      enabled: ALWAYS  # Habilita a saída ANSI para cores
+  logging:
+    level:
+      root: INFO 
+      com.app: DEBUG 
+      org.hibernate: ERROR  
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %highlight(%msg)%n"  
+      file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  
+    file:
+      name: logs/application.log  
 
-jwt:
-  rsa-private-key: classpath:certs/privateKey.pem
-  rsa-public-key: classpath:certs/publicKey.pem
+frontend:
+  url: http://localhost:5173/
+
