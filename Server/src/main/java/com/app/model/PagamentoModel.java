@@ -1,32 +1,29 @@
 package com.app.model;
 
-/* 
-* Importa a classe BigDecimal para manipulação de valores decimais
-* import java.math.BigDecimal;
-* 
-* Importa as anotações para mapeamento objeto-relacional
-* import jakarta.persistence.*;
-* 
-* Importa a anotação @Data do Lombok para geração automática de métodos
-* import lombok.Data;
-*/
 import java.math.BigDecimal;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 /**
  * Entidade que representa a tabela 'pagamentos' no banco de dados.
- * Esta classe armazena as informações relacionadas a um pagamento,
- * incluindo o método de pagamento, data e hora do pagamento, status,
- * valores totais e quaisquer descontos aplicados.
+ * Esta classe armazena as informações relacionadas aos pagamentos
+ * realizados na aplicação, como método de pagamento, valor total,
+ * valor com desconto, e o status do pagamento.
  * 
  * A anotação @Data da biblioteca Lombok é usada para gerar
  * automaticamente getters, setters e outros métodos comuns.
  * 
  * @author Kairo Chácara
  * @version 1.0
- * @since 2024-10-20
+ * @since 2024-10-24
  */
 @Data
 @Entity
@@ -42,12 +39,12 @@ public class PagamentoModel {
     private Long id;
 
     /**
-     * ID do método de pagamento. Este campo referencia a tabela 'metodosDePagamentos',
+     * ID do método de pagamento. Referencia a tabela 'metodosDePagamentos',
      * e é obrigatório.
      */
     @ManyToOne
-@JoinColumn(name = "metodo_pagamento_id", nullable = false)
-private MetodoPagamentoModel metodoPagamento;
+    @JoinColumn(name = "MetodoId", nullable = false)
+    private MetodoPagamentoModel metodoPagamento;
 
     /**
      * Data e hora em que o pagamento foi realizado. Este campo é obrigatório.
@@ -57,7 +54,7 @@ private MetodoPagamentoModel metodoPagamento;
 
     /**
      * Status do pagamento. Este campo é obrigatório e armazena um valor inteiro
-     * que representa o estado atual do pagamento, utilizando um enum (1 a 3).
+     * que representa o estado atual do pagamento, utilizando um enum.
      * Os valores possíveis são:
      * 1 - Pago
      * 2 - Pendente
@@ -74,37 +71,37 @@ private MetodoPagamentoModel metodoPagamento;
     private BigDecimal total;
 
     /**
-     * Valor total do pagamento com desconto, armazenado com precisão de 10 dígitos e 2 casas decimais.
+     * Valor total com desconto aplicado, armazenado com precisão de 10 dígitos e 2 casas decimais.
      * Este campo é obrigatório.
      */
     @Column(name = "totalComDesconto", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalComDesconto;
 
     /**
-     * ID do pedido associado a este pagamento. Este campo referencia a tabela 'pedidos',
+     * ID do pedido associado ao pagamento. Referencia a tabela 'pedidos',
      * e é obrigatório.
      */
-    @Column(name = "pedidoId", nullable = false)
-    private Integer pedidoId;
+    @ManyToOne
+    @JoinColumn(name = "pedidoId", nullable = false)
+    private PedidoModel pedido;
 
     /**
-     * ID do cupom aplicado ao pagamento. Este campo referencia a tabela 'cupons',
-     * e é opcional.
+     * ID do cupom aplicado ao pagamento, se houver. Referencia a tabela 'cupons'.
      */
-     @ManyToOne
-     @JoinColumn(name = "cupom_id", nullable = true)
-     private CupomModel cupom; 
+    @ManyToOne
+    @JoinColumn(name = "cupomId")
+    private CupomModel cupom;
 
     /**
-     * Valor do desconto aplicado ao pagamento, armazenado com precisão de 10 dígitos e 2 casas decimais.
-     * Este campo é obrigatório e tem um valor padrão de 0.
+     * Valor do desconto aplicado, armazenado com precisão de 10 dígitos e 2 casas decimais.
+     * Este campo é obrigatório e seu valor padrão é 0.
      */
     @Column(name = "desconto", nullable = false, precision = 10, scale = 2)
     private BigDecimal desconto;
 
     /**
-     * ID da transação relacionada a este pagamento. Este campo é opcional
-     * e pode ser utilizado para rastrear pagamentos em sistemas externos.
+     * ID da transação gerada no processamento do pagamento. Este campo é opcional
+     * e armazena até 255 caracteres.
      */
     @Column(name = "transactionId", length = 255)
     private String transactionId;
@@ -125,22 +122,10 @@ private MetodoPagamentoModel metodoPagamento;
             this.code = code;
         }
 
-        /**
-         * Retorna o código numérico correspondente ao status.
-         * 
-         * @return Código do status.
-         */
         public int getCode() {
             return code;
         }
 
-        /**
-         * Converte um código numérico em um enum StatusPagamento.
-         * 
-         * @param code Código do status.
-         * @return Enum correspondente ao código.
-         * @throws IllegalArgumentException Se o código não corresponder a nenhum status válido.
-         */
         public static StatusPagamento fromCode(int code) {
             for (StatusPagamento status : StatusPagamento.values()) {
                 if (status.getCode() == code) {

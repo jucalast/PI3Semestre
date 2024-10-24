@@ -26,7 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.app.model.PagCartaoModel;
 import com.app.repository.PagCartaoRepository;
-
 /**
  * Serviço para a entidade 'PagCartaoModel'.
  * Esta classe contém a lógica de negócios relacionada a pagamentos realizados

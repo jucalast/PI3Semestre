@@ -1,91 +1,141 @@
 package com.app.model;
 
-/* 
-* Importa as anotações para mapeamento objeto-relacional
-* import jakarta.persistence.*;
-* 
-* Importa a anotação @Data do Lombok para geração automática de métodos
-* import lombok.Data;
-*/
-import jakarta.persistence.*;
-import lombok.Data;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-/**
- * Entidade que representa a tabela 'pagCartao' no banco de dados.
- * Esta classe armazena as informações relacionadas a pagamentos realizados
- * com cartão de crédito, incluindo detalhes do cartão, dados do titular,
- * e informações de pagamento.
- * 
- * A anotação @Data da biblioteca Lombok é usada para gerar
- * automaticamente getters, setters e outros métodos comuns.
- * 
- * @author Kairo Chácara
- * @version 1.0
- * @since 2024-10-20
- */
-@Data
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 @Entity
 @Table(name = "pagCartao")
 public class PagCartaoModel {
 
-    /**
-     * ID do pagamento com cartão. Este campo é a chave primária da tabela 'pagCartao',
-     * com geração automática de valor incremental.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Bandeira do cartão (ex: Visa, MasterCard). Este campo é obrigatório e
-     * contém até 50 caracteres.
-     */
-    @Column(name = "bandeiraCartao", nullable = false, length = 50)
+    @NotNull
+    @Size(max = 50)
+    @Column(name = "bandeira_cartao", nullable = false, length = 50)
     private String bandeiraCartao;
 
-    /**
-     * Número do cartão de crédito. Este campo é obrigatório e contém até 16 caracteres.
-     * É idealmente criptografado ou tokenizado para garantir a segurança dos dados.
-     */
+    @NotNull
+    @Size(max = 16)
     @Column(name = "numero", nullable = false, length = 16)
     private String numero;
 
-    /**
-     * Data de validade do cartão. Este campo é obrigatório e deve estar no formato MM/AA.
-     */
-    @Column(name = "validade", nullable = false, length = 5)
+    @NotNull
+    @Size(max = 5)
+    @Column(name = "validade", nullable = false, length = 5)  // Formato MM/AA
     private String validade;
 
-    /**
-     * Nome do titular do cartão. Este campo é obrigatório e contém até 100 caracteres.
-     */
+    @NotNull
+    @Size(max = 100)
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    /**
-     * CPF do titular do cartão. Este campo é obrigatório e contém 11 caracteres.
-     * É importante garantir a segurança e validação dos dados.
-     */
+    @NotNull
+    @Size(max = 11)
     @Column(name = "cpf", nullable = false, length = 11)
     private String cpf;
 
-    /**
-     * ID do pagamento associado a este cartão. Este campo referencia a tabela 'pagamentos',
-     * e é obrigatório.
-     */
-    @Column(name = "pagamentoId", nullable = false)
-    private Integer pagamentoId;
+    @ManyToOne
+    @JoinColumn(name = "pagamento_id", nullable = false)
+    private PagamentoModel pagamento;
 
-    /**
-     * Código de autorização do pagamento. Este campo é opcional e pode conter até 100 caracteres.
-     */
-    @Column(name = "autorizacaoCod", length = 100)
+    @Column(name = "autorizacao_cod", length = 100)
     private String autorizacaoCod;
 
-    /**
-     * Número de parcelas do pagamento. Este campo é obrigatório e armazena um valor inteiro
-     * que representa a quantidade de parcelas em que o pagamento foi realizado.
-     */
+    @NotNull
     @Column(name = "parcelas", nullable = false)
     private Integer parcelas;
+
+    // Getters e Setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBandeiraCartao() {
+        return bandeiraCartao;
+    }
+
+    public void setBandeiraCartao(String bandeiraCartao) {
+        this.bandeiraCartao = bandeiraCartao;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public String getValidade() {
+        return validade;
+    }
+
+    public void setValidade(String validade) {
+        this.validade = validade;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+
+    }
+
+    public String getAutorizacaoCod() {
+        return autorizacaoCod;
+    }    
+
+    public void setAutorizacaoCod(String autorizacaoCod) {        
+        this.autorizacaoCod = autorizacaoCod;
+    }
+
+    public Integer getParcelas() {
+        return parcelas;
+    }    
+
+    public void setParcelas(Integer parcelas) {        
+        this.parcelas = parcelas;
+    }    
+
+    public PagamentoModel getPagamento() {        
+        return pagamento;
+    }    
+
+    public void setPagamento(PagamentoModel pagamento) { 
+        this.pagamento = pagamento;
+    }   
+    // (aqui, você já implementou os getters e setters)
+
+    public void setPagamentoId(Long pagamentoId) {
+        if (this.pagamento == null) {
+            this.pagamento = new PagamentoModel();
+        }
+        this.pagamento.setId(pagamentoId);
+    }
 }
