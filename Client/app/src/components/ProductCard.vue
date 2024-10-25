@@ -28,8 +28,8 @@
                   <font-awesome-icon icon="star" class="favoritocard" />
                 </button>
                 <button
-                  class="favorire-button"
-                  @click.stop="handleFavoriteClick"
+                  class="cart-button"
+                  @click.stop="handleAddCart(produto)"
                 >
                   <font-awesome-icon
                     icon="fa-solid fa-shopping-cart"
@@ -47,6 +47,7 @@
         :isVisible="isModalVisible"
         @close="isModalVisible = false"
       />
+
     </div>
     <div v-else>
       <p>Nenhum produto encontrado.</p>
@@ -151,6 +152,9 @@ export default {
         console.error("Erro ao buscar produtos:", error);
       }
     },
+    handleAddCart(produto){
+      console.log(produto);
+    },
   },
   mounted() {
     this.fetchProdutos(); // Chama a função uma vez ao montar o componente
@@ -158,7 +162,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card-container {
   display: flex;
   flex-wrap: wrap;

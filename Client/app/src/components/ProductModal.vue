@@ -234,7 +234,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 
 .product-page .cards {
   margin-top: 0;

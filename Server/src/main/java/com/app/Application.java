@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
+
 /**
  * Classe principal da aplicação Spring Boot.
  * <p>

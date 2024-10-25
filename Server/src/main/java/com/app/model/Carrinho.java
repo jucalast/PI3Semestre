@@ -1,10 +1,14 @@
 package com.app.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -16,21 +20,17 @@ public class Carrinho {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="Id_Carrinho")
     private Long id;
 
-    //@OneToOne
-    //JoinColumn(name = "Id_Usuario", referencedColumnName ="id", @ForeignKey(name = "fk_carrinho_usuario")
-    //private User user;
+    @ManyToOne
+    @JsonProperty("id_user")
+    @JoinColumn(name = "id_user")
+    private UserModel userModel;
 
-    /*@ManyToMany
-    @JoinTable(
-            name = "carrinho_produto",
-            joinColumns = @JoinColumn(name = "Id_Carrinho"),
-            inverseJoinColumns = @JoinColumn(name = "Id_Produto")
-    )
-    */
+    @ManyToOne
+    @JsonProperty("id_produto")
+    @JoinColumn(name = "id_produto", referencedColumnName = "id", nullable = false)
+    private Produto produto;
 
-    @Column(name = "preco", precision =10, scale = 2)
-    private BigDecimal valorFrete;
+    private int quantidade;
 }

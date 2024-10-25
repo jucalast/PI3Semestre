@@ -7,7 +7,7 @@
           <img src="@/assets/icons8-coffee-beans-90(1).png" alt="Produtos" />
           Produtos
         </router-link>
-        <router-link to="/cart" active-class="active-link" exact-active-class="exact-active-link">
+        <router-link to="/" active-class="active-link" exact-active-class="exact-active-link">
           <img src="@/assets/icons8-repository-64.png" alt="Receitas" />
           Receitas
         </router-link>
@@ -46,14 +46,24 @@
       </div>
     </div>
     <div class="divnav"></div>
+    <CartModal :isModalVisible="isCartModalVisible" 
+              @close="isCartModalVisible = false">
+
+    </CartModal>
   </header>
 </template>
 
 <script>
+import CartModal from '@/components/CartModal.vue';
+
 export default {
+  components:{
+    CartModal
+  },
   data() {
     return {
       searchQuery: "",
+      isCartModalVisible: false
     };
   },
   methods: {
@@ -63,7 +73,11 @@ export default {
     handleSearch() {
       this.$emit('search', this.searchQuery);
     },
+    handleCartClick(){
+      this.isCartModalVisible = !this.isCartModalVisible
+    }
   },
+
 };
 </script>
 

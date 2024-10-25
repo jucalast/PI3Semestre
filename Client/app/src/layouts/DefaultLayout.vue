@@ -10,12 +10,14 @@
 
 <script>
 import Header from '@/components/Header.vue';
+import CartModal from '@/components/CartModal.vue';
 import FooterComponent from '@/components/FooterComponent.vue';
 
 export default {
   components: {
     Header,
-    FooterComponent
+    FooterComponent,
+    CartModal
   },
   methods: {
     handleSearch(query) {
