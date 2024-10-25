@@ -1,15 +1,18 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+import store from './store';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import './assets/tailwind.css';
-import '@fortawesome/fontawesome-free/css/all.css'; // Importação do CSS
-import './plugins/fontawesome'; // Certifique-se de que este arquivo adiciona os ícones à biblioteca
-import store from './store'; // Importa o store Vuex
+import '@fortawesome/fontawesome-free/css/all.css';
+import './plugins/fontawesome';
+import VueTheMask from 'vue-the-mask'
 
 const app = createApp(App);
 
 app.use(router);
-app.component('font-awesome-icon', FontAwesomeIcon); // Registro correto do ícone
+app.use(store);
+app.use(VueTheMask);
+app.component('font-awesome-icon', FontAwesomeIcon);
+
 app.mount('#app');
-app.use(store) // Usa o store

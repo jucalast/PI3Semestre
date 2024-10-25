@@ -1,29 +1,41 @@
 <template>
-  <div class="address-selector p-4 bg-black-100 rounded-lg shadow-md h-full w-full">
-    <h3 class="text-lg font-semibold mb-4">Endereços Cadastrados</h3>
-    <ul class="space-y-2 ">
-      <li v-for="address in addresses" :key="address.id" class="flex items-center">
-        <label class="flex items-center cursor-pointer">
-          <input
-            type="radio"
-            :value="address"
-            v-model="selectedAddress"
-            @change="selectAddress(address)"
-            class="mr-2"
-          />
-          <span class="text-gray-800">{{ address.label }} - {{ address.details }}</span>
-        </label>
-      </li>
-    </ul>
+  <div class="address-selector p-6 bg-white rounded-lg shadow-lg h-full w-full flex flex-col">
+    <h3 class="text-2xl font-semibold mb-4 text-gray-800 text-left">Endereços Cadastrados</h3>
+    
+    <div class="address-list overflow-y-auto flex-grow mb-4">
+      <ul class="space-y-4">
+        <li v-for="address in addresses" :key="address.id" class="flex items-center bg-gray-100 p-4 rounded-md shadow hover:bg-gray-100 transition duration-200">
+          <label class="flex items-center cursor-pointer w-full">
+            <input
+              type="radio"
+              :value="address"
+              v-model="selectedAddress"
+              @change="selectAddress(address)"
+              class="mr-4 text-blue-600 focus:ring-blue-500"
+            />
+            <span class="text-gray-800 text-lg">
+              {{ address.street }}, {{ address.number }} - {{ address.neighborhood }},
+              {{ address.city }} - {{ address.state }} ({{ address.zipCode }})
+            </span>
+          </label>
+        </li>
+      </ul>
+    </div>
 
-    <button @click="redirectToAddAddress" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200">
+    <button
+      @click="redirectToAddAddress"
+      class="mt-4 w-full px-4 py-2 bg-headerBackground text-white font-semibold rounded hover:bg-yellow-400 transition duration-200"
+    >
       Adicionar Novo Endereço
     </button>
   </div>
 </template>
 
 <script>
+import axiosInstance from '@/utils/axiosInstance';
+
 export default {
+  name: 'AddressSelector',
   data() {
     return {
       addresses: [],
@@ -36,8 +48,8 @@ export default {
   methods: {
     async fetchAddresses() {
       try {
-        const response = await fetch('/api/addresses');
-        this.addresses = await response.json();
+        const response = await axiosInstance.get('/api/addresses');
+        this.addresses = response.data; 
       } catch (error) {
         console.error('Erro ao buscar endereços:', error);
       }
@@ -47,11 +59,15 @@ export default {
       this.$emit('address-selected', address);
     },
     redirectToAddAddress() {
-      this.$router.push('/add-address'); 
+      this.$router.push('/address');
     },
   },
 };
 </script>
 
 <style scoped>
+.address-list {
+  overflow-y: auto; 
+  max-height: 300px; 
+}
 </style>

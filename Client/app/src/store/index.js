@@ -1,9 +1,9 @@
-// src/store/index.js
 import { createStore } from 'vuex';
+import auth from './modules/auth'; 
 
 const store = createStore({
   state: {
-    produtosFiltrados: [],
+    produtosFiltrados: [], 
   },
   mutations: {
     setProdutosFiltrados(state, produtos) {
@@ -12,11 +12,14 @@ const store = createStore({
   },
   actions: {
     updateProdutosFiltrados({ commit }, produtos) {
-      commit('setProdutosFiltrados', produtos);
+      commit('setProdutosFiltrados', produtos); 
     },
   },
   getters: {
-    produtosFiltrados: (state) => state.produtosFiltrados,
+    produtosFiltrados: (state) => state.produtosFiltrados, 
+  },
+  modules: {
+    auth, 
   },
 });
 
