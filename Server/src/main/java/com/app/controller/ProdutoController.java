@@ -1,18 +1,24 @@
 package com.app.controller;
 
-import com.app.service.ProdutoService;
-import com.app.model.MetodoPreparo;
-import com.app.model.Produto;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.app.model.Produto;
+import com.app.service.ProdutoService;
 
 @RestController
 @RequestMapping("/api/produtos")
@@ -26,24 +32,6 @@ public class ProdutoController {
     public ResponseEntity<List<Map<String, Object>>> listarAtributos() {
         List<Map<String, Object>> atributos = produtoService.listarAtributos();
         return ResponseEntity.ok(atributos);
-    }
-
-    // Rota para buscar produtos com filtros
-    @GetMapping("/filtro")
-    public ResponseEntity<List<Produto>> filtrarProdutos(
-            @RequestParam(required = false) String nome,
-            @RequestParam(required = false) BigDecimal precoMin,
-            @RequestParam(required = false) BigDecimal precoMax,
-            @RequestParam(required = false) String origem,
-            @RequestParam(required = false) String variedade,
-            @RequestParam(required = false) String torrefacao,
-            @RequestParam(required = false) String tipoPreparo,
-            @RequestParam(required = false) MetodoPreparo.Complexidade complexidade) {
-
-        List<Produto> produtos = produtoService.filtrarProdutos(
-                nome, precoMin, precoMax, origem, variedade, torrefacao, tipoPreparo, complexidade);
-
-        return ResponseEntity.ok(produtos);
     }
 
     @GetMapping
@@ -100,12 +88,10 @@ public class ProdutoController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/search")
-    public List<Produto> searchProdutos(@RequestParam(required = false) String search) {
-        if (search != null && !search.isEmpty()) {
-            return produtoService.searchProdutosByNome(search);
-        }
-        return produtoService.getAllProdutos();
+    @GetMapping("/buscar-por-atributos")
+    public ResponseEntity<List<Produto>> buscarProdutosPorAtributos(@RequestParam Map<String, String> atributos) {
+        List<Produto> produtos = produtoService.buscarProdutosPorAtributos(atributos);
+        return ResponseEntity.ok(produtos);
     }
 
 }
