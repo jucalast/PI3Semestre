@@ -135,4 +135,8 @@ public class PagamentoModel {
             throw new IllegalArgumentException("Status inválido: " + code);
         }
     }
+    public void setId(Long id) {
+      this.id = id;
+  }
+  
 }

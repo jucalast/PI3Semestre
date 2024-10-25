@@ -1,17 +1,34 @@
 package com.app.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+/**
+ * Representa a entidade 'PagCartao' que armazena informações sobre pagamentos feitos com cartão.
+ * Esta classe é mapeada para a tabela 'pagCartao' no banco de dados e inclui campos que
+ * armazenam detalhes do cartão, informações do titular e do pagamento associado.
+ * 
+ * @author Kairo Chácara
+ * @version 1.0
+ * @since 2024-10-24
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "pagCartao")
 public class PagCartaoModel {
@@ -19,118 +36,43 @@ public class PagCartaoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
 
-    @NotNull
+    @NotBlank(message = "A bandeira do cartão é obrigatória.")
     @Size(max = 50)
     @Column(name = "bandeira_cartao", nullable = false, length = 50)
     private String bandeiraCartao;
 
-    @NotNull
-    @Size(max = 16)
+    @NotBlank(message = "O número do cartão é obrigatório.")
+    @Size(min = 16, max = 16)
     @Column(name = "numero", nullable = false, length = 16)
     private String numero;
 
-    @NotNull
-    @Size(max = 5)
-    @Column(name = "validade", nullable = false, length = 5)  // Formato MM/AA
+    @NotBlank(message = "A validade do cartão é obrigatória.")
+    @Size(min = 5, max = 5)
+    @Column(name = "validade", nullable = false, length = 5)
     private String validade;
 
-    @NotNull
+    @NotBlank(message = "O nome do titular do cartão é obrigatório.")
     @Size(max = 100)
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @NotNull
-    @Size(max = 11)
+    @NotBlank(message = "O CPF é obrigatório.")
+    @Size(min = 11, max = 11)
     @Column(name = "cpf", nullable = false, length = 11)
     private String cpf;
 
     @ManyToOne
-    @JoinColumn(name = "pagamento_id", nullable = false)
+    @JoinColumn(name = "pagamentoId")
     private PagamentoModel pagamento;
 
     @Column(name = "autorizacao_cod", length = 100)
     private String autorizacaoCod;
 
-    @NotNull
+    @NotNull(message = "O número de parcelas é obrigatório.")
     @Column(name = "parcelas", nullable = false)
     private Integer parcelas;
-
-    // Getters e Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getBandeiraCartao() {
-        return bandeiraCartao;
-    }
-
-    public void setBandeiraCartao(String bandeiraCartao) {
-        this.bandeiraCartao = bandeiraCartao;
-    }
-
-    public String getNumero() {
-        return numero;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    public String getValidade() {
-        return validade;
-    }
-
-    public void setValidade(String validade) {
-        this.validade = validade;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-
-    }
-
-    public String getAutorizacaoCod() {
-        return autorizacaoCod;
-    }    
-
-    public void setAutorizacaoCod(String autorizacaoCod) {        
-        this.autorizacaoCod = autorizacaoCod;
-    }
-
-    public Integer getParcelas() {
-        return parcelas;
-    }    
-
-    public void setParcelas(Integer parcelas) {        
-        this.parcelas = parcelas;
-    }    
-
-    public PagamentoModel getPagamento() {        
-        return pagamento;
-    }    
-
-    public void setPagamento(PagamentoModel pagamento) { 
-        this.pagamento = pagamento;
-    }   
-    // (aqui, você já implementou os getters e setters)
 
     public void setPagamentoId(Long pagamentoId) {
         if (this.pagamento == null) {

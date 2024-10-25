@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.app.model.PagCartaoModel;
+import com.app.model.PagamentoModel;
 
 /**
  * Repositório para a entidade 'PagCartaoModel'.
@@ -44,4 +45,13 @@ public interface PagCartaoRepository extends JpaRepository<PagCartaoModel, Long>
      * @return true se o cartão está associado a um pagamento; caso contrário, false.
      */
     boolean existsByNumero(String numero);
+
+    /**
+     * Verifica se um cartão está associado a um pagamento.  
+     * @param pagamento O pagamento.
+     * @return true se o cartão está associado ao pagamento; caso contrário, false.  
+     */
+    List<PagCartaoModel> findByPagamento(PagamentoModel pagamento);
+
+      
 }
