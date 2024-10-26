@@ -89,6 +89,7 @@ justify-content: flex-start;
 .sessiontwo {
   padding: 2rem; /* Adiciona espaço ao redor do conteúdo */
   display: flex !important;
+  height: 100vh;
 }
 
 .accordion {

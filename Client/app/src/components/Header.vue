@@ -54,10 +54,10 @@
             <img src="@/assets/user.png" alt="User" />
           </button>
           <div class="dropdown-content" v-if="dropdownVisible">
-            <div v-if="isAuthenticated">
+            <div v-if="isAuthenticated" class="useroptions">
               <router-link to="/profile">Perfil</router-link>
               <router-link to="/settings">Configurações</router-link>
-              <button @click="handleLogout">Sair</button>
+              <button class="exitbtn" @click="handleLogout">Sair <img src="@/assets/icons8-sair-96.png" alt=""></button>
             </div>
             <div v-else>
               <a :href="`${baseURL}/login`">Login</a>
@@ -149,6 +149,16 @@ export default {
 
 .logo-container {
   width: 15%;
+}
+
+.exitbtn {
+  display: flex !important;
+  border: none !important;
+  justify-content: space-between !important;
+}
+
+.exitbtn img {
+  width: 2rem;
 }
 
 a {
@@ -275,22 +285,32 @@ header .action-buttons {
 }
 
 .dropdown-content {
-  display: block;
+display: block;
+  right: -2rem;
+  top: 5rem;
+
   position: absolute;
-  background-color: white;
+  background-color: #ededed;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
+  border: 1px solid #c1c1c1;
+  border-radius: 2rem;
+  font-size: 1rem !important;
 }
+
 
 .dropdown-content a, .dropdown-content button {
   color: black;
   padding: 12px 16px;
   text-decoration: none;
-  display: block;
+  display: flex;
+  border-bottom: solid 1px #9d9d9d;
+  border-radius: 0;
+  width: 100%;
+  justify-content: center;
+  font-size: 1.5rem !important;
 }
 
-.dropdown-content a:hover, .dropdown-content button:hover {
-  background-color: #ddd;
-}
+
 </style>
