@@ -50,14 +50,85 @@ public class Produto {
 
     private Integer avaliacao;
 
-    // Relacionamento com CafeEspecial
     @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private CafeEspecial cafeEspecial;
 
-    // Na classe Produto
     @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private MetodoPreparo metodoPreparo;
 
+    // Getters and Setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public BigDecimal getPreco() {
+        return preco;
+    }
+
+    public void setPreco(BigDecimal preco) {
+        this.preco = preco;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+
+    public int getQuantidadeEstoque() {
+        return quantidadeEstoque;
+    }
+
+    public void setQuantidadeEstoque(int quantidadeEstoque) {
+        this.quantidadeEstoque = quantidadeEstoque;
+    }
+
+    public Integer getAvaliacao() {
+        return avaliacao;
+    }
+
+    public void setAvaliacao(Integer avaliacao) {
+        this.avaliacao = avaliacao;
+    }
+
+    public CafeEspecial getCafeEspecial() {
+        return cafeEspecial;
+    }
+
+    public void setCafeEspecial(CafeEspecial cafeEspecial) {
+        this.cafeEspecial = cafeEspecial;
+    }
+
+    public MetodoPreparo getMetodoPreparo() {
+        return metodoPreparo;
+    }
+
+    public void setMetodoPreparo(MetodoPreparo metodoPreparo) {
+        this.metodoPreparo = metodoPreparo;
+    }
 }
