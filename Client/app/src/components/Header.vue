@@ -41,27 +41,32 @@
       <div class="action-buttons">
         <div class="favorites-container" @mouseover="handleFavoriteHover" @mouseleave="handleFavoriteLeave">
           <button class="action-button favorite-button">
-            <img src="@/assets/estrela.png" alt="Favorites" />
+            <font-awesome-icon
+                icon="star"
+                class="favorite-icon"
+            />
           </button>
           <div v-if="showModal" class="modal">
+            <div>favoritos:</div>
             <div v-if="!authenticated">
-              <p>Favoritos não acessados. Você precisa estar logado.</p>
-              <button @click="redirectToLogin">Login</button>
+              <p>Você precisa estar logado.</p>
+              <button @click="redirectToLogin" style="background: #2ecc71; color: white; border-radius: 20px; padding: 10px">Login</button>
             </div>
             <div v-else class="product-scroll-container">
-              <div>favoritos</div>
-              <div v-for="product in favorite_products" :key="product.id" class="product-card">
-                <div class="product-image">
-                  <img :src="product.imagem" alt="Imagem do Produto">
-                </div>
-                <div class="product-details">
-                  <h4>{{ product.nome }}</h4>
-                  <p>{{ product.preco.toFixed(2) }}</p>
-                  <button @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
+              <div>
+                <div v-for="product in favorite_products" :key="product.id" class="product-card">
+                  <div class="product-image">
+                    <img :src="product.imagem" alt="Imagem do Produto">
+                  </div>
+                  <div class="product-details">
+                    <h4>{{ product.nome }}</h4>
+                    <p>{{ product.preco.toFixed(2) }}</p>
+                    <button @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <button @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos</button>
+             </div>
+            <button v-if="authenticated" @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos</button>
           </div>
         </div>
         <button class="action-button cart-button" @click="handleCartClick">
@@ -353,6 +358,10 @@ header .action-buttons {
 
 .dropdown-content a:hover, .dropdown-content button:hover {
   background-color: #ddd;
+}
+
+.favorite-icon:hover {
+  font-size: 2.5rem;
 }
 
 
