@@ -106,6 +106,9 @@ export default {
     goToHome() {
       this.$router.push('/');
     },
+    handleFavoriteClick() {
+      this.$router.push('/favorites');  // Redireciona para a página de favoritos
+    },
   },
   mounted() {
     this.checkAuthentication();
