@@ -43,9 +43,33 @@
       </div>
 
       <div class="action-buttons">
-        <button class="action-button favorite-button" @click="handleFavoriteClick">
-          <img src="@/assets/estrela.png" alt="Favorites" />
-        </button>
+        <div class="favorites-container" @mouseover="handleFavoriteHover" @mouseleave="handleFavoriteLeave">
+          <button class="action-button favorite-button">
+            <img src="@/assets/estrela.png" alt="Favorites" />
+          </button>
+          <div v-if="showModal" class="modal">
+            <div v-if="!authenticated">
+              <p>Favoritos não acessados. Você precisa estar logado.</p>
+              <button @click="redirectToLogin">Login</button>
+            </div>
+            <div v-else class="product-scroll-container">
+              <div v-for="product in products" :key="product.id" class="product-card">
+                <div class="product-image">
+                  <img :src="product.imagem" alt="Imagem do Produto">
+                </div>
+                <div class="product-details">
+                  <h4>{{ product.nome }}</h4>
+                  <p>{{ product.preco.toFixed(2) }}</p>
+                  <button @click="deleteProduct(product.id)">Excluir</button>
+                </div>
+              </div>
+            </div>
+            <button @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos</button>
+          </div>
+
+
+
+        </div>
         <button class="action-button cart-button" @click="handleCartClick">
           <img src="@/assets/carrinho.png" alt="Cart" />
         </button>
@@ -73,12 +97,16 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import axiosInstance from "@/utils/axiosInstance";
 
 export default {
   data() {
     return {
       searchQuery: "",
       dropdownVisible: false,
+      showModal: false,
+      authenticated: true,
+      products: [],
       baseURL: import.meta.env.VITE_API_BASE_URL, // Mantendo o baseURL
     };
   },
@@ -106,9 +134,36 @@ export default {
     goToHome() {
       this.$router.push('/');
     },
-    handleFavoriteClick() {
-      this.$router.push('/favorites');  // Redireciona para a página de favoritos
+    goToFavorites() {
+      this.$router.push('/favorites'); // Ajuste a rota conforme necessário
     },
+    handleFavoriteLeave() {
+      this.showModal = false;
+      console.log("Mouse leave"); // Debugging
+    },
+    async handleFavoriteHover() {
+      try {
+        const response = await axiosInstance.get(`${this.baseURL}/favorites/favorited-products`);
+        if (response.data.length) {
+          this.products = response.data;
+          this.authenticated = true;
+          this.showModal = true;
+        }
+      } catch (error) {
+        console.error('Erro ao verificar a autenticação do usuário', error);
+        if (error.response && error.response.status === 401) {
+          // Se a resposta da API for 401, defina o modal para mostrar a mensagem de não autenticado
+          this.authenticated = false;
+          this.showModal = true;
+        } else {
+          this.showModal = false;
+        }
+      }
+    },
+    redirectToLogin() {
+      window.location.href = `${this.baseURL}/login`;
+    }
+
   },
   mounted() {
     this.checkAuthentication();
@@ -296,4 +351,55 @@ header .action-buttons {
 .dropdown-content a:hover, .dropdown-content button:hover {
   background-color: #ddd;
 }
+
+
+.modal {
+  position: absolute;
+  right: 2px;
+  top: 5rem;
+  width: 300px;
+  max-height: 400px;
+  background-color: white;
+  padding: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1; /* Allows this container to grow and fill the space, pushing the button to the bottom */
+}
+
+.all-favorites-button {
+  width: 100%;
+  padding: 10px;
+  background-color: gray; /* Customize according to your color scheme */
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.product-card {
+  display: flex;
+  height: auto;
+  margin: 5px;
+  border: 1px solid #ccc;
+}
+
+.product-image img {
+  width: 100px;
+  height: auto;
+}
+
+.product-details {
+  color: black;
+  display: flex;
+  flex-direction: column;
+}
+
 </style>
