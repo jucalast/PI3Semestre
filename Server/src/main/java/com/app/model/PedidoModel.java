@@ -46,7 +46,8 @@ public class PedidoModel {
      * e é obrigatório.
      */
     @Column(name = "usuarioId", nullable = false)
-    private Integer usuarioId;
+    @JoinColumn(name = "id")
+    private UserModel usuarioId;
 
     /**
      * Data e hora em que o pedido foi realizado. Este campo é obrigatório.

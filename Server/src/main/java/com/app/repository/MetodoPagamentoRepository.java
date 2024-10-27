@@ -8,6 +8,7 @@ package com.app.repository;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -47,4 +48,13 @@ public interface MetodoPagamentoRepository extends JpaRepository<MetodoPagamento
      */
     @Query("SELECT m.nome, m.taxa FROM MetodoPagamentoModel m ORDER BY m.nome ASC, m.taxa ASC")
     List<Object[]> listPorNomeTaxa();
+    /**
+     * Busca um método de pagamento pelo ID e retorna o nome.
+     *
+     * @param id O ID do método de pagamento.
+     * @return Um Optional contendo o nome do método de pagamento se encontrado, ou vazio se não encontrado.
+     */
+    default Optional<String> findNomeById(Integer id) {
+        return findById(id).map(MetodoPagamentoModel::getNome);
+    }
 }

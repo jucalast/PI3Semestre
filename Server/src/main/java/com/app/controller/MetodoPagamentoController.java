@@ -145,4 +145,18 @@ public class MetodoPagamentoController {
         List<MetodoPagamentoNomeTaxaDTO> listaDTO = metodoPagamentoService.listarNomeETaxaOrdenado();
         return new ResponseEntity<>(listaDTO, HttpStatus.OK);
     }
+     /**
+     * Endpoint para obter o nome do método de pagamento pelo ID.
+     *
+     * @param id O ID do método de pagamento a ser buscado.
+     * @return Resposta com o nome do método de pagamento encontrado ou status 404 (Not Found) se não encontrado.
+     */
+    @GetMapping("/nome/{id}")
+    public ResponseEntity<String> obterNomeMetodoPagamentoPorId(@PathVariable Integer id) {
+        String nome = metodoPagamentoService.getNomeMetodoPagamentoById(id);
+        if ("Método de pagamento não encontrado".equals(nome)) {
+            return ResponseEntity.notFound().build();
+        }
+        return new ResponseEntity<>(nome, HttpStatus.OK);
+}
 }

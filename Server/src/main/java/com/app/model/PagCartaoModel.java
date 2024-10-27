@@ -1,13 +1,13 @@
 package com.app.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
+
 /**
  * Representa a entidade 'PagCartao' que armazena informações sobre pagamentos feitos com cartão.
  * Esta classe é mapeada para a tabela 'pagCartao' no banco de dados e inclui campos que
@@ -19,14 +19,15 @@ import jakarta.validation.constraints.Size;
  * @author Kairo Chácara
  * @version 1.0
  * @since 2024-10-24
- */
+*/
+@Data 
 @Entity
 @Table(name = "pagCartao")
 public class PagCartaoModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @NotNull(message = "O ID do pagamento associado é obrigatório.")
+    private Long pagamentoId;
 
     @NotBlank(message = "A bandeira do cartão é obrigatória.")
     @Size(max = 50, message = "A bandeira do cartão não pode ter mais de 50 caracteres.")
@@ -47,9 +48,6 @@ public class PagCartaoModel {
     @NotBlank(message = "O CPF é obrigatório.")
     @Size(min = 11, max = 11, message = "O CPF deve ter exatamente 11 dígitos.")
     private String cpf; // Garantir segurança e validação
-
-    @NotNull(message = "O ID do pagamento associado é obrigatório.")
-    private Long pagamentoId; // ID do pagamento associado
 
     private String autorizacaoCod;
 

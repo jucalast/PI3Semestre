@@ -2,6 +2,7 @@ package com.app.DTO;
 
 import java.math.BigDecimal;
 import java.util.List;
+import com.app.model.UserModel;
 
 import lombok.Data;
 
@@ -19,7 +20,7 @@ import lombok.Data;
 @Data
 public class PedidoDTO {
     
-    private Integer usuarioId;            // ID do usuário que fez o pedido
+    private UserModel usuarioId;            // ID do usuário que fez o pedido
     private String dataPedido;             // Data em que o pedido foi realizado
     private Integer statusPedido;          // Status atual do pedido (ex: 0 - Pendente, 1 - Confirmado, etc.)
     private BigDecimal total;              // Total do pedido
