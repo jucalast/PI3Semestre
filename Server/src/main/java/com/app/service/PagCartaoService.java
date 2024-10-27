@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.app.model.PagCartaoModel;
+import com.app.model.PagamentoModel;
 import com.app.repository.PagCartaoRepository;
 
 /**
@@ -56,22 +57,22 @@ public class PagCartaoService {
     /**
      * Obtém um pagamento com cartão pelo ID.
      *
-     * @param id O ID do pagamento com cartão a ser buscado.
+     * @param pagamentoId ID do pagamento com cartão a ser buscado.
      * @return Um objeto Optional que contém o pagamento com cartão, se encontrado.
      */
-    public Optional<PagCartaoModel> obterPagCartaoPorId(Long id) {
-        return pagCartaoRepository.findById(id);
+    public Optional<PagCartaoModel> obterPagCartaoPorId(Long pagamentoId) {
+        return pagCartaoRepository.findById(pagamentoId);
     }
 
     /**
      * Atualiza um pagamento com cartão existente.
      *
-     * @param id O ID do pagamento com cartão a ser atualizado.
+     * @param pagamentoId O ID do pagamento com cartão a ser atualizado.
      * @param pagCartao Os novos dados do pagamento com cartão.
      * @return Um Optional com o pagamento com cartão atualizado, ou vazio se o ID não for encontrado.
      */
-    public Optional<PagCartaoModel> atualizarPagCartao(Long id, PagCartaoModel pagCartao) {
-        return pagCartaoRepository.findById(id).map(existingPagCartao -> {
+    public Optional<PagCartaoModel> atualizarPagCartao(Long pagamentoId, PagCartaoModel pagCartao) {
+        return pagCartaoRepository.findById(pagamentoId).map(existingPagCartao -> {
             existingPagCartao.setBandeiraCartao(pagCartao.getBandeiraCartao());
             existingPagCartao.setNumero(pagCartao.getNumero());
             existingPagCartao.setValidade(pagCartao.getValidade());
@@ -86,10 +87,10 @@ public class PagCartaoService {
     /**
      * Exclui um pagamento com cartão pelo ID.
      *
-     * @param id O ID do pagamento com cartão a ser excluído.
+     * @param pagamentoId O ID do pagamento com cartão a ser excluído.
      */
-    public void deletarPagCartao(Long id) {
-        pagCartaoRepository.deleteById(id);
+    public void deletarPagCartao(Long pagamentoId) {
+        pagCartaoRepository.deleteById(pagamentoId);
     }
 
     /**
@@ -98,7 +99,7 @@ public class PagCartaoService {
      * @param pagamentoId ID do pagamento associado
      * @return Optional de PagCartaoModel
      */
-    public Optional<PagCartaoModel> obterPagCartaoPorPagamentoId(Long pagamentoId) {
+    public Optional<PagCartaoModel> obterPagCartaoPorPagamentoId(PagamentoModel pagamentoId) {
         return pagCartaoRepository.findByPagamentoId(pagamentoId);
     }
 

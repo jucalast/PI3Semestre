@@ -1,15 +1,15 @@
 package com.app.model;
 
 /* 
-* Importa a classe BigDecimal para manipulação de valores decimais
-* import java.math.BigDecimal;
-* 
-* Importa as anotações para mapeamento objeto-relacional
-* import jakarta.persistence.*;
-* 
-* Importa a anotação @Data do Lombok para geração automática de métodos
-* import lombok.Data;
-*/
+ * Importa a classe BigDecimal para manipulação de valores decimais
+ * import java.math.BigDecimal;
+ * 
+ * Importa as anotações para mapeamento objeto-relacional
+ * import jakarta.persistence.*;
+ * 
+ * Importa a anotação @Data do Lombok para geração automática de métodos
+ * import lombok.Data;
+ */
 import java.math.BigDecimal;
 
 import jakarta.persistence.*; 
@@ -46,8 +46,7 @@ public class PedidoModel {
      * e é obrigatório.
      */
     @Column(name = "usuarioId", nullable = false)
-    @JoinColumn(name = "id")
-    private UserModel usuarioId;
+    private Integer usuarioId;
 
     /**
      * Data e hora em que o pedido foi realizado. Este campo é obrigatório.
@@ -140,6 +139,12 @@ public class PedidoModel {
 
         private final int code;
 
+        /**
+         * Construtor do enum StatusPedido que associa um código numérico
+         * a cada status.
+         * 
+         * @param code Código numérico que representa o status.
+         */
         StatusPedido(int code) {
             this.code = code;
         }
@@ -156,7 +161,7 @@ public class PedidoModel {
         /**
          * Converte um código numérico em um enum StatusPedido.
          * 
-         * @param code Código do status.
+         * @param code Código do status a ser convertido.
          * @return Enum correspondente ao código.
          * @throws IllegalArgumentException Se o código não corresponder a nenhum status válido.
          */

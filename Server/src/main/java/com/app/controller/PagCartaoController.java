@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.app.model.PagCartaoModel;
+import com.app.model.PagamentoModel;
 import com.app.service.PagCartaoService;
 
 /**
@@ -108,7 +109,7 @@ public class PagCartaoController {
      * @return Resposta com o pagamento encontrado ou 404 Not Found se não encontrado.
      */
     @GetMapping("/por-pagamento/{pagamentoId}")
-    public ResponseEntity<PagCartaoModel> obterPagCartaoPorPagamentoId(@PathVariable Long pagamentoId) {
+    public ResponseEntity<PagCartaoModel> obterPagCartaoPorPagamentoId(@PathVariable PagamentoModel pagamentoId) {
         Optional<PagCartaoModel> pagCartao = pagCartaoService.obterPagCartaoPorPagamentoId(pagamentoId);
         return pagCartao.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
