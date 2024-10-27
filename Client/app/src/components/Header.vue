@@ -5,43 +5,39 @@
         <!-- Link para Produtos com a troca de imagem baseada na rota ativa -->
         <router-link to="/products" active-class="active-link" exact-active-class="exact-active-link">
           <!-- Usando v-if para trocar a imagem baseada no estado da rota ativa -->
-          <img 
-            v-if="$route.path === '/products'" 
-            src="@/assets/produtoselected.png" 
-            alt="Produtos" 
+          <img
+              v-if="$route.path === '/products'"
+              src="@/assets/produtoselected.png"
+              alt="Produtos"
           />
-          <img 
-            v-else 
-            src="@/assets/icons8-coffee-beans-90(1).png" 
-            alt="Produtos" 
+          <img
+              v-else
+              src="@/assets/icons8-coffee-beans-90(1).png"
+              alt="Produtos"
           />
           Produtos
         </router-link>
-
         <!-- Link para Receitas sem mudanças -->
         <router-link to="/cart" active-class="active-link" exact-active-class="exact-active-link">
           <img src="@/assets/icons8-repository-64.png" alt="Receitas" />
           Receitas
         </router-link>
       </nav>
-
       <form @submit.prevent="handleSearchSubmit">
         <div class="search-container">
           <button type="submit" class="search-button">
             <i class="fas fa-search"></i>
           </button>
           <input type="text" placeholder="Buscar grãos, métodos e muito mais..." class="search-input"
-            v-model="searchQuery" @input="handleSearch" />
+                 v-model="searchQuery" @input="handleSearch" />
           <button type="button" class="clear-button" v-if="searchQuery" @click="clearSearch">
             <i class="fas fa-times"></i>
           </button>
         </div>
       </form>
-
       <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
-
       <div class="action-buttons">
         <div class="favorites-container" @mouseover="handleFavoriteHover" @mouseleave="handleFavoriteLeave">
           <button class="action-button favorite-button">
@@ -53,22 +49,20 @@
               <button @click="redirectToLogin">Login</button>
             </div>
             <div v-else class="product-scroll-container">
-              <div v-for="product in products" :key="product.id" class="product-card">
+              <div>favoritos</div>
+              <div v-for="product in favorite_products" :key="product.id" class="product-card">
                 <div class="product-image">
                   <img :src="product.imagem" alt="Imagem do Produto">
                 </div>
                 <div class="product-details">
                   <h4>{{ product.nome }}</h4>
                   <p>{{ product.preco.toFixed(2) }}</p>
-                  <button @click="deleteProduct(product.id)">Excluir</button>
+                  <button @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
                 </div>
               </div>
             </div>
             <button @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos</button>
           </div>
-
-
-
         </div>
         <button class="action-button cart-button" @click="handleCartClick">
           <img src="@/assets/carrinho.png" alt="Cart" />
@@ -98,6 +92,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import axiosInstance from "@/utils/axiosInstance";
+import { globalState, updateFavorites } from "@/state.js";
 
 export default {
   data() {
@@ -106,7 +101,7 @@ export default {
       dropdownVisible: false,
       showModal: false,
       authenticated: true,
-      products: [],
+      favorite_products: [],
       baseURL: import.meta.env.VITE_API_BASE_URL, // Mantendo o baseURL
     };
   },
@@ -145,7 +140,7 @@ export default {
       try {
         const response = await axiosInstance.get(`${this.baseURL}/favorites/favorited-products`);
         if (response.data.length) {
-          this.products = response.data;
+          this.favorite_products = response.data;
           this.authenticated = true;
           this.showModal = true;
         }
@@ -160,17 +155,26 @@ export default {
         }
       }
     },
+    async deleteProduct(productId) {
+      try {
+        const response = await axiosInstance.delete(`${this.baseURL}/favorites/remove?productId=${productId}`);
+        if (response.status === 200) {
+          this.favorite_products = this.favorite_products.filter(product => product.id !== productId);
+          updateFavorites(this.favorite_products);
+        }
+      } catch (error) {
+        console.error('Erro ao excluir o produto', error);
+      }
+    },
     redirectToLogin() {
       window.location.href = `${this.baseURL}/login`;
     }
-
   },
   mounted() {
     this.checkAuthentication();
   },
 };
 </script>
-
 
 <style scoped>
 @import "@/assets/css/variables.css";
@@ -237,7 +241,6 @@ a img {
 }
 
 a:hover {
-
   transform: scale(1.05);
 }
 
@@ -337,7 +340,7 @@ header .action-buttons {
   position: absolute;
   background-color: white;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -362,7 +365,7 @@ header .action-buttons {
   background-color: white;
   padding: 10px;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -399,6 +402,7 @@ header .action-buttons {
 .product-details {
   color: black;
   display: flex;
+  margin-right: 0.5em;
   flex-direction: column;
 }
 

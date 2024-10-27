@@ -7,7 +7,8 @@
       <div class="product-info">
         <h3>{{ produto.nome }}</h3>
         <p>{{ produto.descricao }}</p>
-        <p>{{ produto.preco | currency }}</p>
+        <p>{{ produto.preco.toFixed(2) }}</p>
+
         <div>
           <button class="comprar-btn">Comprar</button>
           <button class="delete-btn" @click="deleteProduct(produto.id)">Excluir</button>
@@ -22,7 +23,7 @@
         <span class="close" @click="closeModal">&times;</span>
         <h3>{{ produto.nome }}</h3>
         <img :src="produto.imagem" :alt="produto.nome" class="modal-image" />
-        <p>{{ produto.preco | currency }}</p>
+        <p>{{ produto.preco.toFixed(2) }}</p>
       </div>
     </div>
   </div>

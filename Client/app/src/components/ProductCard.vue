@@ -67,6 +67,8 @@
 import ProductModal from "@/components/ProductModal.vue";
 import axios from "axios";
 import axiosInstance from "@/utils/axiosInstance";
+import { globalState } from "@/state.js";
+import { computed } from "vue";
 export default {
   props: {
     produtos: {
@@ -93,7 +95,14 @@ export default {
     return {
       isModalVisible: false,
       selectedProduct: null,
-      favoriteProductIds: [], // Armazena os IDs dos produtos favoritos
+    };
+  },
+  setup() {
+    // Agora você pode acessar os IDs diretamente do estado reativo
+    const favoriteProductIds = computed(() => globalState.favoriteProductIds);
+    return {
+      // eslint-disable-next-line vue/no-dupe-keys
+      favoriteProductIds
     };
   },
   computed: {
@@ -119,7 +128,7 @@ export default {
     async fetchFavorites() {
       try {
         const response = await axiosInstance.get('/favorites/list');
-        this.favoriteProductIds = response.data.map(fav => fav.productId);
+        globalState.favoriteProductIds = response.data.map(fav => fav.productId);
       } catch (error) {
         console.error('Erro ao buscar favoritos:', error);
       }
