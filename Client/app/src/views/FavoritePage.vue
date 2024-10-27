@@ -16,7 +16,7 @@
 
 <script>
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import FavoriteProductCard from '@/components/FavoriteProductCard.vue';
+import FavoriteProductCard from '@/components/FavoriteCard.vue';
 import axiosInstance from "@/utils/axiosInstance";
 
 export default {

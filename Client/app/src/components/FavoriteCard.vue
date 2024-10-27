@@ -70,7 +70,7 @@ export default {
 
 <style scoped>
 #card-container {
-  padding: 40px 40px 0px; /* Padding on the sides and top, none at the bottom */
+  padding: 40px 40px 0; /* Padding on the sides and top, none at the bottom */
 }
 
 .product-card {
@@ -79,8 +79,8 @@ export default {
   align-items: center;
   cursor: pointer;
   width: 100%; /* Use full available space */
-  margin: 0px; /* No margin between cards */
-  padding: 0px; /* No padding inside the card */
+  margin: 0; /* No margin between cards */
+  padding: 0; /* No padding inside the card */
   color: black; /* Text color */
   border: 1px solid #ccc; /* Restoring border around each card */
 }
