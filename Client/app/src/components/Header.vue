@@ -5,47 +5,70 @@
         <!-- Link para Produtos com a troca de imagem baseada na rota ativa -->
         <router-link to="/products" active-class="active-link" exact-active-class="exact-active-link">
           <!-- Usando v-if para trocar a imagem baseada no estado da rota ativa -->
-          <img 
-            v-if="$route.path === '/products'" 
-            src="@/assets/produtoselected.png" 
-            alt="Produtos" 
+          <img
+              v-if="$route.path === '/products'"
+              src="@/assets/produtoselected.png"
+              alt="Produtos"
           />
-          <img 
-            v-else 
-            src="@/assets/icons8-coffee-beans-90(1).png" 
-            alt="Produtos" 
+          <img
+              v-else
+              src="@/assets/icons8-coffee-beans-90(1).png"
+              alt="Produtos"
           />
           Produtos
         </router-link>
-
         <!-- Link para Receitas sem mudanças -->
         <router-link to="/cart" active-class="active-link" exact-active-class="exact-active-link">
           <img src="@/assets/icons8-repository-64.png" alt="Receitas" />
           Receitas
         </router-link>
       </nav>
-
       <form @submit.prevent="handleSearchSubmit">
         <div class="search-container">
           <button type="submit" class="search-button">
             <i class="fas fa-search"></i>
           </button>
           <input type="text" placeholder="Buscar grãos, métodos e muito mais..." class="search-input"
-            v-model="searchQuery" @input="handleSearch" />
+                 v-model="searchQuery" @input="handleSearch" />
           <button type="button" class="clear-button" v-if="searchQuery" @click="clearSearch">
             <i class="fas fa-times"></i>
           </button>
         </div>
       </form>
-
       <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
-
       <div class="action-buttons">
-        <button class="action-button favorite-button" @click="handleFavoriteClick">
-          <img src="@/assets/estrela.png" alt="Favorites" />
-        </button>
+        <div class="favorites-container" @mouseover="handleFavoriteHover" @mouseleave="handleFavoriteLeave">
+          <button class="action-button favorite-button">
+            <font-awesome-icon
+                icon="star"
+                class="favorite-icon"
+            />
+          </button>
+          <div v-if="showModal" class="modal">
+            <div>favoritos:</div>
+            <div v-if="!authenticated">
+              <p>Você precisa estar logado.</p>
+              <button @click="redirectToLogin" style="background: #2ecc71; color: white; border-radius: 20px; padding: 10px">Login</button>
+            </div>
+            <div v-else class="product-scroll-container">
+              <div>
+                <div v-for="product in favorite_products" :key="product.id" class="product-card">
+                  <div class="product-image">
+                    <img :src="product.imagem" alt="Imagem do Produto">
+                  </div>
+                  <div class="product-details">
+                    <h4>{{ product.nome }}</h4>
+                    <p>{{ product.preco.toFixed(2) }}</p>
+                    <button @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
+                  </div>
+                </div>
+              </div>
+             </div>
+            <button v-if="authenticated" @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos</button>
+          </div>
+        </div>
         <button class="action-button cart-button" @click="handleCartClick">
           <img src="@/assets/carrinho.png" alt="Cart" />
         </button>
@@ -73,12 +96,17 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import axiosInstance from "@/utils/axiosInstance";
+import { globalState, updateFavorites } from "@/state.js";
 
 export default {
   data() {
     return {
       searchQuery: "",
       dropdownVisible: false,
+      showModal: false,
+      authenticated: true,
+      favorite_products: [],
       baseURL: import.meta.env.VITE_API_BASE_URL, // Mantendo o baseURL
     };
   },
@@ -106,13 +134,52 @@ export default {
     goToHome() {
       this.$router.push('/');
     },
+    goToFavorites() {
+      this.$router.push('/favorites'); // Ajuste a rota conforme necessário
+    },
+    handleFavoriteLeave() {
+      this.showModal = false;
+      console.log("Mouse leave"); // Debugging
+    },
+    async handleFavoriteHover() {
+      try {
+        const response = await axiosInstance.get(`${this.baseURL}/favorites/favorited-products`);
+        if (response.data.length) {
+          this.favorite_products = response.data;
+          this.authenticated = true;
+          this.showModal = true;
+        }
+      } catch (error) {
+        console.error('Erro ao verificar a autenticação do usuário', error);
+        if (error.response && error.response.status === 401) {
+          // Se a resposta da API for 401, defina o modal para mostrar a mensagem de não autenticado
+          this.authenticated = false;
+          this.showModal = true;
+        } else {
+          this.showModal = false;
+        }
+      }
+    },
+    async deleteProduct(productId) {
+      try {
+        const response = await axiosInstance.delete(`${this.baseURL}/favorites/remove?productId=${productId}`);
+        if (response.status === 200) {
+          this.favorite_products = this.favorite_products.filter(product => product.id !== productId);
+          updateFavorites(this.favorite_products);
+        }
+      } catch (error) {
+        console.error('Erro ao excluir o produto', error);
+      }
+    },
+    redirectToLogin() {
+      window.location.href = `${this.baseURL}/login`;
+    }
   },
   mounted() {
     this.checkAuthentication();
   },
 };
 </script>
-
 
 <style scoped>
 @import "@/assets/css/variables.css";
@@ -189,7 +256,6 @@ a img {
 }
 
 a:hover {
-
   transform: scale(1.05);
 }
 
@@ -292,7 +358,7 @@ display: block;
   position: absolute;
   background-color: #ededed;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   border: 1px solid #c1c1c1;
   border-radius: 2rem;
@@ -312,5 +378,59 @@ display: block;
   font-size: 1.5rem !important;
 }
 
+.favorite-icon:hover {
+  font-size: 2.5rem;
+}
+
+
+.modal {
+  position: absolute;
+  right: 2px;
+  top: 5rem;
+  width: 300px;
+  max-height: 400px;
+  background-color: white;
+  padding: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1; /* Allows this container to grow and fill the space, pushing the button to the bottom */
+}
+
+.all-favorites-button {
+  width: 100%;
+  padding: 10px;
+  background-color: gray; /* Customize according to your color scheme */
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.product-card {
+  display: flex;
+  height: auto;
+  margin: 5px;
+  border: 1px solid #ccc;
+}
+
+.product-image img {
+  width: 100px;
+  height: auto;
+}
+
+.product-details {
+  color: black;
+  display: flex;
+  margin-right: 0.5em;
+  flex-direction: column;
+}
 
 </style>

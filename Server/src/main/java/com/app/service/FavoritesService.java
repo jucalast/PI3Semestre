@@ -1,11 +1,14 @@
 package com.app.service;
 
 import com.app.model.FavoritesModel;
+import com.app.model.Produto;
 import com.app.repository.FavoritesRepository;
+import com.app.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for managing favorite items, providing methods to add and retrieve favorites.
@@ -14,10 +17,14 @@ import java.util.List;
 public class FavoritesService {
 
     private final FavoritesRepository favoritesRepository;
+    private final ProdutoRepository produtoRepository;
+
+
 
     @Autowired
-    public FavoritesService(FavoritesRepository favoritesRepository) {
+    public FavoritesService(FavoritesRepository favoritesRepository, ProdutoRepository produtoRepository) {
         this.favoritesRepository = favoritesRepository;
+        this.produtoRepository = produtoRepository;
     }
 
     /**
@@ -50,4 +57,28 @@ public class FavoritesService {
     public boolean isProductAlreadyFavorite(Long userId, Long productId) {
         return favoritesRepository.existsByUserIdAndProductId(userId, productId);
     }
+
+
+
+    public List<Produto> getFavoriteProducts(Long userId) {
+        List<FavoritesModel> favorites = getUserFavorites(userId);
+        return favorites.stream()
+                .map(favorite -> produtoRepository.findById(favorite.getProductId()).orElse(null))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes a favorite from the user.
+     * @param userId The ID of the user.
+     * @param productId The ID of the product to remove.
+     * @return true if the favorite was successfully removed, false otherwise.
+     */
+    public boolean removeFavorite(Long userId, Long productId) {
+        if (favoritesRepository.existsByUserIdAndProductId(userId, productId)) {
+            favoritesRepository.deleteByUserIdAndProductId(userId, productId);
+            return true;
+        }
+        return false;
+    }
+
 }
