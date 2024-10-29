@@ -23,7 +23,7 @@
 
 <script>
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
-import ProductCard from "@/components/ProductCard.vue";
+import ProductCard from "@/components/ProductCardComponent.vue";
 import AtributosProduto from "@/components/AtributosProduto.vue";
 import axios from "axios";
 
@@ -89,7 +89,8 @@ justify-content: flex-start;
 .sessiontwo {
   padding: 2rem; /* Adiciona espaço ao redor do conteúdo */
   display: flex !important;
-  height: 100vh;
+  height: fit-content;
+
 }
 
 .accordion {

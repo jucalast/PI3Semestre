@@ -4,6 +4,7 @@ import ProductsPage from '@/views/ProductsPage.vue';
 import CheckoutPage from '@/views/CheckoutPage.vue';
 import AddressPage from '@/views/AddressPage.vue';
 import FavoritePage from "@/views/FavoritePage.vue";
+import AdminDashboard from '@/views/AdminDashboard.vue';
 
 const routes = [
   { path: '/', component: HomePage },
@@ -11,7 +12,7 @@ const routes = [
   { path: '/checkout', component: CheckoutPage, name: 'checkout' }, 
   { path: '/Address', component: AddressPage, name: 'address' },
   { path: '/favorites', component: FavoritePage, name: 'FavoritePage' },
-
+  { path: '/admin', component: AdminDashboard, name: 'AdminDashboard' },
 ];
 
 const router = createRouter({

@@ -15,7 +15,7 @@
 
 <script>
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import ProductCard from '@/components/ProductCard.vue';
+import ProductCard from '@/components/ProductCardComponent.vue';
 import axios from 'axios';
 
 export default {
