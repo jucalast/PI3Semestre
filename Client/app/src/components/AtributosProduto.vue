@@ -13,29 +13,6 @@
           {{ formatTitle(key) }} <span>{{ isOpen(key) ? '-' : '+' }}</span>
         </h3>
         <ul v-show="isOpen(key)">
-          <!-- Inputs de Data e Preço -->
-          <li v-if="key === 'dataTorra' || key === 'dataValidade'">
-            <div class="input-group">
-              <label for="dataDe">De:</label>
-              <input 
-                type="date" 
-                id="dataDe" 
-                class="input-data" 
-                placeholder="Data de" 
-                @change="onDateChange('dataDe', $event.target.value)" 
-              />
-            </div>
-            <div class="input-group">
-              <label for="dataAte">Até:</label>
-              <input 
-                type="date" 
-                id="dataAte" 
-                class="input-data" 
-                placeholder="Data até" 
-                @change="onDateChange('dataAte', $event.target.value)" 
-              />
-            </div>
-          </li>
           <li v-if="key === 'preco'">
             <div class="input-group">
               <label for="precoDe">De:</label>
