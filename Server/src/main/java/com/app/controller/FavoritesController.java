@@ -14,63 +14,69 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * Controller for handling requests related to the favorites functionality.
- * It provides endpoints for adding a product to favorites and listing all favorites of a user.
+ * Classe controladora para lidar com operações relacionadas à funcionalidade de favoritos do usuário.
+ * Fornece endpoints RESTful para adicionar, remover e listar produtos favoritos de um usuário.
+ * Este controlador realiza a verificação de autenticação, garantindo que uma sessão de usuário exista antes de permitir modificações nos favoritos.
  */
 @RestController
 @RequestMapping("/favorites")
 public class FavoritesController {
-
+    /**
+     * Objeto de serviço para gerenciar operações de favoritos. É automaticamente injetado pelo Spring.
+     */
     @Autowired
     private FavoritesService favoritesService;
 
     /**
-     * Adds a product to the user's favorites.
+     * Manipula a solicitação para adicionar ou remover um produto da lista de favoritos do usuário.
+     * O produto é adicionado se atualmente não for um favorito; caso contrário, é removido.
      *
-     * @param request     The HttpServletRequest providing request information.
-     * @param productId   The ID of the product to add to favorites.
-     * @return ResponseEntity with either a favorite object on success or an error message on failure.
+     * @param request    O HttpServletRequest que fornece informações da sessão.
+     * @param productId  O ID do produto a ser adicionado ou removido.
+     * @return           Uma ResponseEntity com um objeto favorito na adição bem-sucedida,
+     *                   uma mensagem de sucesso na remoção ou uma mensagem de erro se a operação falhar.
      */
     @PostMapping("/add")
     public ResponseEntity<?> addOrRemoveFavorite(HttpServletRequest request, @RequestParam Long productId) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
         if (authenticatedUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
         if (productId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID must not be null.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID do produto não pode ser nulo.");
         }
 
         try {
-            // Check if the product is already a favorite
+            // Verifica se o produto já é um favorito
             if (favoritesService.isProductAlreadyFavorite(authenticatedUser.getId(), productId)) {
-                // If it is, remove it
+                // Se for, remove
                 boolean isRemoved = favoritesService.removeFavorite(authenticatedUser.getId(), productId);
                 if (isRemoved) {
-                    return ResponseEntity.ok("Product " + productId + " removed from favorites.");
+                    return ResponseEntity.ok("Produto " + productId + " removido dos favoritos.");
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found in favorites.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado nos favoritos.");
                 }
             } else {
-                // If it's not, add it
+                // Se não for, adiciona
                 FavoritesModel favorite = favoritesService.addFavorite(authenticatedUser.getId(), productId);
                 return ResponseEntity.ok(favorite);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro: " + e.getMessage());
         }
     }
+
     /**
-     * Retrieves a list of all favorites for the authenticated user.
+     * Recupera todos os favoritos para o usuário autenticado.
      *
-     * @param request The HttpServletRequest providing request information.
-     * @return ResponseEntity containing a list of favorites or a relevant error message.
+     * @param request O HttpServletRequest que fornece informações da sessão.
+     * @return        Uma ResponseEntity contendo uma lista de objetos favoritos, ou uma mensagem de erro apropriada.
      */
     @GetMapping("/list")
     public ResponseEntity<?> listUserFavorites(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
         if (authenticatedUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
 
         try {
@@ -80,17 +86,23 @@ public class FavoritesController {
             }
             return ResponseEntity.ok(favorites);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Favorites not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Favoritos não encontrados.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while retrieving favorites.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao recuperar os favoritos.");
         }
     }
 
+    /**
+     * Recupera todos os produtos favoritos para o usuário autenticado, detalhando as informações do produto.
+     *
+     * @param request O HttpServletRequest que fornece informações da sessão.
+     * @return        Uma ResponseEntity contendo uma lista de produtos, ou uma mensagem de erro apropriada.
+     */
     @GetMapping("/favorited-products")
     public ResponseEntity<?> listFavoriteProducts(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
         if (authenticatedUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
 
         try {
@@ -100,40 +112,39 @@ public class FavoritesController {
             }
             return ResponseEntity.ok(favoriteProducts);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Favorites not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Favoritos não encontrados.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while retrieving favorite products.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao recuperar produtos favoritos.");
         }
     }
 
     /**
-     * Deletes a product from the user's favorites.
+     * Exclui um produto específico dos favoritos do usuário.
      *
-     * @param request     The HttpServletRequest providing request information.
-     * @param productId   The ID of the product to remove from favorites.
-     * @return ResponseEntity with either a success message or an error message.
+     * @param request    O HttpServletRequest que fornece informações da sessão.
+     * @param productId  O ID do produto a ser removido dos favoritos.
+     * @return           Uma ResponseEntity com uma mensagem de sucesso ou uma mensagem de erro.
      */
     @DeleteMapping("/remove")
     public ResponseEntity<?> removeFavorite(HttpServletRequest request, @RequestParam Long productId) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
         if (authenticatedUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
 
         if (productId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID must not be null.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID do produto não pode ser nulo.");
         }
 
         try {
             boolean isRemoved = favoritesService.removeFavorite(authenticatedUser.getId(), productId);
             if (isRemoved) {
-                return ResponseEntity.ok("Product " + productId + " removed from favorites.");
+                return ResponseEntity.ok("Produto " + productId + " removido dos favoritos.");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found in favorites.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado nos favoritos.");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the product from favorites: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao remover o produto dos favoritos: " + e.getMessage());
         }
     }
-
 }

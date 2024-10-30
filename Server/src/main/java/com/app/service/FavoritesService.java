@@ -11,15 +11,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service layer for managing favorite items, providing methods to add and retrieve favorites.
+ * Classe de serviço para gerenciar itens favoritos.
+ * Fornece métodos para adicionar e remover favoritos, verificar se um produto é um favorito e recuperar todos os favoritos ou produtos favoritos de um usuário.
  */
 @Service
 public class FavoritesService {
-
+    /**
+     * Repositório para gerenciar operações CRUD em itens favoritos.
+     */
     private final FavoritesRepository favoritesRepository;
+
+    /**
+     * Repositório para acessar informações de produtos, usado para buscar produtos favoritos.
+     */
     private final ProdutoRepository produtoRepository;
-
-
 
     @Autowired
     public FavoritesService(FavoritesRepository favoritesRepository, ProdutoRepository produtoRepository) {
@@ -28,10 +33,11 @@ public class FavoritesService {
     }
 
     /**
-     * Adds a new favorite for a user.
-     * @param userId The ID of the user.
-     * @param productId The ID of the product.
-     * @return The saved favorite model.
+     * Adiciona um novo favorito para um usuário.
+     *
+     * @param userId     O ID do usuário.
+     * @param productId  O ID do produto.
+     * @return           A instância de FavoritesModel salva.
      */
     public FavoritesModel addFavorite(Long userId, Long productId) {
         System.out.println("Service Layer - UserId: " + userId + ", ProductId: " + productId);
@@ -40,26 +46,32 @@ public class FavoritesService {
     }
 
     /**
-     * Retrieves all favorite items of a user.
-     * @param userId The ID of the user.
-     * @return A list of favorite models.
+     * Recupera todos os itens favoritos de um usuário.
+     *
+     * @param userId  O ID do usuário.
+     * @return        Uma lista de instâncias de FavoritesModel.
      */
     public List<FavoritesModel> getUserFavorites(Long userId) {
         return favoritesRepository.findByUserId(userId);
     }
 
     /**
-     * Checks if a product is already marked as favorite by a user.
-     * @param userId The user's ID.
-     * @param productId The product's ID.
-     * @return true if the product is already a favorite, false otherwise.
+     * Verifica se um produto já está marcado como favorito por um usuário.
+     *
+     * @param userId     O ID do usuário.
+     * @param productId  O ID do produto.
+     * @return           verdadeiro se o produto já for um favorito, falso caso contrário.
      */
     public boolean isProductAlreadyFavorite(Long userId, Long productId) {
         return favoritesRepository.existsByUserIdAndProductId(userId, productId);
     }
 
-
-
+    /**
+     * Recupera todos os produtos que um usuário marcou como favoritos.
+     *
+     * @param userId  O ID do usuário.
+     * @return        Uma lista de instâncias de Produto representando os produtos favoritos.
+     */
     public List<Produto> getFavoriteProducts(Long userId) {
         List<FavoritesModel> favorites = getUserFavorites(userId);
         return favorites.stream()
@@ -68,10 +80,11 @@ public class FavoritesService {
     }
 
     /**
-     * Removes a favorite from the user.
-     * @param userId The ID of the user.
-     * @param productId The ID of the product to remove.
-     * @return true if the favorite was successfully removed, false otherwise.
+     * Remove um item favorito de um usuário.
+     *
+     * @param userId     O ID do usuário.
+     * @param productId  O ID do produto a ser removido.
+     * @return           verdadeiro se o favorito foi removido com sucesso, falso caso contrário.
      */
     public boolean removeFavorite(Long userId, Long productId) {
         if (favoritesRepository.existsByUserIdAndProductId(userId, productId)) {
@@ -80,5 +93,4 @@ public class FavoritesService {
         }
         return false;
     }
-
 }
