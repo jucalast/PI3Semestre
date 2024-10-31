@@ -36,15 +36,16 @@
   
   <style scoped>
   .card {
-    border: 1px solid #ccc;
+
     padding: 2rem;
     cursor: pointer;
     border-radius: 2rem;
     transition: background-color 0.3s;
+    background: #dfdfdf !important;
   }
   
   .card:hover {
-    background-color: #f0f0f0;
+    background: #d6d6d6 !important;
   }
 
   p{

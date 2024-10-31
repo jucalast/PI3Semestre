@@ -1,8 +1,7 @@
 <template>
   <AdminLayout>
-    <img src="@/assets/backgroundadm.png" alt="">
     <section class="centered-section">
-      <h1>Tudo na palma das suas mãos</h1>
+      <h1>Tudo na palma das <strong>suas mãos</strong> </h1>
       <p>Explore e gerencie todos seu negócio com facilidade e rapidez.</p>
     </section>
     <section class="principal-section">
@@ -69,6 +68,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .centered-section {
   margin-top: 6rem;
   display: flex;
@@ -93,12 +94,16 @@ export default {
 h1 {
   font-size: 10rem;
   line-height: 0.8;
-  color: #1a1a1a;
+  color: #cdd5ff;
   letter-spacing: -0.05em; /* Ajuste este valor conforme necessário */
 }
 
+strong {
+  color: #e6eaff !important;
+}
+
 .product-list {
-    width: 40%;
+    width: 45%;
     background: #ffffff;
     border: solid 1px #d2d2d2;
     border-radius: 1.5rem;
@@ -114,12 +119,12 @@ img {
 }
 
 p {
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-top: 1rem;
   background: transparent;
   width: 80%;
   backdrop-filter: blur(0);
-  color: #3a5bff;
+  color: #16225e;
 }
 
 h3 {

@@ -15,10 +15,15 @@ export default {
 </script>
 
 <style scoped>
+
 .admin-content {
-  padding: 20px;
-  background-color: #f4f4f4;
+  padding: 20px; 
 }
+main{
+  background: #3a5bff !important;
+}
+
+
 .layout {
   display: flex;
   flex-direction: column;

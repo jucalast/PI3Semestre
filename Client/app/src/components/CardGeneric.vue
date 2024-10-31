@@ -33,8 +33,11 @@
             </div>
           </div>
           <div v-if="showButtons === produto.id" class="action-buttons">
-            <button class="excluir" @click.stop="confirmDeleteProduct(produto.id)">
-              <i class="fas fa-trash "></i>
+            <button
+              class="excluir"
+              @click.stop="confirmDeleteProduct(produto.id)"
+            >
+              <i class="fas fa-trash"></i>
             </button>
             <button class="editar" @click.stop="editProduct(produto)">
               <i class="fas fa-edit"></i>
@@ -43,16 +46,28 @@
         </div>
       </div>
 
+      <!-- Modal de Edição -->
+      <EditProductModal
+        :product="productToEdit"
+        :isVisible="isEditModalVisible"
+        @close="isEditModalVisible = false"
+        @save="saveProductEdit"
+      />
+
+      <!-- Modal de produto existente -->
       <ProductModal
         :product="selectedProduct"
         :isVisible="isModalVisible"
         @close="isModalVisible = false"
       />
+      <!-- Confirmação de exclusão -->
       <div v-if="isConfirmationVisible" class="confirmation-modal">
-      <p>Tem certeza que deseja excluir este produto?</p>
-      <button class="deletesim" @click="deleteProduct">Sim</button>
-      <button class="deletenao" @click="isConfirmationVisible = false">Não</button>
-    </div>
+        <p>Tem certeza que deseja excluir este produto?</p>
+        <button class="deletesim" @click="deleteProduct">Sim</button>
+        <button class="deletenao" @click="isConfirmationVisible = false">
+          Não
+        </button>
+      </div>
     </div>
     <div class="not" v-else>
       <p>Nenhum produto encontrado.</p>
@@ -62,6 +77,7 @@
 
 <script>
 import ProductModal from "@/components/ProductModal.vue";
+import EditProductModal from "@/components/EditProductModal.vue";
 import axios from "axios";
 
 import { useToast } from "vue-toastification"; // Importando o Vue Toastification
@@ -87,12 +103,14 @@ export default {
   },
   components: {
     ProductModal,
+    EditProductModal,
   },
   data() {
     return {
       isConfirmationVisible: false, // Para controlar a visibilidade do modal de confirmação
       productToDelete: null, // Armazena o produto a ser excluído
-
+      isEditModalVisible: false, // Controla o modal de edição
+      productToEdit: null, // Armazena o produto para editar
       isModalVisible: false,
       selectedProduct: null,
       showButtons: null, // Para controlar a visibilidade dos botões
@@ -102,7 +120,6 @@ export default {
     const toast = useToast(); // Inicializando o Toast
 
     return {
-
       toast,
     };
   },
@@ -127,7 +144,7 @@ export default {
     formattedDescription(descricao) {
       return descricao.length > 30 ? descricao.slice(0, 30) + "..." : descricao;
     },
-   
+
     async openModal(product) {
       this.selectedProduct = product; // Armazena o produto selecionado
       await this.fetchProductDetails(product.id); // Certifique-se de que o método está disponível
@@ -184,13 +201,45 @@ export default {
 
       return filtered;
     },
-    
+
     handleCartClick(produto) {
       // Lógica para adicionar produto ao carrinho
     },
     editProduct(produto) {
-      // Lógica para editar o produto
-      console.log("Editando produto:", produto);
+  this.productToEdit = { ...produto }; // Faz uma cópia do produto a ser editado
+  console.log("Dados do produto selecionado para edição:", this.productToEdit);
+
+  // Exibe especializações se existirem
+  if (produto.cafeEspecial) {
+    console.log("Especialização Café Especial:", produto.cafeEspecial);
+  }
+  if (produto.metodoPreparo) {
+    console.log("Especialização Método de Preparo:", produto.metodoPreparo);
+  }
+
+  this.isEditModalVisible = true;
+},
+
+    // Função chamada ao salvar alterações
+    async saveProductEdit(updatedProduct) {
+      try {
+        const response = await axios.put(
+          `http://localhost:8080/api/produtos/${updatedProduct.id}`,
+          updatedProduct
+        );
+        const index = this.produtos.findIndex(
+          (produto) => produto.id === updatedProduct.id
+        );
+        if (index !== -1) {
+          this.produtos.splice(index, 1, response.data); // Atualiza o produto no array
+        }
+        this.toast.success("Produto atualizado com sucesso!");
+      } catch (error) {
+        console.error("Erro ao atualizar produto:", error);
+        this.toast.error("Erro ao atualizar o produto.");
+      } finally {
+        this.isEditModalVisible = false; // Fecha o modal
+      }
     },
     async fetchProducts() {
       try {
@@ -207,23 +256,27 @@ export default {
     },
     async deleteProduct() {
       try {
-        await axios.delete(`http://localhost:8080/api/produtos/${this.productToDelete}`);
+        await axios.delete(
+          `http://localhost:8080/api/produtos/${this.productToDelete}`
+        );
         // Remova o produto do array de produtos localmente
-        const index = this.produtos.findIndex(prod => prod.id === this.productToDelete);
+        const index = this.produtos.findIndex(
+          (prod) => prod.id === this.productToDelete
+        );
         if (index !== -1) {
           this.produtos.splice(index, 1); // Remove o produto do array existente
           this.toast.success("Produto excluído com sucesso!"); // Exibe notificação de sucesso
         }
       } catch (error) {
         console.error("Erro ao excluir o produto:", error);
-        this.toast.error("Erro ao excluir o produto. Tente novamente mais tarde."); // Exibe notificação de erro
+        this.toast.error(
+          "Erro ao excluir o produto. Tente novamente mais tarde."
+        ); // Exibe notificação de erro
       } finally {
         this.isConfirmationVisible = false; // Oculta o modal de confirmação
       }
     },
-  
   },
-
 };
 </script>
 
@@ -244,7 +297,6 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 1000; /* Certifique-se de que o modal apareça acima de outros elementos */
   border-radius: 2rem;
-
 }
 .confirmation-modal p {
   font-size: 2rem;
@@ -276,7 +328,7 @@ body {
   margin-top: 7rem;
 }
 
-.deletesim:hover, 
+.deletesim:hover,
 .deletenao:hover {
   border: solid 1px #ff4d4d;
 }
@@ -311,26 +363,23 @@ body {
 }
 
 .product-card {
-
   display: flex;
   border-radius: 1.5rem;
   width: 100%;
   height: auto;
   text-align: center;
-  background: #ffffff !important;
   padding: 1rem;
   cursor: pointer;
-  transition: none;
+  transition: none !important;
   align-items: center;
   margin: 0;
   position: relative;
+  background: #dfdfdf !important;
 }
 
 .product-card:hover {
   width: 84%;
   transform: translateY(0px);
-  background: #f3f3f3 !important;
-  border: solid 1px #d1d1d1 !important;
 }
 
 .imgcardcont {
@@ -406,28 +455,23 @@ p {
 }
 
 .editar {
-  background: #f3f3f3 !important;
-  color: #4e4e4e;
-  border: solid 1px #d1d1d1 !important;
+  background: #dfdfdf !important;
 }
 
 .action-buttons i {
-color: #aaaaaa;
-font-size: 2rem !important;
+  color: #6b6b6b;
+  font-size: 2rem !important;
 }
 
 .action-buttons .excluir i:hover {
-color: #ff4d4d;
+  color: #ff4d4d;
 }
 
 .action-buttons .editar i:hover {
-color: #3a5bff;
+  color: #3a5bff;
 }
 
-
 .excluir {
-  background: #f3f3f3 !important;
-  color: #4e4e4e;
-  border: solid 1px #d1d1d1 !important;
+  background: #dfdfdf !important;
 }
 </style>
