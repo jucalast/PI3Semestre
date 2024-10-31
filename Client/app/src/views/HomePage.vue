@@ -6,7 +6,7 @@
       </div>
       <div class="sessiontwo">
         <div class="product-list">
-          <ProductCard :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
+           <ProductCard :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
         </div>
       </div>
     </div>
@@ -54,7 +54,7 @@ export default {
     },
     updateSearchQuery(query) {
       this.searchQuery = query;
-    }
+    },
   },
   mounted() {
     this.fetchProdutos(); // Chama a função uma vez ao montar o componente

@@ -1,26 +1,30 @@
 <template>
-    <div v-if=isModalVisible class="cart-modal-bckg" @click.self="close">
+    <div v-if=isModalVisible class="cart-modal-bckg" @click.self="close" >
         <div class="cart-modal">
             <div class="header-cart"> 
                 <h1>Carrinho de compras</h1>
                 <h1>Av. Dos Teste, No 123 - Bairro dos Testes</h1>
             </div>
             <div class="main-cart">
-                <section class="product-section">   
+                <section class="products">
+                <section v-for="(cartItem, index) in cartItems"
+                :key = "index" 
+                class="product-section">
                     <div class="image-bckg">
-                        <img class="image-product" src="https://i.ibb.co/q1yrJxr/1.png" alt="image do produto">
+                        <img class="image-product" :src="cartItem.imagem_produto" :alt="cartItem.nome_produto">
                     </div>
-                        <h2>AeroPress</h2>
-                        <button>Excluir</button>
+                        <h2>{{cartItem.nome_produto}}</h2>
+                        <button @click="removeItemOnCartUser(cartItem.userId, cartItem.produtoId, index)">REMOVER</button>
                         <select name="Quantidade" class="input-qntty">
+                            <option :value="cartItem.quantidade">{{ cartItem.quantidade }}</option>
                             <option value="1">1 Uni</option>
                             <option value="2">2 Uni</option>
                             <option value="3">3 Uni</option>
                             <option value="4">4 Uni</option>
                         </select>
-                        <span>R$35,55</span>
+                        <span>R${{cartItem.preco_produto}}</span>
                 </section>
-                <hr>
+                </section>
                 <section class="frete-section">
                         <span id="info-01">Frete</span>
                         <span id="info-02">R$14,59</span>
@@ -38,21 +42,53 @@
 </template>
 
 <script>
+import axios from 'axios'
 
-export default ({
+export default{
     name: 'CartModal',
     props:{
         isModalVisible: {
-      type: Boolean,
-      required: true,
+        type: Boolean,
+        required: true,
     },
+    data(){
+        return{
+            cartItems: [],
+            cartValue: 0,
+        };
+    }
     },
     methods: {
         close(){
             this.$emit("close");
-        }
+        },
+        async fetchCarts(){
+            console.log("Iniciando a requisição para o carrinho...");
+            try{          
+                const responseCart = await axios.get("http://localhost:8080/api/carrinho/1");
+                this.cartItems = responseCart.data;
+            } catch (error){
+                console.error("Erro ao buscar produtos do carrinho: ", error);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async removeItemOnCartUser(userId, productId, index){
+            console.log(userId, productId)
+            try{
+                const responseCart = await axios.delete(`http://localhost:8080/api/carrinho/${userId}/${productId}`);
+                //await this.fetchCarts();
+            } catch (error){
+                console.error("Erro ao remover produto do carrinho", error);
+            } finally {
+                this.isLoading = false;
+            }
     }
-})
+    },
+    mounted(){
+        this.fetchCarts();
+    }
+}
 </script>
 
 <style scoped>
@@ -103,22 +139,26 @@ export default ({
     margin: 10px 0px 0px 15%;
 }
 
-
-
 .main-cart{
     background-color: #c3c3c3 ;
-    width: 90%;
+    width: 95%;
     height: 40%;
-    border-radius: 50px;
+    border-radius: 40px;
     margin: 0 auto 0;
     font-size: 18pt;
+    overflow: hidden;
 }
 
 .main-cart h2{
-    font-size: 20pt;
+    font-size: 16pt;
     color: black;
     font-weight: 100;
     
+}
+
+.products{
+    height: 60%;
+    overflow-y: auto;
 }
 
 .image-bckg{ grid-area: image;}
@@ -140,18 +180,16 @@ export default ({
     padding: 20px 20px 0px 20px;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 20% 33% 47%;
+    grid-template-columns: 30% 20% 10% 20% ;
     grid-template-rows: 3rem 1rem 2rem;
     grid-template-areas: 
-    'image name-product none'
-    'image input-quantity none'
-    'image btn-delete price-prod';
+    'image name-product input-quantity price-prod '
+    'image btn-delete input-quantity price-prod';
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
     gap: 0.7rem 2rem;
-    justify-content: start;
-    align-items: center;
-    justify-items: start;
-    align-items: center;
-    justify-items: start;
+    border-bottom: solid rgba(0, 0, 0, 0.342) 1pt;
 }
 
 button{
@@ -181,8 +219,7 @@ button:hover{
 }
 
 .product-section > span{
-    justify-self: end;
-    padding-right: 4.5rem;
+    display: inline-block;
 
 }
 
@@ -202,7 +239,7 @@ button:hover{
 }
 
 .image-product{
-    width: 50%;   
+    width: 50%;  
 }
 
 hr{

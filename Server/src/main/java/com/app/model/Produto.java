@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,9 +12,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "produto")
 public class Produto {
 
@@ -53,7 +56,8 @@ public class Produto {
     @JsonManagedReference
     private MetodoPreparo metodoPreparo;
 
-
+    // Carrinho
+    @JsonIgnore
     @ManyToMany(mappedBy = "produtos")
     private Set<UserModel> users;
 
