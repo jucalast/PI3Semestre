@@ -8,6 +8,7 @@
     <section class="principal-section">
       <CreateProductComponent />
       <div class="product-list">
+        <h3>Edite ou exclua produtos</h3>
         <!-- Mude de ProductCard para CardGeneric -->
         <CardGeneric :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
       </div>
@@ -90,14 +91,20 @@ export default {
 }
 
 h1 {
-  font-size: 12rem;
+  font-size: 10rem;
   line-height: 0.8;
-  color: #1b1b1b;
+  color: #1a1a1a;
   letter-spacing: -0.05em; /* Ajuste este valor conforme necessário */
 }
 
 .product-list {
-    width: 30%;
+    width: 40%;
+    background: #ffffff;
+    border: solid 1px #d2d2d2;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
 img {
@@ -113,5 +120,12 @@ p {
   width: 80%;
   backdrop-filter: blur(0);
   color: #3a5bff;
+}
+
+h3 {
+  width: 80%;
+  font-size: 3rem;
+  line-height: 1 !important;
+  padding-bottom:2rem ;
 }
 </style>
