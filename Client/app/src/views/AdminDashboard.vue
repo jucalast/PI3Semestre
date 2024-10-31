@@ -1,15 +1,17 @@
 <template>
-  
   <AdminLayout>
     <img src="@/assets/backgroundadm.png" alt="">
     <section class="centered-section">
-
       <h1>Tudo na palma das suas mãos</h1>
       <p>Explore e gerencie todos seu negócio com facilidade e rapidez.</p>
     </section>
     <section class="principal-section">
-    <CreateProductComponent />
-  </section>
+      <CreateProductComponent />
+      <div class="product-list">
+        <!-- Mude de ProductCard para CardGeneric -->
+        <CardGeneric :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
+      </div>
+    </section>
     <!-- Outros conteúdos do dashboard -->
   </AdminLayout>
 </template>
@@ -17,12 +19,50 @@
 <script>
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import CreateProductComponent from '@/components/CreateProductComponent.vue';
+import CardGeneric from '@/components/CardGeneric.vue';
+import axios from 'axios';
 
 export default {
   name: 'AdminDashboard',
   components: {
     AdminLayout,
     CreateProductComponent,
+    CardGeneric, // Certifique-se de que o nome está correto
+  },
+  data() {
+    return {
+      produtos: [],
+      isLoading: true,
+      searchQuery: "",
+    };
+  },
+  computed: {
+    filteredProducts() {
+      if (!this.searchQuery) {
+        return this.produtos;
+      }
+      return this.produtos.filter(produto => 
+        produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    }
+  },
+  methods: {
+    async fetchProdutos() {
+      try {
+        const response = await axios.get("http://localhost:8080/api/produtos");
+        this.produtos = response.data;
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    updateSearchQuery(query) {
+      this.searchQuery = query;
+    }
+  },
+  mounted() {
+    this.fetchProdutos(); // Chama a função uma vez ao montar o componente
   },
 };
 </script>
@@ -36,15 +76,17 @@ export default {
   align-items: center;
   text-align: center;
   padding: 2rem;
-
 }
 
 .principal-section {
   background: white;
-  height: 100vh;
+  height: fit-content;
   margin: 5rem;
   padding: 5rem;
   border-radius: 2rem;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
 }
 
 h1 {
@@ -54,6 +96,9 @@ h1 {
   letter-spacing: -0.05em; /* Ajuste este valor conforme necessário */
 }
 
+.product-list {
+    width: 30%;
+}
 
 img {
   position: absolute;
