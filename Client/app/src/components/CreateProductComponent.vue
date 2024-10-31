@@ -36,7 +36,6 @@
   
   <style scoped>
   .card {
-    width: 30%;
     border: 1px solid #ccc;
     padding: 2rem;
     cursor: pointer;

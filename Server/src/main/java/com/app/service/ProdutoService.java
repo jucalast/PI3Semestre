@@ -151,15 +151,27 @@ public class ProdutoService {
     @Transactional
     public void deleteProduto(Long id) {
         logger.info("Deletando produto com ID: {}", id);
-
-        if (!produtoRepository.existsById(id)) {
-            logger.error("Erro: Produto não encontrado com ID: {}", id);
-            throw new RuntimeException("Produto não encontrado com ID: " + id);
+    
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+    
+        // Verifica e deleta a especialização CafeEspecial se existir
+        if (produto.getCafeEspecial() != null) {
+            cafeEspecialRepository.delete(produto.getCafeEspecial());
+            logger.info("Especialização CafeEspecial deletada para o produto ID: {}", id);
         }
-
-        produtoRepository.deleteById(id);
+    
+        // Verifica e deleta a especialização MetodoPreparo se existir
+        if (produto.getMetodoPreparo() != null) {
+            metodoPreparoRepository.delete(produto.getMetodoPreparo());
+            logger.info("Especialização MetodoPreparo deletada para o produto ID: {}", id);
+        }
+    
+        // Após deletar as especializações, deleta o próprio produto
+        produtoRepository.delete(produto);
         logger.info("Produto com ID {} deletado com sucesso", id);
     }
+    
 
     @Autowired
     private CafeEspecialRepository cafeEspecialRepository;

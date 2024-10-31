@@ -261,7 +261,7 @@ export default {
 
 .product-card {
   border-radius: 2rem;
-  width: 16.5rem;
+  width: 16.5rem ;
   height: 21.5rem;
   text-align: center;
   background: transparent !important;
