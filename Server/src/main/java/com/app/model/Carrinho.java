@@ -1,11 +1,12 @@
 package com.app.model;
 
-
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.*;
 
-import java.math.BigDecimal;
-
+/**
+ * Representa a entidade Carrinho.
+ */
 @Entity
 @Builder
 @NoArgsConstructor
@@ -14,23 +15,18 @@ import java.math.BigDecimal;
 @Setter
 public class Carrinho {
 
+    /**
+     * Identificador único do carrinho.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="Id_Carrinho")
+    @Column(name = "Id_Carrinho")
     private Long id;
 
-    //@OneToOne
-    //JoinColumn(name = "Id_Usuario", referencedColumnName ="id", @ForeignKey(name = "fk_carrinho_usuario")
-    //private User user;
-
-    /*@ManyToMany
-    @JoinTable(
-            name = "carrinho_produto",
-            joinColumns = @JoinColumn(name = "Id_Carrinho"),
-            inverseJoinColumns = @JoinColumn(name = "Id_Produto")
-    )
-    */
-
-    @Column(name = "preco", precision =10, scale = 2)
+    /**
+     * Valor do frete associado ao carrinho.
+     * Precision: 10 dígitos no total, incluindo 2 casas decimais.
+     */
+    @Column(name = "preco", precision = 10, scale = 2)
     private BigDecimal valorFrete;
 }

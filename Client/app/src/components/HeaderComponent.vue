@@ -108,7 +108,7 @@ export default {
       showModal: false,
       authenticated: true,
       favorite_products: [],
-      baseURL: import.meta.env.VITE_API_BASE_URL, // Mantendo o baseURL
+      baseURL: import.meta.env.VITE_API_BASE_URL,
     };
   },
   computed: {
