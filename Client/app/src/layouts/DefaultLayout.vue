@@ -9,8 +9,7 @@
 </template>
 
 <script>
-import Header from '@/components/Header.vue';
-import CartModal from '@/components/CartModal.vue';
+import Header from '@/components/HeaderComponent.vue';
 import FooterComponent from '@/components/FooterComponent.vue';
 
 export default {
@@ -36,5 +35,6 @@ export default {
 
 main {
   flex: 1; /* Faz o main ocupar o espaço restante entre o header e o footer */
+  padding-top: 6.7rem; /* João, meu consagrado, coloquei este padding p/ SEMPRE evitar q o conteúdo sobreponha o header, e deixei no layout p/ não ter que configurar isso em cada view, se for ajustar o tamanho do header muda aq tb */
 }
 </style>

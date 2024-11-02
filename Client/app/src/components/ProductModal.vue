@@ -235,9 +235,11 @@ export default {
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 .product-page .cards {
-  margin-top: 0;
+  margin-top: 5rem;
+  width: 100%;
 }
 /* Adicione estilos para o accordion */
 .accordion {
@@ -265,7 +267,7 @@ export default {
   justify-content: space-between;
   padding: 1rem;
   cursor: pointer;
-  height: 2rem;
+
   flex-direction: row;
   align-content: flex-start;
   align-items: center;
@@ -288,7 +290,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 20;
+  z-index: 300;
   backdrop-filter: blur(5px);
 }
 
@@ -328,7 +330,6 @@ export default {
   width: 25%;
   height: 25%;
 }
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 .modal-content {
   background-color: white;
@@ -376,8 +377,7 @@ span {
   flex-direction: column;
 }
 
-.add-to-cart,
-.favorire-button {
+.add-to-cart {
   background-color: #313131;
   color: #fff;
   border: none;

@@ -1,0 +1,25 @@
+{
+  "usuarioId": 1,
+  "dataPedido": "2024-10-19T12:00:00",
+  "statusPedido": 0,
+  "observacoes": "Entregar no endereço indicado.",
+  "estado": "SP",
+  "cep": "12345-678",
+  "cidade": "São Paulo",
+  "bairro": "Centro",
+  "complemento": "Próximo à praça",
+  "numero": "123",
+  "rua": "Rua das Flores",
+  "produtos": [
+    {
+      "produtoId": 1,
+      "quantidade": 2,
+      "subtotal": 20.0
+    },
+    {
+      "produtoId": 2,
+      "quantidade": 1,
+      "subtotal": 10.0
+    }
+  ]
+}

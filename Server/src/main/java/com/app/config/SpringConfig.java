@@ -2,20 +2,18 @@ package com.app.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import java.io.IOException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
-import java.io.IOException;
 
 /**
  * Classe de configuração para o Spring Security.
@@ -49,13 +47,13 @@ public class SpringConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**", "/login", "/register", "/api/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                .requestMatchers("/**", "/login", "/register", "/api/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") 
-                        .permitAll() 
+                .loginPage("/login")
+                .permitAll()
                 )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
@@ -67,26 +65,35 @@ public class SpringConfig {
                                 }
                             });
                 })
+                .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout") 
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID") 
+                )
                 .build();
     }
 
     /**
      * Bean para o AuthenticationManager utilizado na autenticação de usuários.
-     * 
-     * @param http o objeto HttpSecurity utilizado para construir o AuthenticationManager
-     * @return um bean AuthenticationManager que representa o gerenciador de autenticação
-     * @throws Exception se ocorrer algum erro durante a configuração do AuthenticationManager
+     *
+     * @param http o objeto HttpSecurity utilizado para construir o
+     * AuthenticationManager
+     * @return um bean AuthenticationManager que representa o gerenciador de
+     * autenticação
+     * @throws Exception se ocorrer algum erro durante a configuração do
+     * AuthenticationManager
      */
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = 
-                http.getSharedObject(AuthenticationManagerBuilder.class);
+        AuthenticationManagerBuilder authenticationManagerBuilder
+                = http.getSharedObject(AuthenticationManagerBuilder.class);
         return authenticationManagerBuilder.build();
     }
 
     /**
      * Bean para o PasswordEncoder utilizado na criptografia de senhas.
-     * 
+     *
      * @return uma instância de BCryptPasswordEncoder
      */
     @Bean
