@@ -8,8 +8,5 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)) // Ajuste do alias
     }
-  },
-  server:{
-    port: 5173
   }
 });

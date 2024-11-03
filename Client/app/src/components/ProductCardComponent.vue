@@ -128,10 +128,25 @@ export default {
   methods: {
     async fetchFavorites() {
       try {
-        const response = await axiosInstance.get('/favorites/list');
-        globalState.favoriteProductIds = response.data.map(fav => fav.productId);
+        const response = await axiosInstance.get(`/api/favorites/list`);
+        if (Array.isArray(response.data)) {
+          console.log('Favoritos:', response.data);
+          globalState.favoriteProductIds = response.data.map(fav => fav.productId);
+        } else {
+          throw new Error('Resposta não é um array');
+        }
       } catch (error) {
-        console.error('Erro ao buscar favoritos:', error);
+        if (error.response) {
+          // A requisição foi feita e o servidor respondeu com um status fora do intervalo de 2xx
+          console.error('Erro no servidor:', error.response.status);
+        } else if (error.request) {
+          // A requisição foi feita mas não houve resposta
+          console.error('Nenhuma resposta do servidor:', error.request);
+        } else {
+          // Algo aconteceu na configuração da requisição que acionou um erro
+          console.error('Erro na requisição:', error.message);
+        }
+        console.error('Configuração da requisição:', error.config);
       }
     },
     async openModal(product) {
@@ -200,7 +215,7 @@ export default {
         const params = new URLSearchParams();
         params.append('productId', produto.id);
 
-        const response = await axiosInstance.post(`/favorites/add?${params.toString()}`);
+        const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
         if (response.status === 200) {
           console.log('Produto adicionado aos favoritos com sucesso!');
           await this.fetchFavorites(); // Atualiza a lista de favoritos após adicionar um novo

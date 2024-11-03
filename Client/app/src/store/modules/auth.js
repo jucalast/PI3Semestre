@@ -1,7 +1,7 @@
 import axiosInstance from "@/utils/axiosInstance";
 
 const state = {
-  isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated")) || false, 
+  isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated")) || false,
 };
 
 const mutations = {

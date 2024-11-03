@@ -50,7 +50,7 @@ export default {
     },
     async deleteProduct(productId) {
       try {
-        const response = await axiosInstance.delete(`/favorites/remove?productId=${productId}`);
+        const response = await axiosInstance.delete(`/api/favorites/remove?productId=${productId}`);
         if (response.status === 200) {
           this.$emit('product-deleted', productId);
         } else {
