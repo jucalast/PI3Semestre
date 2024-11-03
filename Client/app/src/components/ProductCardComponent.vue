@@ -11,7 +11,7 @@
             : produtos"
           :key="produto.id"
           class="product-card"
-          @click="openModal(produto)"
+          
         >
           <h2>{{ produto.nome }}</h2>
           <div class="backcard">
@@ -38,7 +38,7 @@
 
                 <button
                   class="favorire-button"
-                  @click.stop="handleCartClick(produto)"
+                  @click="handleCartClick(produto)"
                 >
                   <font-awesome-icon
                     icon="fa-solid fa-shopping-cart"
@@ -95,6 +95,7 @@ export default {
     return {
       isModalVisible: false,
       selectedProduct: null,
+      baseURL: import.meta.env.VITE_API_BASE_URL
     };
   },
   setup() {
@@ -210,9 +211,18 @@ export default {
         console.error('Erro ao enviar requisição para adicionar aos favoritos:', error);
       }
     },
-
-    handleCartClick(produto) {
-      // Lógica para adicionar produto ao carrinho
+    async handleCartClick(produto) {
+      try{
+        const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`)
+        console.log(responseCart.status);
+        if(responseCart.status === 200){
+          
+        } else {
+          console.error("Falha ao adicionar produto ao carrinho.");
+        } 
+       } catch (error){
+          console.error("Erro ao enviar requisição para adicionar ao carrinho: ", error);
+        }
     },
   },
 
@@ -227,7 +237,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card-container {
   display: flex;
   flex-wrap: wrap;

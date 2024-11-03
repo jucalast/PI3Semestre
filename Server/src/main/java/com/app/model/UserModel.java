@@ -1,11 +1,13 @@
 package com.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Representa a entidade Usuário para a aplicação.
@@ -75,10 +77,24 @@ public class UserModel {
      * Relação N:N com AddressModel.
      */
     @ManyToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
     @JoinTable(
             name = "TB_USER_ADDRESS",
             joinColumns = @JoinColumn(name = "USER_ID"), 
             inverseJoinColumns = @JoinColumn(name = "ADDRESS_ID") 
     )
-    private List<AddressModel> addresses; 
+    private List<AddressModel> addresses;
+
+    @ManyToMany
+    @JoinTable(
+            name = "carrinho",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_produto")
+    )
+    private Set<Produto> produtos;
+
+    public UserModel(Long id) {
+        this.id = id;
+    }
+
 }
