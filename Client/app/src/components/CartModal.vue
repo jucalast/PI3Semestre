@@ -7,14 +7,14 @@
             </div>
             <div class="main-cart">
                 <section class="products">
-                <section v-for="(cartItem, index) in cartItems"
+                <section v-for="(cartItem, index) in cartItems "
                 :key = "index" 
                 class="product-section">
                     <div class="image-bckg">
                         <img class="image-product" :src="cartItem.imagem_produto" :alt="cartItem.nome_produto">
                     </div>
                         <h2>{{cartItem.nome_produto}}</h2>
-                        <button @click="removeItemOnCartUser(cartItem.userId, cartItem.produtoId, index)">REMOVER</button>
+                        <button @click="removeItemOnCartUser(cartItem.produtoId, index)">REMOVER</button>
                         <select name="Quantidade" class="input-qntty">
                             <option :value="cartItem.quantidade">{{ cartItem.quantidade }}</option>
                             <option value="1">1 Uni</option>
@@ -32,17 +32,17 @@
                 </section>
             </div>
             <div class="footer-cart">
-                <h3 id="info-ft-01"> 1 Produto</h3>
+                <h3 id="info-ft-01">{{somaQuantidade}} Produtos</h3>
                 <span id="info-ft-02">Inserir cupom</span>
-                <span id="info-ft-03">R$90,00</span>
+                <span id="info-ft-03">R${{somaValorItens}}</span>
                 <button class="btn-compra">Continuar a compra</button>
             </div>
         </div>
     </div>
-</template>
+</template> 
 
 <script>
-import axios from 'axios'
+import axiosInstance from "@/utils/axiosInstance";
 
 export default{
     name: 'CartModal',
@@ -51,42 +51,52 @@ export default{
         type: Boolean,
         required: true,
     },
+    },
     data(){
         return{
             cartItems: [],
-            cartValue: 0,
+            somaValorItens: 0,
+            somaQuantidade: 0,
+            baseURL: import.meta.env.VITE_API_BASE_URL
+
         };
-    }
     },
     methods: {
         close(){
             this.$emit("close");
         },
         async fetchCarts(){
-            console.log("Iniciando a requisição para o carrinho...");
             try{          
-                const responseCart = await axios.get("http://localhost:8080/api/carrinho/1");
+                const responseCart = await axiosInstance.get(`${this.baseURL}/api/carrinho/`);
                 this.cartItems = responseCart.data;
+                console.log(this.cartItems)
+                this.somasCarrinho(responseCart.data);
             } catch (error){
                 console.error("Erro ao buscar produtos do carrinho: ", error);
             } finally {
                 this.isLoading = false;
             }
         },
-        async removeItemOnCartUser(userId, productId, index){
-            console.log(userId, productId)
+        async removeItemOnCartUser(productId, index){
             try{
-                const responseCart = await axios.delete(`http://localhost:8080/api/carrinho/${userId}/${productId}`);
-                //await this.fetchCarts();
+                const responseCart = await axiosInstance.delete(`${this.baseURL}/api/carrinho/${productId}`);
+                this.fetchCarts();
             } catch (error){
                 console.error("Erro ao remover produto do carrinho", error);
             } finally {
                 this.isLoading = false;
             }
-    }
+         },
+         somasCarrinho(itensCarrinho){            
+            for(let index=0; index < itensCarrinho.length; index++){
+                this.somaValorItens += parseFloat(itensCarrinho[index].preco_produto) * parseFloat(itensCarrinho[index].quantidade);
+                this.somaQuantidade += parseInt(itensCarrinho[index].quantidade);
+
+            }
+         },
     },
-    mounted(){
-        this.fetchCarts();
+    async mounted(){
+        await this.fetchCarts();
     }
 }
 </script>
@@ -180,11 +190,10 @@ export default{
     padding: 20px 20px 0px 20px;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 30% 20% 10% 20% ;
-    grid-template-rows: 3rem 1rem 2rem;
+    grid-template-columns: 20% 10% 10% 15% ;
+    grid-template-rows: 6rem 1rem;
     grid-template-areas: 
-    'image name-product input-quantity price-prod '
-    'image btn-delete input-quantity price-prod';
+    'image name-product input-quantity price-prod btn-delete';
     align-items: center;
     justify-items: center;
     justify-content: center;
@@ -200,6 +209,7 @@ button{
     border-width: 1px;
     color: white;
     font-size: 11pt;
+    padding: 2px;
     
 }
 
@@ -258,6 +268,7 @@ hr{
     overflow: hidden;
     padding: 20px 20px 0px 20px;
     box-sizing: border-box;
+    align-items: center;
 }
 
 #info-02{
@@ -266,6 +277,7 @@ hr{
 }
 
 #info-03{
+    background-color: transparent;
     width: 100%;
     height: 100%;
     grid-row: 2;
@@ -293,8 +305,8 @@ hr{
     'insert-cupom subtotal'
     'btn-compra btn-compra';
     box-sizing: border-box;
-    gap: 2rem;
-    padding: 0px;
+    gap:1.5rem;
+    padding: 20px 0px 0px 0px;
     justify-content: center;
     justify-items: center;
 }

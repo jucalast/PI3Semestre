@@ -97,10 +97,11 @@ public class FavoritesController {
      *
      * @param request O HttpServletRequest que fornece informações da sessão.
      * @return        Uma ResponseEntity contendo uma lista de produtos, ou uma mensagem de erro apropriada.
-     */
+            */
     @GetMapping("/favorited-products")
     public ResponseEntity<?> listFavoriteProducts(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+
         if (authenticatedUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }

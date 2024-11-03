@@ -16,7 +16,6 @@ export default {
   components: {
     Header,
     FooterComponent,
-    CartModal
   },
   methods: {
     handleSearch(query) {

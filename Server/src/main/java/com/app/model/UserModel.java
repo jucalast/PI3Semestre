@@ -1,5 +1,6 @@
 package com.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -76,6 +77,7 @@ public class UserModel {
      * Relação N:N com AddressModel.
      */
     @ManyToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
     @JoinTable(
             name = "TB_USER_ADDRESS",
             joinColumns = @JoinColumn(name = "USER_ID"), 
