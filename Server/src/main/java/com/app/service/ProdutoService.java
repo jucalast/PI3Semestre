@@ -21,6 +21,10 @@ import com.app.repository.CafeEspecialRepository;
 import com.app.repository.MetodoPreparoRepository;
 import com.app.repository.ProdutoRepository;
 
+/**
+ * Serviço para operações relacionadas a produtos, incluindo CRUD e filtragem de
+ * atributos.
+ */
 @Service
 public class ProdutoService {
 
@@ -29,6 +33,13 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    /**
+     * Cria um novo produto no sistema após validação.
+     *
+     * @param produto Objeto Produto a ser criado.
+     * @return Produto criado.
+     * @throws RuntimeException se já existe um produto com o mesmo nome.
+     */
     @Transactional
     public Produto createProduto(Produto produto) {
         logger.info("Criando um novo produto: {}", produto.getNome());
@@ -40,17 +51,20 @@ public class ProdutoService {
             throw new RuntimeException("Já existe um produto com o nome: " + produto.getNome());
         }
 
-        // Salva o produto e suas especializações
         Produto savedProduto = produtoRepository.save(produto);
         logger.info("Produto {} criado com sucesso", savedProduto.getNome());
         return savedProduto;
     }
 
+    /**
+     * Retorna uma lista de todos os produtos.
+     *
+     * @return Lista de todos os produtos.
+     */
     public List<Produto> getAllProdutos() {
         logger.info("Listando todos os produtos");
         List<Produto> produtos = produtoRepository.findAll();
 
-        // Inicializa as especializações para cada produto
         produtos.forEach(produto -> {
             Hibernate.initialize(produto.getCafeEspecial());
             Hibernate.initialize(produto.getMetodoPreparo());
@@ -59,13 +73,26 @@ public class ProdutoService {
         return produtos;
     }
 
+    /**
+     * Retorna uma lista de todos os produtos com suas especializações
+     * carregadas.
+     *
+     * @return Lista de produtos com especializações.
+     */
     public List<Produto> getAllProdutosComEspecializacoes() {
         logger.info("Listando todos os produtos com suas especializações");
         List<Produto> produtos = produtoRepository.findAll();
-        // Aqui, não é necessário usar Hibernate.initialize, porque estamos usando EAGER
         return produtos;
     }
 
+    /**
+     * Busca um produto pelo ID.
+     *
+     * @param id ID do produto a ser buscado.
+     * @return Produto encontrado.
+     * @throws RuntimeException se o produto com o ID especificado não for
+     * encontrado.
+     */
     public Produto getProdutoById(Long id) {
         logger.info("Buscando produto com ID: {}", id);
         Produto produto = produtoRepository.findById(id)
@@ -74,50 +101,96 @@ public class ProdutoService {
                     return new RuntimeException("Produto não encontrado com ID: " + id);
                 });
 
-        // Asegure-se de que as especializações estão sendo carregadas
         Hibernate.initialize(produto.getCafeEspecial());
         Hibernate.initialize(produto.getMetodoPreparo());
 
         return produto;
     }
 
+    /**
+     * Atualiza um produto existente.
+     *
+     * @param id ID do produto a ser atualizado.
+     * @param produto Dados atualizados do produto.
+     * @return Produto atualizado.
+     * @throws RuntimeException se o produto não for encontrado ou se já existir
+     * um produto com o novo nome.
+     */
     @Transactional
     public Produto updateProduto(Long id, Produto produto) {
         logger.info("Atualizando produto com ID: {}", id);
-
+    
         ValidationUtil.validarObjeto(produto);
-
+    
         Produto existingProduto = getProdutoById(id);
-
-        if (!existingProduto.getNome().equals(produto.getNome()) && produtoRepository.existsByNome(produto.getNome())) {
-            logger.error("Erro: Já existe um produto com o nome {}", produto.getNome());
-            throw new RuntimeException("Já existe um produto com o nome: " + produto.getNome());
-        }
-
+    
+        // Atualiza os dados do produto
         existingProduto.setNome(produto.getNome());
         existingProduto.setDescricao(produto.getDescricao());
         existingProduto.setPreco(produto.getPreco());
         existingProduto.setImagem(produto.getImagem());
         existingProduto.setQuantidadeEstoque(produto.getQuantidadeEstoque());
         existingProduto.setAvaliacao(produto.getAvaliacao());
-
+    
+        // Atualiza a especialização CafeEspecial se existir
+        if (produto.getCafeEspecial() != null) {
+            if (existingProduto.getCafeEspecial() == null) {
+                existingProduto.setCafeEspecial(produto.getCafeEspecial());
+                produto.getCafeEspecial().setProduto(existingProduto);
+            } else {
+                existingProduto.getCafeEspecial().setNotasSensoriais(produto.getCafeEspecial().getNotasSensoriais());
+                // Atualizar outros campos conforme necessário...
+            }
+        }
+    
+        // Atualiza a especialização MetodoPreparo se existir
+        if (produto.getMetodoPreparo() != null) {
+            if (existingProduto.getMetodoPreparo() == null) {
+                existingProduto.setMetodoPreparo(produto.getMetodoPreparo());
+                produto.getMetodoPreparo().setProduto(existingProduto);
+            } else {
+                existingProduto.getMetodoPreparo().setComplexidade(produto.getMetodoPreparo().getComplexidade());
+                // Atualizar outros campos conforme necessário...
+            }
+        }
+    
         Produto updatedProduto = produtoRepository.save(existingProduto);
         logger.info("Produto {} atualizado com sucesso", updatedProduto.getNome());
         return updatedProduto;
     }
+    
 
+    /**
+     * Deleta um produto pelo ID.
+     *
+     * @param id ID do produto a ser deletado.
+     * @throws RuntimeException se o produto com o ID especificado não for
+     * encontrado.
+     */
     @Transactional
     public void deleteProduto(Long id) {
         logger.info("Deletando produto com ID: {}", id);
-
-        if (!produtoRepository.existsById(id)) {
-            logger.error("Erro: Produto não encontrado com ID: {}", id);
-            throw new RuntimeException("Produto não encontrado com ID: " + id);
+    
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+    
+        // Verifica e deleta a especialização CafeEspecial se existir
+        if (produto.getCafeEspecial() != null) {
+            cafeEspecialRepository.delete(produto.getCafeEspecial());
+            logger.info("Especialização CafeEspecial deletada para o produto ID: {}", id);
         }
-
-        produtoRepository.deleteById(id);
+    
+        // Verifica e deleta a especialização MetodoPreparo se existir
+        if (produto.getMetodoPreparo() != null) {
+            metodoPreparoRepository.delete(produto.getMetodoPreparo());
+            logger.info("Especialização MetodoPreparo deletada para o produto ID: {}", id);
+        }
+    
+        // Após deletar as especializações, deleta o próprio produto
+        produtoRepository.delete(produto);
         logger.info("Produto com ID {} deletado com sucesso", id);
     }
+    
 
     @Autowired
     private CafeEspecialRepository cafeEspecialRepository;
@@ -125,6 +198,12 @@ public class ProdutoService {
     @Autowired
     private MetodoPreparoRepository metodoPreparoRepository;
 
+    /**
+     * Lista atributos dos produtos, incluindo especializações de CafeEspecial e
+     * MetodoPreparo.
+     *
+     * @return Lista de atributos de produtos.
+     */
     public List<Map<String, Object>> listarAtributos() {
         List<Produto> produtos = produtoRepository.findAll();
         List<Map<String, Object>> listaAtributos = new ArrayList<>();
@@ -133,7 +212,6 @@ public class ProdutoService {
             Map<String, Object> atributos = new HashMap<>();
             atributos.put("avaliacao", produto.getAvaliacao());
 
-            // Verifica se o produto possui CafeEspecial associado
             CafeEspecial cafeEspecial = produto.getCafeEspecial();
             if (cafeEspecial != null) {
                 atributos.put("notasSensoriais", cafeEspecial.getNotasSensoriais());
@@ -144,7 +222,6 @@ public class ProdutoService {
                 atributos.put("variedade", cafeEspecial.getVariedade());
             }
 
-            // Verifica se o produto possui MetodoPreparo associado
             MetodoPreparo metodoPreparo = produto.getMetodoPreparo();
             if (metodoPreparo != null) {
                 atributos.put("complexidade", metodoPreparo.getComplexidade());
@@ -159,12 +236,17 @@ public class ProdutoService {
         return listaAtributos;
     }
 
+    /**
+     * Busca produtos que atendem aos critérios de atributos especificados.
+     *
+     * @param atributos Mapa de atributos a serem buscados.
+     * @return Lista de produtos que atendem aos critérios.
+     */
     public List<Produto> buscarProdutosPorAtributos(Map<String, String> atributos) {
         logger.info("Buscando produtos com os atributos {}", atributos);
         List<Produto> produtos = produtoRepository.findAll();
         List<Produto> produtosFiltrados = new ArrayList<>();
 
-        // Mapeia os atributos para suas funções de verificação
         Map<String, BiPredicate<CafeEspecial, String>> cafeEspecialChecks = new HashMap<>();
         cafeEspecialChecks.put("variedade", (cafeEspecial, v) -> cafeEspecial.getVariedade() != null && cafeEspecial.getVariedade().equalsIgnoreCase(v));
         cafeEspecialChecks.put("torra", (cafeEspecial, v) -> cafeEspecial.getTorra() != null && cafeEspecial.getTorra().equalsIgnoreCase(v));
@@ -180,41 +262,28 @@ public class ProdutoService {
         metodoPreparoChecks.put("tipopreparo", (metodoPreparo, v) -> metodoPreparo.getTipoPreparo() != null && metodoPreparo.getTipoPreparo().equalsIgnoreCase(v));
 
         for (Produto produto : produtos) {
-            boolean atendeTodosCriterios = true;
+            CafeEspecial cafeEspecial = produto.getCafeEspecial();
+            MetodoPreparo metodoPreparo = produto.getMetodoPreparo();
 
-            // Verificar cada atributo solicitado
+            boolean matches = true;
             for (Map.Entry<String, String> entry : atributos.entrySet()) {
-                String atributo = entry.getKey().toLowerCase();
-                String valor = entry.getValue();
-
-                boolean atendeCriterio = false;
-
-                // Verificar se o produto possui CafeEspecial e se contém o atributo correspondente
-                CafeEspecial cafeEspecial = produto.getCafeEspecial();
-                if (cafeEspecial != null && cafeEspecialChecks.containsKey(atributo)) {
-                    atendeCriterio = cafeEspecialChecks.get(atributo).test(cafeEspecial, valor);
-                }
-
-                // Verificar se o produto possui MetodoPreparo e se contém o atributo correspondente
-                MetodoPreparo metodoPreparo = produto.getMetodoPreparo();
-                if (metodoPreparo != null && metodoPreparoChecks.containsKey(atributo)) {
-                    atendeCriterio = metodoPreparoChecks.get(atributo).test(metodoPreparo, valor);
-                }
-
-                // Se o critério não for atendido, interromper
-                if (!atendeCriterio) {
-                    atendeTodosCriterios = false;
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (cafeEspecialChecks.containsKey(key) && cafeEspecial != null) {
+                    matches = matches && cafeEspecialChecks.get(key).test(cafeEspecial, value);
+                } else if (metodoPreparoChecks.containsKey(key) && metodoPreparo != null) {
+                    matches = matches && metodoPreparoChecks.get(key).test(metodoPreparo, value);
+                } else {
+                    matches = false;
                     break;
                 }
             }
 
-            // Se atender a todos os critérios, adicionar à lista filtrada
-            if (atendeTodosCriterios) {
+            if (matches) {
                 produtosFiltrados.add(produto);
             }
         }
 
         return produtosFiltrados;
     }
-
 }

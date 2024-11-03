@@ -6,16 +6,17 @@
       </div>
       <div class="sessiontwo">
         <div class="product-list">
-          <ProductCard :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
+           <ProductCard :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
         </div>
       </div>
     </div>
+  
   </DefaultLayout>
 </template>
 
 <script>
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import ProductCard from '@/components/ProductCard.vue';
+import ProductCard from '@/components/ProductCardComponent.vue';
 import axios from 'axios';
 
 export default {
@@ -53,7 +54,7 @@ export default {
     },
     updateSearchQuery(query) {
       this.searchQuery = query;
-    }
+    },
   },
   mounted() {
     this.fetchProdutos(); // Chama a função uma vez ao montar o componente

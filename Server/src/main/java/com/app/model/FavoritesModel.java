@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Entity representation of a favorite item, which includes user and product identifiers.
+ * Modelo de entidade representando um item favorito no sistema. Este item conecta um usuário a um produto que ele marcou como favorito.
+ * A entidade é persistida na tabela "Favoritos" no banco de dados.
  */
 @Data
 @NoArgsConstructor
@@ -14,24 +15,29 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "Favoritos")
 public class FavoritesModel {
-
+    /**
+     * Identificador único para o registro de favoritos.
+     */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userId;
-
-    @Column(nullable = false)
-    private Long productId;
+    /**
+     * O usuário que possui este favorito. A relação muitos-para-um é definida aqui.
+     */
+    @ManyToOne
+    @JoinColumn(name = "userId", nullable = false)
+    private UserModel user;
 
     /**
-     * Constructs a new FavoritesModel with specified user ID and product ID.
-     * @param userId the ID of the user
-     * @param productId the ID of the product
+     * O produto que foi favoritado pelo usuário.
      */
-    public FavoritesModel(Long userId, Long productId) {
-        this.userId = userId;
-        this.productId = productId;
+    @ManyToOne
+    @JoinColumn(name = "productId", nullable = false)
+    private Produto produto;
+
+    public FavoritesModel(UserModel user, Produto product) {
+        this.user = user;
+        this.produto = product;
     }
 }

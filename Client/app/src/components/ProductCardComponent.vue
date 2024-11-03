@@ -11,7 +11,7 @@
             : produtos"
           :key="produto.id"
           class="product-card"
-          @click="openModal(produto)"
+          
         >
           <h2>{{ produto.nome }}</h2>
           <div class="backcard">
@@ -26,14 +26,19 @@
               <div class="priceandfav">
                 <p>{{ produto.preco.toFixed(2) }}</p>
                 <button
-                  class="favorire-button"
-                  @click.stop="handleFavoriteClick(produto)"
+                    class="favorire-button"
+                    @click.stop="handleFavoriteClick(produto)"
                 >
-                  <font-awesome-icon icon="star" class="favoritocard" />
+                  <font-awesome-icon
+                      icon="star"
+                      :class="{'favoritocard': true, 'is-favorite': favoriteProductIds.includes(produto.id)}"
+                  />
+
                 </button>
+
                 <button
                   class="favorire-button"
-                  @click.stop="handleCartClick(produto)"
+                  @click="handleCartClick(produto)"
                 >
                   <font-awesome-icon
                     icon="fa-solid fa-shopping-cart"
@@ -61,6 +66,9 @@
 <script>
 import ProductModal from "@/components/ProductModal.vue";
 import axios from "axios";
+import axiosInstance from "@/utils/axiosInstance";
+import { globalState } from "@/state.js";
+import { computed } from "vue";
 export default {
   props: {
     produtos: {
@@ -87,6 +95,15 @@ export default {
     return {
       isModalVisible: false,
       selectedProduct: null,
+      baseURL: import.meta.env.VITE_API_BASE_URL
+    };
+  },
+  setup() {
+    // Agora você pode acessar os IDs diretamente do estado reativo
+    const favoriteProductIds = computed(() => globalState.favoriteProductIds);
+    return {
+      // eslint-disable-next-line vue/no-dupe-keys
+      favoriteProductIds
     };
   },
   computed: {
@@ -102,11 +119,36 @@ export default {
       return searchFiltered; // Retorna todos os produtos filtrados pela busca
     }
 
-    const finalFiltered = this.filterBySelectedAttributes(searchFiltered);
-    return finalFiltered;
+      return this.filterBySelectedAttributes(searchFiltered);
+    },
   },
+  async mounted() {
+    await this.fetchFavorites();
   },
   methods: {
+    async fetchFavorites() {
+      try {
+        const response = await axiosInstance.get(`/api/favorites/list`);
+        if (Array.isArray(response.data)) {
+          console.log('Favoritos:', response.data);
+          globalState.favoriteProductIds = response.data.map(fav => fav.productId);
+        } else {
+          throw new Error('Resposta não é um array');
+        }
+      } catch (error) {
+        if (error.response) {
+          // A requisição foi feita e o servidor respondeu com um status fora do intervalo de 2xx
+          console.error('Erro no servidor:', error.response.status);
+        } else if (error.request) {
+          // A requisição foi feita mas não houve resposta
+          console.error('Nenhuma resposta do servidor:', error.request);
+        } else {
+          // Algo aconteceu na configuração da requisição que acionou um erro
+          console.error('Erro na requisição:', error.message);
+        }
+        console.error('Configuração da requisição:', error.config);
+      }
+    },
     async openModal(product) {
       this.selectedProduct = { ...product };
       await this.fetchProductDetails(product.id);
@@ -168,11 +210,34 @@ export default {
 
       return filtered;
     },
-    handleFavoriteClick(produto) {
-      // Lógica para adicionar/remover produto aos favoritos
+    async handleFavoriteClick(produto) {
+      try {
+        const params = new URLSearchParams();
+        params.append('productId', produto.id);
+
+        const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
+        if (response.status === 200) {
+          console.log('Produto adicionado aos favoritos com sucesso!');
+          await this.fetchFavorites(); // Atualiza a lista de favoritos após adicionar um novo
+        } else {
+          console.error('Falha ao adicionar produto aos favoritos');
+        }
+      } catch (error) {
+        console.error('Erro ao enviar requisição para adicionar aos favoritos:', error);
+      }
     },
-    handleCartClick(produto) {
-      // Lógica para adicionar produto ao carrinho
+    async handleCartClick(produto) {
+      try{
+        const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`)
+        console.log(responseCart.status);
+        if(responseCart.status === 200){
+          
+        } else {
+          console.error("Falha ao adicionar produto ao carrinho.");
+        } 
+       } catch (error){
+          console.error("Erro ao enviar requisição para adicionar ao carrinho: ", error);
+        }
     },
   },
 
@@ -187,7 +252,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card-container {
   display: flex;
   flex-wrap: wrap;
@@ -221,7 +286,7 @@ export default {
 
 .product-card {
   border-radius: 2rem;
-  width: 16.5rem;
+  width: 16.5rem ;
   height: 21.5rem;
   text-align: center;
   background: transparent !important;
@@ -331,6 +396,10 @@ h2 {
 .favoritocard:hover {
   color: var(--favoritocard-hover-color);
   transform: scale(1.2); /* Aumenta o ícone em 20% */
+}
+
+.favoritocard.is-favorite {
+  color: var(--favoritocard-hover-color); /* Altera a cor para a cor de favorito ativo */
 }
 
 .favorire-button {
