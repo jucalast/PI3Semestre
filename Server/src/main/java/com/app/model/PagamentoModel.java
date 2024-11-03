@@ -58,7 +58,7 @@ public class PagamentoModel {
     @Column(name = "transactionId", length = 255)
     private String transactionId;
 
-    private PagCartaoModel pagCartaoModel;
+   
 
     public enum StatusPagamento {
         PAGO(1),
