@@ -21,6 +21,15 @@ import com.app.service.ProdutoPedidoService;
  * Controlador que expõe as APIs relacionadas à entidade ProdutoPedidoModel.
  * Permite operações de CRUD e consultas específicas sobre produtos de pedidos.
  * 
+ * Bibliotecas utilizadas:
+ * 
+ * - com.app.model.ProdutoPedidoModel: Classe que representa o modelo de dados de um produto em um pedido.
+ * - com.app.service.ProdutoPedidoService: Classe de serviço que contém a lógica de negócios relacionada aos produtos de pedidos.
+ * - org.springframework.beans.factory.annotation.Autowired: Permite a injeção de dependência em classes Spring.
+ * - org.springframework.http.HttpStatus: Representa os códigos de status HTTP, utilizados para construir respostas.
+ * - org.springframework.http.ResponseEntity: Classe que encapsula a resposta HTTP, incluindo o corpo e os cabeçalhos.
+ * - org.springframework.web.bind.annotation.*: Contém anotações para definir controladores e mapear requisições HTTP para métodos (como @RestController, @RequestMapping, @GetMapping, @PostMapping, etc.).
+ * 
  * @author Kairo
  * @version 1.0
  * @since 2024-10-19

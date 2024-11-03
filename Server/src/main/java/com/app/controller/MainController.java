@@ -71,4 +71,23 @@ public class MainController {
         }
     }
 
+    /**
+     * Rota que verifica se o usuário está autenticado.
+     *
+     * @param request O objeto HttpServletRequest utilizado para acessar a
+     * sessão do usuário.
+     * @return Um ResponseEntity com status 200 se o usuário estiver
+     * autenticado, ou 401 se não estiver.
+     */
+    @GetMapping("/is-authenticated")
+    public ResponseEntity<Void> isAuthenticated(HttpServletRequest request) {
+        UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+        
+        if (authenticatedUser != null) {
+            return ResponseEntity.ok().build(); 
+        } else {
+            return ResponseEntity.status(401).build(); 
+        }
+    }
+
 }

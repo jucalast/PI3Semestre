@@ -15,7 +15,7 @@
 
 <script>
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import ProductCard from '@/components/ProductCard.vue';
+import ProductCard from '@/components/ProductCardComponent.vue';
 import axios from 'axios';
 
 export default {
@@ -70,15 +70,17 @@ export default {
 }
 
 .banner {
-  position: absolute;
   width: 95%;
   height: 20rem;
   padding: 2rem;
-  margin-top: 7rem;
+
 }
 
+.home-page .card-container {
+  margin-top: 0rem !important;
+}
 .sessionone {
-  background: #c2cdff;
+ 
   display: flex;
 }
 </style>

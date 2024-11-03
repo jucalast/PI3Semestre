@@ -1,5 +1,19 @@
 package com.app.model;
 
+/* 
+* Importa a classe BigDecimal para manipulação de valores decimais
+* import java.math.BigDecimal;
+* 
+* Importa as anotações para mapeamento objeto-relacional
+* import jakarta.persistence.*;
+* 
+* Importa a anotação para validação de campos nulos
+* import jakarta.validation.constraints.NotNull;
+* 
+* Importa a anotação @Data do Lombok para geração automática de métodos
+* import lombok.Data;
+*/
+
 import java.math.BigDecimal;
 
 import jakarta.persistence.*;

@@ -35,6 +35,7 @@ import com.app.service.MetodoPagamentoService;
 /**
  * Controlador responsável por gerenciar as requisições relacionadas aos métodos de pagamento.
  * Este controlador fornece endpoints para criação, consulta, atualização e remoção de métodos de pagamento.
+ * 
  * @author Kairo Chácara
  * @version 1.0
  * @since 2024-10-14
