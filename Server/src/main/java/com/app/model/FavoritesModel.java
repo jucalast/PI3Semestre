@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Classe de entidade representando um item favorito, que associa um usuário a um produto que ele marcou como favorito.
- * Esta classe é mapeada para uma tabela no banco de dados através de anotações JPA.
+ * Modelo de entidade representando um item favorito no sistema. Este item conecta um usuário a um produto que ele marcou como favorito.
+ * A entidade é persistida na tabela "Favoritos" no banco de dados.
  */
 @Data
 @NoArgsConstructor
@@ -16,33 +16,28 @@ import lombok.NoArgsConstructor;
 @Table(name = "Favoritos")
 public class FavoritesModel {
     /**
-     * A chave primária do registro de favoritos.
+     * Identificador único para o registro de favoritos.
      */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
-     * O ID do usuário que marcou o item como favorito.
-     * Este campo é vinculado à entidade do usuário e é obrigatório.
+     * O usuário que possui este favorito. A relação muitos-para-um é definida aqui.
      */
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "userId", nullable = false)
+    private UserModel user;
 
     /**
-     * O ID do produto marcado como favorito pelo usuário.
-     * Este campo é vinculado à entidade do produto e é obrigatório.
+     * O produto que foi favoritado pelo usuário.
      */
-    @Column(nullable = false)
-    private Long productId;
+    @ManyToOne
+    @JoinColumn(name = "productId", nullable = false)
+    private Produto produto;
 
-    /**
-     * Constrói um novo modelo de favoritos com ID de usuário e ID de produto especificados.
-     * @param userId     O ID do usuário.
-     * @param productId  O ID do produto.
-     */
-    public FavoritesModel(Long userId, Long productId) {
-        this.userId = userId;
-        this.productId = productId;
+    public FavoritesModel(UserModel user, Produto product) {
+        this.user = user;
+        this.produto = product;
     }
 }

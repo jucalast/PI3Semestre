@@ -37,7 +37,7 @@ export default {
   methods: {
     async fetchFavoritos() {
       try {
-        const response = await axiosInstance.get('/favorites/favorited-products');
+        const response = await axiosInstance.get('/api/favorites/favorited-products');
         if (response && response.data) {
           this.produtos = response.data;
         } else {

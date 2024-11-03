@@ -10,8 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 /**
  * Classe controladora para lidar com operações relacionadas à funcionalidade de favoritos do usuário.
@@ -19,7 +22,7 @@ import java.util.NoSuchElementException;
  * Este controlador realiza a verificação de autenticação, garantindo que uma sessão de usuário exista antes de permitir modificações nos favoritos.
  */
 @RestController
-@RequestMapping("/favorites")
+@RequestMapping("/api/favorites")
 public class FavoritesController {
     /**
      * Objeto de serviço para gerenciar operações de favoritos. É automaticamente injetado pelo Spring.
@@ -59,7 +62,10 @@ public class FavoritesController {
             } else {
                 // Se não for, adiciona
                 FavoritesModel favorite = favoritesService.addFavorite(authenticatedUser.getId(), productId);
-                return ResponseEntity.ok(favorite);
+                System.out.println("Adicionando favorito - UserId: " + authenticatedUser.getId() + ", ProductId: " + productId);
+
+                return ResponseEntity.ok("Produto " + productId + " adicionado aos favoritos.");
+
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro: " + e.getMessage());
@@ -81,10 +87,20 @@ public class FavoritesController {
 
         try {
             List<FavoritesModel> favorites = favoritesService.getUserFavorites(authenticatedUser.getId());
-            if (favorites.isEmpty()) {
+            List<Map<String, Long>> favoriteDtos = favorites.stream()
+                    .map(f -> {
+                        Map<String, Long> favoriteMap = new HashMap<>();
+                        favoriteMap.put("favoriteId", f.getId());
+                        favoriteMap.put("userId", f.getUser().getId());
+                        favoriteMap.put("productId", f.getProduto().getId());
+                        return favoriteMap;
+                    })
+                    .collect(Collectors.toList());
+
+            if (favoriteDtos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             }
-            return ResponseEntity.ok(favorites);
+            return ResponseEntity.ok(favoriteDtos);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Favoritos não encontrados.");
         } catch (Exception e) {
@@ -97,10 +113,11 @@ public class FavoritesController {
      *
      * @param request O HttpServletRequest que fornece informações da sessão.
      * @return        Uma ResponseEntity contendo uma lista de produtos, ou uma mensagem de erro apropriada.
-     */
+            */
     @GetMapping("/favorited-products")
     public ResponseEntity<?> listFavoriteProducts(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+
         if (authenticatedUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }

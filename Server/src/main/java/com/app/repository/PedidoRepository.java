@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.app.model.PedidoModel;
+import com.app.model.UserModel;
 
 /**
  * Repositório responsável por realizar operações de persistência
@@ -64,5 +65,5 @@ public interface PedidoRepository extends JpaRepository<PedidoModel, Long> {
      * @param usuarioId ID do usuário cujos pedidos devem ser buscados.
      * @return Lista de pedidos associados ao usuário especificado.
      */
-    List<PedidoModel> findByUsuarioId(Integer usuarioId);
+    List<PedidoModel> findByUsuarioId(UserModel usuarioId);
 }

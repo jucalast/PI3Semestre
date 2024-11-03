@@ -1,41 +1,38 @@
 package com.app.repository;
 
 import com.app.model.FavoritesModel;
+import com.app.model.UserModel;
+import com.app.model.Produto;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
 /**
- * Interface do repositório Spring Data JPA para entidades do modelo de favoritos.
- * Fornece métodos para realizar operações CRUD na tabela de favoritos no banco de dados,
- * especificamente encontrando por ID de usuário, verificando a existência por ID de usuário e produto, e excluindo por ID de usuário e produto.
+ * Repositório JPA para operações de banco de dados na entidade FavoritesModel.
  */
 @Repository
 public interface FavoritesRepository extends JpaRepository<FavoritesModel, Long> {
     /**
-     * Encontra todos os registros de favoritos associados a um ID de usuário específico.
-     * @param userId O ID do usuário para procurar favoritos.
-     * @return Uma lista de instâncias de FavoritesModel.
+     * Encontra todos os favoritos associados a um usuário específico.
+     * @param user O usuário cujos favoritos devem ser recuperados.
+     * @return Uma lista de objetos FavoritesModel.
      */
-    List<FavoritesModel> findByUserId(Long userId);
+    List<FavoritesModel> findByUser(UserModel user);
 
     /**
-     * Verifica se um produto específico já está marcado como favorito por um usuário específico.
-     * @param userId O ID do usuário.
-     * @param productId O ID do produto.
-     * @return verdadeiro se o favorito existir, falso caso contrário.
+     * Verifica se um produto específico já está marcado como favorito por um usuário.
+     * @param user O usuário em questão.
+     * @param produto O produto em questão.
+     * @return true se o produto já é um favorito do usuário, false caso contrário.
      */
-    boolean existsByUserIdAndProductId(Long userId, Long productId);
+    boolean existsByUserAndProduto(UserModel user, Produto produto);
 
     /**
-     * Remove um item favorito por ID de usuário e ID de produto.
-     * Este método é transacional para garantir a consistência do banco de dados durante a operação de exclusão.
-     *
-     * @param userId     O ID do usuário.
-     * @param productId  O ID do produto.
+     * Remove um favorito específico baseado no usuário e produto dados.
+     * @param user O usuário de quem o favorito será removido.
+     * @param produto O produto que será removido dos favoritos.
      */
     @Transactional
-    void deleteByUserIdAndProductId(Long userId, Long productId);
+    void deleteByUserAndProduto(UserModel user, Produto produto);
 }

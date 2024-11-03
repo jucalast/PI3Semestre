@@ -15,7 +15,7 @@ import FooterComponent from '@/components/FooterComponent.vue';
 export default {
   components: {
     Header,
-    FooterComponent
+    FooterComponent,
   },
   methods: {
     handleSearch(query) {

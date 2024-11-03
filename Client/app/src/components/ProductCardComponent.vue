@@ -11,7 +11,7 @@
             : produtos"
           :key="produto.id"
           class="product-card"
-          @click="openModal(produto)"
+          
         >
           <h2>{{ produto.nome }}</h2>
           <div class="backcard">
@@ -38,7 +38,7 @@
 
                 <button
                   class="favorire-button"
-                  @click.stop="handleCartClick(produto)"
+                  @click="handleCartClick(produto)"
                 >
                   <font-awesome-icon
                     icon="fa-solid fa-shopping-cart"
@@ -95,6 +95,7 @@ export default {
     return {
       isModalVisible: false,
       selectedProduct: null,
+      baseURL: import.meta.env.VITE_API_BASE_URL
     };
   },
   setup() {
@@ -127,10 +128,25 @@ export default {
   methods: {
     async fetchFavorites() {
       try {
-        const response = await axiosInstance.get('/favorites/list');
-        globalState.favoriteProductIds = response.data.map(fav => fav.productId);
+        const response = await axiosInstance.get(`/api/favorites/list`);
+        if (Array.isArray(response.data)) {
+          console.log('Favoritos:', response.data);
+          globalState.favoriteProductIds = response.data.map(fav => fav.productId);
+        } else {
+          throw new Error('Resposta não é um array');
+        }
       } catch (error) {
-        console.error('Erro ao buscar favoritos:', error);
+        if (error.response) {
+          // A requisição foi feita e o servidor respondeu com um status fora do intervalo de 2xx
+          console.error('Erro no servidor:', error.response.status);
+        } else if (error.request) {
+          // A requisição foi feita mas não houve resposta
+          console.error('Nenhuma resposta do servidor:', error.request);
+        } else {
+          // Algo aconteceu na configuração da requisição que acionou um erro
+          console.error('Erro na requisição:', error.message);
+        }
+        console.error('Configuração da requisição:', error.config);
       }
     },
     async openModal(product) {
@@ -199,7 +215,7 @@ export default {
         const params = new URLSearchParams();
         params.append('productId', produto.id);
 
-        const response = await axiosInstance.post(`/favorites/add?${params.toString()}`);
+        const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
         if (response.status === 200) {
           console.log('Produto adicionado aos favoritos com sucesso!');
           await this.fetchFavorites(); // Atualiza a lista de favoritos após adicionar um novo
@@ -210,9 +226,18 @@ export default {
         console.error('Erro ao enviar requisição para adicionar aos favoritos:', error);
       }
     },
-
-    handleCartClick(produto) {
-      // Lógica para adicionar produto ao carrinho
+    async handleCartClick(produto) {
+      try{
+        const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`)
+        console.log(responseCart.status);
+        if(responseCart.status === 200){
+          
+        } else {
+          console.error("Falha ao adicionar produto ao carrinho.");
+        } 
+       } catch (error){
+          console.error("Erro ao enviar requisição para adicionar ao carrinho: ", error);
+        }
     },
   },
 
@@ -227,7 +252,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card-container {
   display: flex;
   flex-wrap: wrap;
