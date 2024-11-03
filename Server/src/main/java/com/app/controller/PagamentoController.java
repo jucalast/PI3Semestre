@@ -1,14 +1,24 @@
 package com.app.controller;
 
-import com.app.DTO.PagamentoCompletoComCartaoDTO;
-import com.app.model.PagamentoModel;
-import com.app.service.PagamentoService;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.app.DTO.PagamentoCompletoComCartaoDTO;
+import com.app.model.CupomModel;
+import com.app.model.PagamentoModel;
+import com.app.model.PedidoModel;
+import com.app.service.PagamentoService;
 
 /**
  * Classe de controle responsável por expor APIs relacionadas à entidade PagamentoModel.
@@ -102,7 +112,7 @@ public class PagamentoController {
      * @return Lista de pagamentos associados ao pedido e status 200 OK.
      */
     @GetMapping("/pedido/{pedidoId}")
-    public ResponseEntity<List<PagamentoModel>> listarPagamentosPorPedidoId(@PathVariable Integer pedidoId) {
+    public ResponseEntity<List<PagamentoModel>> listarPagamentosPorPedidoId(@PathVariable PedidoModel pedidoId) {
         List<PagamentoModel> pagamentos = pagamentoService.listarPagamentosPorPedidoId(pedidoId);
         return ResponseEntity.ok(pagamentos);
     }
@@ -114,7 +124,7 @@ public class PagamentoController {
      * @return Lista de pagamentos associados ao cupom e status 200 OK.
      */
     @GetMapping("/cupom/{cupomId}")
-    public ResponseEntity<List<PagamentoModel>> listarPagamentosPorCupomId(@PathVariable Integer cupomId) {
+    public ResponseEntity<List<PagamentoModel>> listarPagamentosPorCupomId(@PathVariable CupomModel cupomId) {
         List<PagamentoModel> pagamentos = pagamentoService.listarPagamentosPorCupomId(cupomId);
         return ResponseEntity.ok(pagamentos);
     }

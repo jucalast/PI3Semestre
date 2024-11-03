@@ -9,8 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.DTO.PagCartaoDTO;
 import com.app.DTO.PagamentoCompletoDTO;
+import com.app.model.CupomModel;
 import com.app.model.PagCartaoModel;
 import com.app.model.PagamentoModel;
+import com.app.model.PedidoModel;
 import com.app.repository.PagCartaoRepository;
 import com.app.repository.PagamentoRepository;
 
@@ -90,7 +92,7 @@ public class PagamentoService {
      * @param pedidoId ID do pedido.
      * @return Lista de pagamentos associados ao ID do pedido.
      */
-    public List<PagamentoModel> listarPagamentosPorPedidoId(Integer pedidoId) {
+    public List<PagamentoModel> listarPagamentosPorPedidoId(PedidoModel pedidoId) {
         return pagamentoRepository.findByPedidoId(pedidoId);
     }
 
@@ -100,7 +102,7 @@ public class PagamentoService {
      * @param cupomId ID do cupom.
      * @return Lista de pagamentos associados ao ID do cupom.
      */
-    public List<PagamentoModel> listarPagamentosPorCupomId(Integer cupomId) {
+    public List<PagamentoModel> listarPagamentosPorCupomId(CupomModel cupomId) {
         return pagamentoRepository.findByCupomId(cupomId);
     }
 
