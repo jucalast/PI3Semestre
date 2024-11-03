@@ -5,7 +5,6 @@ import CheckoutPage from '@/views/CheckoutPage.vue';
 import AddressPage from '@/views/AddressPage.vue';
 import FavoritePage from "@/views/FavoritePage.vue";
 import AdminDashboard from '@/views/AdminDashboard.vue';
-import CartPage from "@/views/CartPage.vue";
 
 const routes = [
   { path: '/', component: HomePage },
@@ -14,7 +13,6 @@ const routes = [
   { path: '/Address', component: AddressPage, name: 'address' },
   { path: '/favorites', component: FavoritePage, name: 'FavoritePage' },
   { path: '/admin', component: AdminDashboard, name: 'AdminDashboard' },
-  { path: '/cart', component: CartPage, name: 'cart' },  // Adicionando rota para '/cart'
 ];
 
 const router = createRouter({

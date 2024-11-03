@@ -91,6 +91,10 @@
       </div>
     </div>
     <div class="divnav"></div>
+    <CartModal :isModalVisible="isCartModalVisible" 
+              @close="isCartModalVisible = false">
+
+    </CartModal>
   </header>
 </template>
 
@@ -98,9 +102,12 @@
 import { mapGetters, mapActions } from 'vuex';
 import axiosInstance from "@/utils/axiosInstance";
 import { globalState, updateFavorites } from "@/state.js";
+import CartModal from './CartModal.vue';
 
 export default {
-  
+  components:{
+    CartModal
+  },
   data() {
     return {
       searchQuery: "",
@@ -108,7 +115,9 @@ export default {
       showModal: false,
       authenticated: true,
       favorite_products: [],
-      baseURL: import.meta.env.VITE_API_BASE_URL, // Mantendo o baseURL
+      baseURL: import.meta.env.VITE_API_BASE_URL,
+      isCartModalVisible: false,
+  
     };
   },
   computed: {
@@ -149,6 +158,7 @@ export default {
           this.favorite_products = response.data;
           this.authenticated = true;
           this.showModal = true;
+          console.log(this.favorite_products);
         }
       } catch (error) {
         console.error('Erro ao verificar a autenticação do usuário', error);
@@ -174,6 +184,9 @@ export default {
     },
     redirectToLogin() {
       window.location.href = `${this.baseURL}/login`;
+    },
+    handleCartClick(){
+      this.isCartModalVisible = !this.isCartModalVisible;
     }
   },
   mounted() {
