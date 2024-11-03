@@ -35,7 +35,7 @@ public class Application {
      * Método principal que inicia a aplicação Spring Boot.
      * <p>
      * Este método carrega as variáveis de ambiente a partir de um arquivo .env
-      * e as define como propriedades do sistema. Ele também registra as informações
+     * e as define como propriedades do sistema. Ele também registra as informações
      * de configuração carregadas e inicia o contexto da aplicação.
      *
      * @param args Argumentos de linha de comando passados durante a inicialização.
