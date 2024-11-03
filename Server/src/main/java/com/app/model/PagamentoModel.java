@@ -1,10 +1,20 @@
 package com.app.model;
 
-import jakarta.persistence.*;
+import java.math.BigDecimal;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
 
 
 @Data
@@ -18,8 +28,9 @@ public class PagamentoModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "metodoPagamentoId", nullable = false)
-    private Integer metodoPagamentoId;
+    @ManyToOne
+    @JoinColumn(name = "metodoPagamentoId", nullable = false)
+    private MetodoPagamentoModel metodoPagamentoId;
 
     @Column(name = "dataHora", nullable = false)
     private String dataHora;
@@ -33,12 +44,13 @@ public class PagamentoModel {
 
     @Column(name = "totalComDesconto", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalComDesconto;
+    @ManyToOne
+    @JoinColumn(name = "pedidoId", nullable = false)
+    private PedidoModel pedidoId;
 
-    @Column(name = "pedidoId", nullable = false)
-    private Integer pedidoId;
-
-    @Column(name = "cupomId")
-    private Integer cupomId;
+    @ManyToOne
+    @JoinColumn(name = "cupomId", nullable = false)
+    private CupomModel cupomId;
 
     @Column(name = "desconto", precision = 10, scale = 2, nullable = false)
     private BigDecimal desconto = BigDecimal.ZERO;

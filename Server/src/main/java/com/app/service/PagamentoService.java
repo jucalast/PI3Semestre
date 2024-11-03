@@ -1,17 +1,18 @@
 package com.app.service;
 
-import com.app.model.PagCartaoModel;
-import com.app.model.PagamentoModel;
-import com.app.DTO.PagCartaoDTO;
-import com.app.DTO.PagamentoCompletoDTO;
-import com.app.repository.PagCartaoRepository;
-import com.app.repository.PagamentoRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import com.app.DTO.PagCartaoDTO;
+import com.app.DTO.PagamentoCompletoDTO;
+import com.app.model.PagCartaoModel;
+import com.app.model.PagamentoModel;
+import com.app.repository.PagCartaoRepository;
+import com.app.repository.PagamentoRepository;
 
 /**
  * Classe de serviço responsável por realizar operações relacionadas à entidade PagamentoModel.
@@ -131,7 +132,7 @@ public class PagamentoService {
         pagamento.setDesconto(pagamentoDTO.getDesconto());
         pagamento.setTransactionId(pagamentoDTO.getTransactionId());
         
-        String nomeMetodoPagamento = metodoPagamentoService.getNomeMetodoPagamentoById(pagamentoDTO.getMetodoPagamentoId());
+        String nomeMetodoPagamento = metodoPagamentoService.getNomeMetodoPagamentoById(pagamentoDTO.getMetodoPagamentoId().getId());
         
         if (nomeMetodoPagamento != null && 
             ("Credito".equalsIgnoreCase(nomeMetodoPagamento) || "Debito".equalsIgnoreCase(nomeMetodoPagamento))) {

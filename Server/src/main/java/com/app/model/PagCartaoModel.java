@@ -1,15 +1,15 @@
 package com.app.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.Data;
 
 /**
@@ -45,61 +45,43 @@ public class PagCartaoModel {
      * para a entidade PagamentoModel, obrigatória para garantir a associação correta
      * entre os pagamentos e suas informações de cartão.
      */
-    @NotNull(message = "O pagamento associado é obrigatório.")
-    @ManyToOne
-    @JoinColumn(name = "pagamentoId")
-    private PagamentoModel pagamentoId;
+    // Restante do código da classe PagCartaoModel
 
-    /**
-     * Bandeira do cartão utilizado para o pagamento. Este campo é obrigatório e deve
-     * ter no máximo 50 caracteres.
-     */
-    @NotBlank(message = "A bandeira do cartão é obrigatória.")
-    @Size(max = 50, message = "A bandeira do cartão não pode ter mais de 50 caracteres.")
-    private String bandeiraCartao;
+@ManyToOne
+@JoinColumn(name = "pagamentoId", nullable = false)
+private PagamentoModel pagamentoId;
 
-    /**
-     * Número do cartão utilizado para o pagamento. Este campo é obrigatório e deve
-     * conter exatamente 16 dígitos. É recomendado que o número do cartão seja 
-     * criptografado ou tokenizado por questões de segurança.
-     */
-    @NotBlank(message = "O número do cartão é obrigatório.")
-    @Size(min = 16, max = 16, message = "O número do cartão deve ter exatamente 16 dígitos.")
-    private String numero; // Idealmente, criptografado ou tokenizado
+@Column(columnDefinition = "VARCHAR(50)")
+@NotBlank(message = "A bandeira do cartão é obrigatória.")
+@Size(max = 50, message = "A bandeira do cartão não pode ter mais de 50 caracteres.")
+private String bandeiraCartao;
 
-    /**
-     * Data de validade do cartão, que é obrigatória e deve estar no formato MM/AA.
-     */
-    @NotBlank(message = "A validade do cartão é obrigatória.")
-    @Size(min = 5, max = 5, message = "A validade deve estar no formato MM/AA.")
-    private String validade; // Formato: MM/AA
+@Column(columnDefinition = "VARCHAR(16)")
+@NotBlank(message = "O número do cartão é obrigatório.")
+@Size(min = 16, max = 16, message = "O número do cartão deve ter exatamente 16 dígitos.")
+private String numero; 
 
-    /**
-     * Nome do titular do cartão. Este campo é obrigatório e deve ter no máximo 100 caracteres.
-     */
-    @NotBlank(message = "O nome do titular do cartão é obrigatório.")
-    @Size(max = 100, message = "O nome do titular não pode ter mais de 100 caracteres.")
-    private String nome;
+@Column(columnDefinition = "VARCHAR(5)")
+@NotBlank(message = "A validade do cartão é obrigatória.")
+@Size(min = 5, max = 5, message = "A validade deve estar no formato MM/AA.")
+private String validade;
 
-    /**
-     * CPF do titular do cartão. Este campo é obrigatório e deve conter exatamente 11 dígitos.
-     * É importante garantir a segurança e a validação do CPF.
-     */
-    @NotBlank(message = "O CPF é obrigatório.")
-    @Size(min = 11, max = 11, message = "O CPF deve ter exatamente 11 dígitos.")
-    private String cpf; // Garantir segurança e validação
+@Column(columnDefinition = "VARCHAR(100)")
+@NotBlank(message = "O nome do titular do cartão é obrigatório.")
+@Size(max = 100, message = "O nome do titular não pode ter mais de 100 caracteres.")
+private String nome;
 
-    /**
-     * Código de autorização do pagamento. Este campo é opcional e pode ser usado para armazenar
-     * informações adicionais relacionadas à autorização do pagamento.
-     */
-    private String autorizacaoCod;
+@Column(columnDefinition = "VARCHAR(11)")
+@NotBlank(message = "O CPF é obrigatório.")
+@Size(min = 11, max = 11, message = "O CPF deve ter exatamente 11 dígitos.")
+private String cpf;
 
-    /**
-     * Número de parcelas em que o pagamento foi realizado. Este campo é obrigatório.
-     */
-    @NotNull(message = "O número de parcelas é obrigatório.")
-    private Integer parcelas;
+@Column(columnDefinition = "VARCHAR(50)")
+private String autorizacaoCod;
+
+@NotNull(message = "O número de parcelas é obrigatório.")
+private Integer parcelas;
+
 
     // Getters e Setters (omitidos para brevidade)
 }

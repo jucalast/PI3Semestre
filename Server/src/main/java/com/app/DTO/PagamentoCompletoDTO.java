@@ -1,6 +1,11 @@
 package com.app.DTO;
 
 import java.math.BigDecimal;
+
+import com.app.model.CupomModel;
+import com.app.model.MetodoPagamentoModel;
+import com.app.model.PedidoModel;
+
 import lombok.Data;
 
 /**
@@ -22,7 +27,7 @@ public class PagamentoCompletoDTO {
     /** 
      * ID do método de pagamento utilizado.
      */
-    private Integer metodoPagamentoId;
+    private MetodoPagamentoModel metodoPagamentoId;
 
     /** 
      * Data e hora em que o pagamento foi realizado.
@@ -47,12 +52,12 @@ public class PagamentoCompletoDTO {
     /** 
      * ID do pedido associado ao pagamento.
      */
-    private Integer pedidoId;
+    private PedidoModel pedidoId;
 
     /** 
      * ID do cupom utilizado no pagamento, se houver.
      */
-    private Integer cupomId;
+    private CupomModel cupomId;
 
     /** 
      * Valor do desconto aplicado ao pagamento.

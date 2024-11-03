@@ -12,8 +12,15 @@ package com.app.model;
  */
 import java.math.BigDecimal;
 
-import jakarta.persistence.*; 
-import lombok.Data; 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity; 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 /**
  * Entidade que representa a tabela 'pedidos' no banco de dados.
@@ -45,8 +52,9 @@ public class PedidoModel {
      * ID do usuário que fez o pedido. Este campo referencia a tabela 'usuarios',
      * e é obrigatório.
      */
-    @Column(name = "usuarioId", nullable = false)
-    private Integer usuarioId;
+    @ManyToOne
+    @JoinColumn(name = "usuarioId", nullable = false)
+    private UserModel usuarioId;
 
     /**
      * Data e hora em que o pedido foi realizado. Este campo é obrigatório.
