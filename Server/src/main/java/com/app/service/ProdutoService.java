@@ -119,27 +119,46 @@ public class ProdutoService {
     @Transactional
     public Produto updateProduto(Long id, Produto produto) {
         logger.info("Atualizando produto com ID: {}", id);
-
+    
         ValidationUtil.validarObjeto(produto);
-
+    
         Produto existingProduto = getProdutoById(id);
-
-        if (!existingProduto.getNome().equals(produto.getNome()) && produtoRepository.existsByNome(produto.getNome())) {
-            logger.error("Erro: Já existe um produto com o nome {}", produto.getNome());
-            throw new RuntimeException("Já existe um produto com o nome: " + produto.getNome());
-        }
-
+    
+        // Atualiza os dados do produto
         existingProduto.setNome(produto.getNome());
         existingProduto.setDescricao(produto.getDescricao());
         existingProduto.setPreco(produto.getPreco());
         existingProduto.setImagem(produto.getImagem());
         existingProduto.setQuantidadeEstoque(produto.getQuantidadeEstoque());
         existingProduto.setAvaliacao(produto.getAvaliacao());
-
+    
+        // Atualiza a especialização CafeEspecial se existir
+        if (produto.getCafeEspecial() != null) {
+            if (existingProduto.getCafeEspecial() == null) {
+                existingProduto.setCafeEspecial(produto.getCafeEspecial());
+                produto.getCafeEspecial().setProduto(existingProduto);
+            } else {
+                existingProduto.getCafeEspecial().setNotasSensoriais(produto.getCafeEspecial().getNotasSensoriais());
+                // Atualizar outros campos conforme necessário...
+            }
+        }
+    
+        // Atualiza a especialização MetodoPreparo se existir
+        if (produto.getMetodoPreparo() != null) {
+            if (existingProduto.getMetodoPreparo() == null) {
+                existingProduto.setMetodoPreparo(produto.getMetodoPreparo());
+                produto.getMetodoPreparo().setProduto(existingProduto);
+            } else {
+                existingProduto.getMetodoPreparo().setComplexidade(produto.getMetodoPreparo().getComplexidade());
+                // Atualizar outros campos conforme necessário...
+            }
+        }
+    
         Produto updatedProduto = produtoRepository.save(existingProduto);
         logger.info("Produto {} atualizado com sucesso", updatedProduto.getNome());
         return updatedProduto;
     }
+    
 
     /**
      * Deleta um produto pelo ID.
