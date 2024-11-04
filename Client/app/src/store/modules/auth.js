@@ -1,7 +1,7 @@
 import axiosInstance from '@/utils/axiosInstance'; // Ajuste o caminho conforme necessário
 
 const state = {
-  isAuthenticated: false,
+  isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated")) || false,
 };
 
 const mutations = {

@@ -2,8 +2,11 @@ package com.app.service;
 
 import com.app.model.FavoritesModel;
 import com.app.model.Produto;
+import com.app.model.UserModel;
 import com.app.repository.FavoritesRepository;
 import com.app.repository.ProdutoRepository;
+import com.app.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,84 +14,82 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Classe de serviço para gerenciar itens favoritos.
- * Fornece métodos para adicionar e remover favoritos, verificar se um produto é um favorito e recuperar todos os favoritos ou produtos favoritos de um usuário.
+ * Serviço para gerenciar a lógica de negócios relacionada aos favoritos dos usuários.
  */
 @Service
 public class FavoritesService {
-    /**
-     * Repositório para gerenciar operações CRUD em itens favoritos.
-     */
     private final FavoritesRepository favoritesRepository;
-
-    /**
-     * Repositório para acessar informações de produtos, usado para buscar produtos favoritos.
-     */
     private final ProdutoRepository produtoRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public FavoritesService(FavoritesRepository favoritesRepository, ProdutoRepository produtoRepository) {
+    public FavoritesService(FavoritesRepository favoritesRepository, ProdutoRepository produtoRepository, UserRepository userRepository) {
         this.favoritesRepository = favoritesRepository;
         this.produtoRepository = produtoRepository;
+        this.userRepository = userRepository;
     }
 
     /**
-     * Adiciona um novo favorito para um usuário.
-     *
-     * @param userId     O ID do usuário.
-     * @param productId  O ID do produto.
-     * @return           A instância de FavoritesModel salva.
+     * Adiciona um produto aos favoritos de um usuário.
+     * @param userId O identificador do usuário.
+     * @param productId O identificador do produto.
+     * @return O objeto FavoritesModel recém-criado e salvo.
      */
+    @Transactional
     public FavoritesModel addFavorite(Long userId, Long productId) {
-        System.out.println("Service Layer - UserId: " + userId + ", ProductId: " + productId);
-        FavoritesModel favorite = new FavoritesModel(userId, productId);
+        UserModel user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Produto product = produtoRepository.findById(productId).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        FavoritesModel favorite = new FavoritesModel(user, product);
         return favoritesRepository.save(favorite);
     }
 
     /**
-     * Recupera todos os itens favoritos de um usuário.
-     *
-     * @param userId  O ID do usuário.
-     * @return        Uma lista de instâncias de FavoritesModel.
+     * Recupera todos os favoritos de um usuário.
+     * @param userId O identificador do usuário.
+     * @return Uma lista de objetos FavoritesModel associados ao usuário.
      */
     public List<FavoritesModel> getUserFavorites(Long userId) {
-        return favoritesRepository.findByUserId(userId);
+        UserModel user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return favoritesRepository.findByUser(user);
     }
 
     /**
-     * Verifica se um produto já está marcado como favorito por um usuário.
-     *
-     * @param userId     O ID do usuário.
-     * @param productId  O ID do produto.
-     * @return           verdadeiro se o produto já for um favorito, falso caso contrário.
+     * Verifica se um produto é um favorito de um usuário.
+     * @param userId O identificador do usuário.
+     * @param productId O identificador do produto.
+     * @return true se o produto for um favorito do usuário, caso contrário, false.
      */
     public boolean isProductAlreadyFavorite(Long userId, Long productId) {
-        return favoritesRepository.existsByUserIdAndProductId(userId, productId);
+        UserModel user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Produto product = produtoRepository.findById(productId).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        return favoritesRepository.existsByUserAndProduto(user, product);
     }
 
     /**
-     * Recupera todos os produtos que um usuário marcou como favoritos.
-     *
-     * @param userId  O ID do usuário.
-     * @return        Uma lista de instâncias de Produto representando os produtos favoritos.
+     * Recupera os produtos favoritos de um usuário, listando apenas os produtos.
+     * @param userId O identificador do usuário.
+     * @return Uma lista de produtos favoritos do usuário.
      */
     public List<Produto> getFavoriteProducts(Long userId) {
-        List<FavoritesModel> favorites = getUserFavorites(userId);
+        UserModel user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        List<FavoritesModel> favorites = favoritesRepository.findByUser(user);
         return favorites.stream()
-                .map(favorite -> produtoRepository.findById(favorite.getProductId()).orElse(null))
+                .map(FavoritesModel::getProduto)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Remove um item favorito de um usuário.
-     *
-     * @param userId     O ID do usuário.
-     * @param productId  O ID do produto a ser removido.
-     * @return           verdadeiro se o favorito foi removido com sucesso, falso caso contrário.
+     * Remove um produto específico dos favoritos de um usuário.
+     * @param userId O identificador do usuário.
+     * @param productId O identificador do produto a ser removido.
+     * @return true se o favorito foi removido com sucesso, false caso contrário.
      */
     public boolean removeFavorite(Long userId, Long productId) {
-        if (favoritesRepository.existsByUserIdAndProductId(userId, productId)) {
-            favoritesRepository.deleteByUserIdAndProductId(userId, productId);
+        UserModel user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Produto product = produtoRepository.findById(productId).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        if (favoritesRepository.existsByUserAndProduto(user, product)) {
+            favoritesRepository.deleteByUserAndProduto(user, product);
             return true;
         }
         return false;

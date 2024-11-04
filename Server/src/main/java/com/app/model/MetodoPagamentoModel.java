@@ -12,6 +12,7 @@ package com.app.model;
  * - jakarta.validation.constraints.Pattern: valida que o campo deve seguir um padrão específico (ex.: regex).
  * - lombok.Data: gera automaticamente os métodos getters, setters, equals, hashCode e toString.
  */
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +26,11 @@ import lombok.Data;
 /**
  * Classe que representa um método de pagamento.
  * Esta classe está mapeada para a tabela 'metodosDePagamentos' no banco de dados.
+ * 
+ * A anotação @Entity indica que esta classe é uma entidade JPA.
+ * A anotação @Table especifica o nome da tabela no banco de dados.
+ * A anotação @Data da biblioteca Lombok é utilizada para gerar automaticamente 
+ * métodos comuns como getters, setters, toString, equals e hashCode.
  * 
  * @author Kairo Chácara
  * @version 1.0

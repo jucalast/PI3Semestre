@@ -47,15 +47,18 @@ public class MetodoPagamentoService {
 
     private final MetodoPagamentoRepository metodoPagamentoRepository;
 
-    /**
-     * Construtor da classe MetodoPagamentoService que injeta o repositório de métodos de pagamento.
-     * 
-     * @param metodoPagamentoRepository O repositório para acessar os dados de métodos de pagamento no banco de dados.
-     */
-    @Autowired
-    public MetodoPagamentoService(MetodoPagamentoRepository metodoPagamentoRepository) {
-        this.metodoPagamentoRepository = metodoPagamentoRepository;
-    }
+   /**
+ * Construtor da classe MetodoPagamentoService que injeta o repositório de métodos de pagamento.
+ * Este construtor é utilizado pelo Spring para criar uma instância do serviço e injetar
+ * a dependência do repositório de métodos de pagamento.
+ *
+ * @param metodoPagamentoRepository O repositório que fornece operações CRUD para
+ *                                   a entidade MetodoPagamentoModel.
+ */
+@Autowired
+public MetodoPagamentoService(MetodoPagamentoRepository metodoPagamentoRepository) {
+    this.metodoPagamentoRepository = metodoPagamentoRepository;
+}
 
     /**
      * Salva um novo método de pagamento no banco de dados.
@@ -138,5 +141,8 @@ public class MetodoPagamentoService {
         }
 
         return listaDTO;
+    }
+    public String getNomeMetodoPagamentoById(Integer id) {
+        return metodoPagamentoRepository.findNomeById(id).orElse("Método de pagamento não encontrado");
     }
 }

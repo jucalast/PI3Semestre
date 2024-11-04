@@ -1,19 +1,26 @@
 package com.app.model;
 
 /* 
-* Importa a classe BigDecimal para manipulação de valores decimais
-* import java.math.BigDecimal;
-* 
-* Importa as anotações para mapeamento objeto-relacional
-* import jakarta.persistence.*;
-* 
-* Importa a anotação @Data do Lombok para geração automática de métodos
-* import lombok.Data;
-*/
+ * Importa a classe BigDecimal para manipulação de valores decimais
+ * import java.math.BigDecimal;
+ * 
+ * Importa as anotações para mapeamento objeto-relacional
+ * import jakarta.persistence.*;
+ * 
+ * Importa a anotação @Data do Lombok para geração automática de métodos
+ * import lombok.Data;
+ */
 import java.math.BigDecimal;
 
-import jakarta.persistence.*; 
-import lombok.Data; 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity; 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 /**
  * Entidade que representa a tabela 'pedidos' no banco de dados.
@@ -45,8 +52,9 @@ public class PedidoModel {
      * ID do usuário que fez o pedido. Este campo referencia a tabela 'usuarios',
      * e é obrigatório.
      */
-    @Column(name = "usuarioId", nullable = false)
-    private Integer usuarioId;
+    @ManyToOne
+    @JoinColumn(name = "usuarioId", nullable = false)
+    private UserModel usuarioId;
 
     /**
      * Data e hora em que o pedido foi realizado. Este campo é obrigatório.
@@ -139,6 +147,12 @@ public class PedidoModel {
 
         private final int code;
 
+        /**
+         * Construtor do enum StatusPedido que associa um código numérico
+         * a cada status.
+         * 
+         * @param code Código numérico que representa o status.
+         */
         StatusPedido(int code) {
             this.code = code;
         }
@@ -155,7 +169,7 @@ public class PedidoModel {
         /**
          * Converte um código numérico em um enum StatusPedido.
          * 
-         * @param code Código do status.
+         * @param code Código do status a ser convertido.
          * @return Enum correspondente ao código.
          * @throws IllegalArgumentException Se o código não corresponder a nenhum status válido.
          */
