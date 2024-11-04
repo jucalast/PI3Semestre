@@ -1,10 +1,9 @@
 package com.app.controller;
 
-import com.app.model.UserModel;
-import com.app.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +17,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.app.model.UserModel;
+import com.app.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Controlador responsável pela gestão das rotas relacionadas ao usuário.
  *
@@ -30,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version 1.0
  * @since 2024-10-05
  */
+@Slf4j
 @Controller
 public class UserController {
 
@@ -58,7 +65,6 @@ public class UserController {
      * @param userService O serviço de usuário a ser injetado.
      * @param authenticationManager O AuthenticationManager a ser injetado.
      */
-    @Autowired
     public UserController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
@@ -89,7 +95,7 @@ public class UserController {
      * @return Um redirecionamento para a URL da home page em caso de sucesso,
      * ou retorno à página de login em caso de falha.
      */
-    @PostMapping("/form-process")
+    @PostMapping("/login/form-process")
     public String loginUser(@RequestParam String email, @RequestParam String password, Model model, HttpServletRequest request) {
 
         try {
@@ -97,6 +103,12 @@ public class UserController {
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            HttpSession session = request.getSession(true);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
+            log.info("Usuário autenticado: {}", authentication.getName());
+            log.info("Authorities do usuário: {}", authentication.getAuthorities());
 
             UserModel user = userService.getUserFromAuthentication(authentication);
             request.getSession().setAttribute("user", user);
@@ -123,7 +135,7 @@ public class UserController {
      * armazenar o usuário autenticado.
      * @return Um redirecionamento para a URL do frontend.
      */
-    @GetMapping("/google-process")
+    @GetMapping("/login/google-process")
     public String processUser(OAuth2AuthenticationToken token, HttpServletRequest request) {
         String name = token.getPrincipal().getAttribute("name");
         String email = token.getPrincipal().getAttribute("email");
@@ -170,5 +182,31 @@ public class UserController {
     public String registerUser(@ModelAttribute UserModel user) {
         userService.registerUser(user);
         return "customLogin";
+    }
+
+    /**
+     * Rota protegida que só pode ser acessada por administradores.
+     *
+     * @return Uma mensagem informando que o acesso foi bem-sucedido.
+     */
+    @GetMapping("/protected/test")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> testAdminAccess(HttpServletRequest request) {
+
+        return ResponseEntity.ok("Acesso concedido: Você está acessando uma rota protegida como administrador!");
+    }
+
+    /**
+     * Rota que verifica se o usuário está autenticado.
+     *
+     * @return Uma mensagem informando se o usuário está autenticado ou não.
+     */
+    @GetMapping("/check-auth")
+    public ResponseEntity<String> checkAuth() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return ResponseEntity.ok("Usuário autenticado: " + authentication.getName());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
     }
 }
