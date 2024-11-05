@@ -34,7 +34,7 @@
                 </button>
                 <button
                   class="favorire-button"
-                  @click.stop="handleCartClick(produto)"
+                  @click.stop="handleCartClick(produto)" 
                 >
                   <font-awesome-icon
                     icon="fa-solid fa-shopping-cart"
@@ -100,6 +100,10 @@ export default {
     const favoriteProductIds = computed(() => globalState.favoriteProductIds);
     return {
       favoriteProductIds,
+    };
+    const itemsOnCart = computed(() => globalState.itemsOnCart);
+    return {
+      itemsOnCart,
     };
   },
   computed: {
@@ -195,8 +199,9 @@ export default {
     async handleCartClick(produto) {
       try {
         const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`);
-        if (responseCart.status !== 200) {
-          console.error("Falha ao adicionar produto ao carrinho.");
+        if (responseCart.status === 200) {
+          } else {
+            console.error("Falha ao adicionar produto ao carrinho.");
         }
       } catch (error) {
         console.error("Erro ao adicionar ao carrinho:", error);

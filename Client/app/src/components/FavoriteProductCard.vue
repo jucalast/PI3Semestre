@@ -21,9 +21,9 @@
     <div v-if="showModal" class="modal">
       <div class="modal-content">
         <span class="close" @click="closeModal">&times;</span>
-        <h3>{{ produto.nome }}</h3>
+        <h3>{{ produto.nome}}</h3>
         <img :src="produto.imagem" :alt="produto.nome" class="modal-image" />
-        <p>{{ produto.preco.toFixed(2) }}</p>
+        <p>{{ produto.preco.toFixed(2)}}</p>
       </div>
     </div>
   </div>
