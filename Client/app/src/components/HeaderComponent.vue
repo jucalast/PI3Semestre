@@ -91,7 +91,7 @@
         </div>
       </div>
       <div class="divnav"></div>
-      <CartModal :isModalVisible="isCartModalVisible"
+      <CartModal :isModalVisible="isCartModalVisible" :isUserAuthenticade="authenticated"
                 @close="isCartModalVisible = false">
 
       </CartModal>
@@ -117,7 +117,6 @@
         favorite_products: [],
         baseURL: import.meta.env.VITE_API_BASE_URL,
         isCartModalVisible: false,
-
       };
     },
     computed: {
@@ -187,6 +186,7 @@
       },
       handleCartClick(){
         this.isCartModalVisible = !this.isCartModalVisible;
+        
       }
     },
     mounted() {

@@ -1,6 +1,9 @@
 <template>
     <div v-if=isModalVisible class="cart-modal-bckg" @click.self="close" >
-        <div class="cart-modal">
+        <div v-if="!this.isUserAuthenticade" class="cart-modal">
+            <p>Carrinho: Você precisa estar logado</p>
+        </div>
+        <div v-else class="cart-modal">
             <div class="header-cart"> 
                 <h1>Carrinho de compras</h1>
                 <h1>Av. Dos Teste, No 123 - Bairro dos Testes</h1>
@@ -49,8 +52,7 @@ export default{
         isModalVisible: {
         type: Boolean,
         required: true,
-        
-    },
+    }
     },
     watch: {
         isModalVisible(newValue){
@@ -64,6 +66,7 @@ export default{
             cartItems: [],
             somaValorItens: 0,
             somaQuantidade: 0,
+            isUserAuthenticade: false,
         };
     },
     methods: {
@@ -73,9 +76,13 @@ export default{
         async fetchCarts(){
             try{          
                 const responseCart = await axiosInstance.get(`/api/carrinho/`);
-                this.cartItems = responseCart.data;
-                console.log(this.cartItems)
-                this.somasCarrinho(responseCart.data);
+                if(responseCart.status === 401){
+                    this.isUserAuthenticade = false;
+                } else {
+                    this.cartItems = responseCart.data;
+                    console.log(this.cartItems)
+                    this.somasCarrinho(responseCart.data);
+            }
             } catch (error){
                 console.error("Erro ao buscar produtos do carrinho: ", error);
             } finally {
@@ -133,6 +140,16 @@ export default{
 }
 
 .cart-modal{
+    background-color: #FFFFFF;
+    width: 30%;
+    height: 100%;
+    z-index: 21;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+}
+
+.cart-modal-exception{
     background-color: #FFFFFF;
     width: 30%;
     height: 100%;
