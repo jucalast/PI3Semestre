@@ -31,17 +31,17 @@ public class CarrinhoController {
     public ResponseEntity<?> addProductsOnUserCart(HttpServletRequest request, @PathVariable Long productId){
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
         if(authenticatedUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro: Usuário não autenticado.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
         try{
             boolean insertItem = carrinhoService.insertProductOnUserCart(authenticatedUser.getId(), productId);
             if(insertItem){
                 return ResponseEntity.ok("Sucesso: Produto adicionado ao carrinho");
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro na requisição");
             }
         }catch (Exception e ){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao tentar adicionar produto ao carrinho" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: Algo de errado aconteceu. " + e.getMessage());
         }
     }
 
@@ -58,7 +58,27 @@ public class CarrinhoController {
                 }
                 return ResponseEntity.ok(carrinhoItems);
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao tentar carregar o carrinho.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: Algo de errado aconteceu. " + e.getMessage());
+            }
+        }
+    }
+
+    @Transactional
+    @PutMapping("/{productId}/{quantity}")
+    public ResponseEntity<?> postQuantityItemOnUserCart(HttpServletRequest request, @PathVariable Long productId, @PathVariable int quantity){
+        UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+        if(authenticatedUser == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+        } else {
+            try{
+                boolean updateQntty = carrinhoService.updateQuantityOnUserCart(authenticatedUser.getId(), productId, quantity);
+                if(updateQntty){
+                    return ResponseEntity.ok().body("Quantidade atualizada");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro na requição");
+                }
+            } catch (Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: Algo de errado aconteceu. " + e.getMessage());
             }
         }
     }
@@ -75,10 +95,10 @@ public class CarrinhoController {
             if (isRemoved){
                 return ResponseEntity.ok("OK");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro: Produto não encontrado");
             }
         } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: Algo de errado aconteceu. " + e.getMessage());
         }
     }
 }

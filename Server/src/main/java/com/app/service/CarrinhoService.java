@@ -29,9 +29,14 @@ public class CarrinhoService {
 
     @Transactional
     //Verificar com o novo código do produto
-    public boolean insertProductOnUserCart(Long userId, Long productId) {
+    public boolean insertProductOnUserCart(Long idUser, Long productId) {
+        Optional<Carrinho> carrinhoExistente = carrinhoRepository.findByUserModelIdAndProdutoId(idUser, productId);
+        if(carrinhoExistente.isPresent()){
+            deleteProductOnUserCart(idUser, productId);
+            return true;
+        }
         try{
-            Optional<UserModel> userModel = userRepository.findById(userId);
+            Optional<UserModel> userModel = userRepository.findById(idUser);
             Optional<Produto> produto = produtoRepository.findById(productId);
 
             if(userModel.isEmpty()){
@@ -56,8 +61,8 @@ public class CarrinhoService {
     }
 
 
-    public List<Map<String, Object>> getProductsOnUserCart(Long id_user) {
-        List<Carrinho> carrinhos = carrinhoRepository.findByUserModelId(id_user);
+    public List<Map<String, Object>> getProductsOnUserCart(Long idUser) {
+        List<Carrinho> carrinhos = carrinhoRepository.findByUserModelId(idUser);
 
         return carrinhos.stream()
                 .map(carrinho -> {
@@ -87,5 +92,23 @@ public class CarrinhoService {
         }
         return false;
     }
-}
+
+    public boolean updateQuantityOnUserCart(Long idUser, Long productId, int quantity) {
+        Optional<Carrinho> carrinhoExistente = carrinhoRepository.findByUserModelIdAndProdutoId(idUser,productId);
+            if (carrinhoExistente.isPresent()) {
+                try {
+                    Carrinho carrinho = carrinhoExistente.get();
+                    carrinho.setQuantidade(quantity);
+                    carrinhoRepository.save(carrinho);
+                    return true;
+                } catch (Exception e) {
+                    System.out.println("Erro: Não foi possível alterar a quantidade" + e.getMessage());
+                    return false;
+                }
+            } else {
+                System.out.println("Erro: Dados não encontrados");
+                return false;
+            }
+        }
+    }
 
