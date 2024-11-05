@@ -4,28 +4,44 @@ import com.app.model.Carrinho;
 import com.app.model.UserModel;
 import jakarta.transaction.Transactional;
 import com.app.service.CarrinhoService;
-import org.apache.coyote.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import lombok.extern.slf4j.Slf4j;
 
 
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
-@Slf4j
+/**
+ * Controlador responsável pela gestão das rotas relacionadas ao carrinho.
+ *
+ * Este controlador valida a autenticação da sessão do usuário e gerenciamento
+ * da das rotas de manipulação do carrinho.
+ *
+ * @author Ricardo L. Ferreira
+ */
 @RestController
 @RequestMapping("api/carrinho")
 public class CarrinhoController {
 
+    /**
+     * Serviço de carrinho utilizado para lógica de negócios relacionada ao carrinho
+     */
     @Autowired
     private CarrinhoService carrinhoService;
 
+    /**
+     * Rota que processa a adição de um novo item no carrinho.
+     *
+     * @param request A partir da interface HttpServeletRequest acessamos informações
+     *                detalhadas de uma solicitação HTTP, nesse caso a sessão do usuário
+     *                para autenticação.
+     * @param productId O id do produto.
+     * @return O retorno é um status HTTP representando se a solicitação foi concluída com sucesso ou não.
+     */
     @Transactional
     @PostMapping("/{productId}")
     public ResponseEntity<?> addProductsOnUserCart(HttpServletRequest request, @PathVariable Long productId){
@@ -45,6 +61,14 @@ public class CarrinhoController {
         }
     }
 
+    /**
+     * Rota responsável por processar a coleta dos itens existentes no carrinho
+     *
+     * @param request A partir da interface HttpServeletRequest acessamos informações
+     *                detalhadas de uma solicitação HTTP, nesse caso a sessão do usuário
+     *                para autenticação.
+     * @return O retorno é um status HTTP representando se a solicitação foi concluída com sucesso ou não.
+     */
     @GetMapping("/")
     public ResponseEntity<?> listProductsOnUserCart(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
@@ -63,6 +87,15 @@ public class CarrinhoController {
         }
     }
 
+    /**
+     * Rota que processa a atualização da quantidade unitária de cada item presente no carrinho
+     * @param request A partir da interface HttpServeletRequest acessamos informações
+     *                detalhadas de uma solicitação HTTP, nesse caso a sessão do usuário
+     *                para autenticação.
+     * @param productId O id do produto.
+     * @param quantity A quantidade a ser atualizada do item no carrinho.
+     * @return O retorno é um status HTTP representando se a solicitação foi concluída com sucesso ou não.
+     */
     @Transactional
     @PutMapping("/{productId}/{quantity}")
     public ResponseEntity<?> postQuantityItemOnUserCart(HttpServletRequest request, @PathVariable Long productId, @PathVariable int quantity){
@@ -83,6 +116,15 @@ public class CarrinhoController {
         }
     }
 
+    /**
+     * Rota que processa a remoção de itens do carrinho
+     *
+     * @param request A partir da interface HttpServeletRequest acessamos informações
+     *                detalhadas de uma solicitação HTTP, nesse caso a sessão do usuário
+     *                para autenticação.
+     * @param productId O id do produto.
+     * @return O retorno é um status HTTP representando se a solicitação foi concluída com sucesso ou não.
+     */
     @Transactional
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> removeProductOnUserCart(HttpServletRequest request, @PathVariable Long productId){
