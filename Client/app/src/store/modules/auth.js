@@ -1,39 +1,31 @@
-import axiosInstance from "@/utils/axiosInstance";
+import axiosInstance from '@/utils/axiosInstance'; // Ajuste o caminho conforme necessário
 
 const state = {
   isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated")) || false,
 };
 
 const mutations = {
-  SET_AUTHENTICATION(state, isAuthenticated) {
-    state.isAuthenticated = isAuthenticated;
-    localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
+  setAuthentication(state, status) {
+    state.isAuthenticated = status;
   },
 };
 
 const actions = {
-  async checkAuthentication({ commit }) {
+  async checkAuth({ commit }) {
     try {
-      const response = await axiosInstance.get("/is-authenticated");
+      const response = await axiosInstance.get('/check-auth');
       if (response.status === 200) {
-        commit("SET_AUTHENTICATION", true);
-      } else {
-        commit("SET_AUTHENTICATION", false);
+        commit('setAuthentication', true);
       }
     } catch (error) {
-      console.error("Erro ao verificar autenticação:", error);
-      commit("SET_AUTHENTICATION", false);
+      commit('setAuthentication', false);
     }
   },
-
-  async logout({ commit }) {
-    try {
-      await axiosInstance.post("/logout");
-      commit("SET_AUTHENTICATION", false);
-      localStorage.removeItem("isAuthenticated");
-    } catch (error) {
-      console.error("Error on logout:", error);
-    }
+  login({ commit }) {
+    commit('setAuthentication', true);
+  },
+  logout({ commit }) {
+    commit('setAuthentication', false);
   },
 };
 
@@ -42,7 +34,6 @@ const getters = {
 };
 
 export default {
-  namespaced: true,
   state,
   mutations,
   actions,
