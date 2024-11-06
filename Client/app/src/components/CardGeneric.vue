@@ -238,7 +238,7 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
-  margin-top: 7rem;
+
 }
 
 .deletesim:hover,
@@ -261,6 +261,7 @@ body {
   align-items: flex-start;
   align-content: flex-start;
   width: 100%;
+  gap:1rem;
 }
 
 .name {
@@ -344,7 +345,7 @@ p {
 .action-buttons {
   height: 100%;
   position: absolute;
-  right: -74px;
+  right: -53px;
   gap: 0rem;
   width: 4rem;
   display: flex;
@@ -366,6 +367,7 @@ p {
   transition: background-color 0.3s;
   height: 50%;
   border-radius: 1.5rem;
+  width: 5rem;
 }
 
 .editar {

@@ -1,337 +1,460 @@
 <template>
-    <div v-if=isModalVisible class="cart-modal-bckg" @click.self="close" >
-        <div class="cart-modal">
-            <div class="header-cart"> 
-                <h1>Carrinho de compras</h1>
-                <h1>Av. Dos Teste, No 123 - Bairro dos Testes</h1>
+  <div v-if="isModalVisible" class="cart-modal-bckg" @click.self="close">
+    <div class="cart-modal">
+      <div class="header-cart">
+        <h1>Carrinho de compras</h1>
+        <h1>Av. Dos Teste, No 123 - Bairro dos Testes</h1>
+      </div>
+      <div class="main-cart">
+        <section class="products">
+          <section
+            v-for="(cartItem, index) in cartItems"
+            :key="index"
+            class="product-section"
+          >
+            <div class="image-bckg">
+              <img
+                class="image-product"
+                :src="cartItem.imagem_produto"
+                :alt="cartItem.nome_produto"
+              />
             </div>
-            <div class="main-cart">
-                <section class="products">
-                <section v-for="(cartItem, index) in cartItems "
-                :key = "index" 
-                class="product-section">
-                    <div class="image-bckg">
-                        <img class="image-product" :src="cartItem.imagem_produto" :alt="cartItem.nome_produto">
-                    </div>
-                        <h2>{{cartItem.nome_produto}}</h2>
-                        <button @click="removeItemOnCartUser(cartItem.produtoId)">REMOVER</button>
-                        <select @change="updateQuantidadeItem(cartItem.produtoId, $event.target.value)" name="Quantidade" class="input-qntty" :value="cartItem.quantidade">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                        <span>R${{cartItem.preco_produto}}</span>
-                </section>
-                </section>
-                <section class="frete-section">
-                        <span id="info-01">Frete</span>
-                        <span id="info-02">R$14,59</span>
-                        <p id="info-03">Aproveite o <b>frete grátis</b> adicionando mais produtos<br style="display: hidden;"> ao pedido</p>
-                </section>
-            </div>
-            <div class="footer-cart">
-                <h3 id="info-ft-01">{{somaQuantidade}} Produtos</h3>
-                <span id="info-ft-02">Inserir cupom</span>
-                <span id="info-ft-03">R${{parseFloat(somaValorItens.toFixed(2))}}</span>
-                <button class="btn-compra">Continuar a compra</button>
-            </div>
+            <div class="nameandbutton">
+            <h2>{{ cartItem.nome_produto }}</h2>
+            <button class="excluir" @click="removeItemOnCartUser(cartItem.produtoId)">
+              Excluir
+            </button>
         </div>
+            <select
+              @change="
+                updateQuantidadeItem(cartItem.produtoId, $event.target.value)
+              "
+              name="Quantidade"
+              class="input-qntty"
+              :value="cartItem.quantidade"
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="1">5</option>
+              <option value="2">6</option>
+              <option value="3">7</option>
+              <option value="4">8</option>
+            </select>
+            <span>R${{ cartItem.preco_produto }}</span>
+          </section>
+        </section>
+      </div>
+
+      <div class="footer-cart">
+        <div class="info-footer">
+          <div class="info-left">
+            <h3 id="info-ft-01">{{ somaQuantidade }} Produtos</h3>
+          </div>
+
+          <div class="info-rigth">
+            <span id="info-ft-02">Inserir cupom</span>
+            <span id="info-ft-03"
+              >R${{ parseFloat(somaValorItens.toFixed(2)) }}</span
+            >
+          </div>
+          
+        </div>
+        <section class="frete-section">
+            <div class="frete">
+          <span id="info-01">Frete</span>
+          <span id="info-02">R$14,59</span>
+        </div>
+          <p id="info-03">
+            Aproveite o <strong>frete grátis</strong> adicionando mais produtos ao pedido
+          </p>
+        </section>
+        <button class="btn-compra">Continuar a compra</button>
+      </div>
     </div>
-</template> 
+  </div>
+</template>
 
 <script>
 import axiosInstance from "@/utils/axiosInstance";
 
-export default{
-    name: 'CartModal',
-    props:{
-        isModalVisible: {
-        type: Boolean,
-        required: true,
-        
+export default {
+  name: "CartModal",
+  props: {
+    isModalVisible: {
+      type: Boolean,
+      required: true,
     },
+  },
+  watch: {
+    isModalVisible(newValue) {
+      if (newValue) {
+        this.fetchCarts();
+      }
     },
-    watch: {
-        isModalVisible(newValue){
-            if(newValue){
-                this.fetchCarts();
-            }
-        },
+  },
+  data() {
+    return {
+      cartItems: [],
+      somaValorItens: 0,
+      somaQuantidade: 0,
+    };
+  },
+  methods: {
+    close() {
+      this.$emit("close");
     },
-    data(){
-        return{
-            cartItems: [],
-            somaValorItens: 0,
-            somaQuantidade: 0,
-        };
+    async fetchCarts() {
+      try {
+        const responseCart = await axiosInstance.get(`/api/carrinho/`);
+        this.cartItems = responseCart.data;
+        console.log(this.cartItems);
+        this.somasCarrinho(responseCart.data);
+      } catch (error) {
+        console.error("Erro ao buscar produtos do carrinho: ", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
-    methods: {
-        close(){
-            this.$emit("close");
-        },
-        async fetchCarts(){
-            try{          
-                const responseCart = await axiosInstance.get(`/api/carrinho/`);
-                this.cartItems = responseCart.data;
-                console.log(this.cartItems)
-                this.somasCarrinho(responseCart.data);
-            } catch (error){
-                console.error("Erro ao buscar produtos do carrinho: ", error);
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async removeItemOnCartUser(productId){
-            try{
-                const responseCart = await axiosInstance.delete(`/api/carrinho/${productId}`);
-                this.fetchCarts();
-            } catch (error){
-                console.error("Erro ao remover produto do carrinho", error);
-            } finally {
-                this.isLoading = false;
-            }
-         },
-         somasCarrinho(itensCarrinho){    
-            this.somaValorItens = 0;
-            this.somaQuantidade = 0;            
-            for(let index=0; index < itensCarrinho.length; index++){
-                this.somaValorItens += parseFloat(itensCarrinho[index].preco_produto) * parseFloat(itensCarrinho[index].quantidade);
-                this.somaQuantidade += parseInt(itensCarrinho[index].quantidade);
-            }
-         },
-         async updateQuantidadeItem(productId, quantity){
-            console.log(productId, quantity)
-            const responseCart = await axiosInstance.put(`/api/carrinho/${productId}/${parseInt(quantity)}`);
-            console.log(responseCart.data);
-         }
+    async removeItemOnCartUser(productId) {
+      try {
+        const responseCart = await axiosInstance.delete(
+          `/api/carrinho/${productId}`
+        );
+        this.fetchCarts();
+      } catch (error) {
+        console.error("Erro ao remover produto do carrinho", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
-    async mounted(){
-        await this.fetchCarts();
-    }
-}
+    somasCarrinho(itensCarrinho) {
+      this.somaValorItens = 0;
+      this.somaQuantidade = 0;
+      for (let index = 0; index < itensCarrinho.length; index++) {
+        this.somaValorItens +=
+          parseFloat(itensCarrinho[index].preco_produto) *
+          parseFloat(itensCarrinho[index].quantidade);
+        this.somaQuantidade += parseInt(itensCarrinho[index].quantidade);
+      }
+    },
+    async updateQuantidadeItem(productId, quantity) {
+      console.log(productId, quantity);
+      const responseCart = await axiosInstance.put(
+        `/api/carrinho/${productId}/${parseInt(quantity)}`
+      );
+      console.log(responseCart.data);
+    },
+  },
+  async mounted() {
+    await this.fetchCarts();
+  },
+};
 </script>
 
 <style scoped>
-
-*{
-    font-size: 14pt;
+* {
+  font-size: 14pt;
 }
 
-.cart-modal-bckg{
-    position:fixed;
-    background-color: rgba(0, 0, 0, 0.7);
-    margin-top: 6rem;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: right;
-    align-items: center;
-    z-index: 20;
-    backdrop-filter: blur(5px);
+.cart-modal-bckg {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.7);
+  margin-top: 6rem;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  z-index: 20;
+  backdrop-filter: blur(5px);
 }
 
-.cart-modal{
-    background-color: #FFFFFF;
-    width: 30%;
-    height: 100%;
-    z-index: 21;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: stretch;
+.cart-modal {
+  background-color: #ffffff;
+  width: 40%;
+  height: 100%;
+  z-index: 21;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: stretch;
 }
 
-.header-cart{
-    background-color: #5170fc;
-    width: 100%;
-    height: 15%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    font-size: 18pt;
-    font-weight: bolder;
+.header-cart {
+  background-color: #5170fc;
+  width: 100%;
+  height: 15%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  font-weight: bolder;
+  align-content: center;
+  justify-content: flex-start;
+  padding: 1rem;
+  gap: 1rem;
 }
 
-.cart-modal h1{
-    font-size: 65%;
-    color: black;
-    font-weight: 100;
-    margin: 10px 0px 0px 15%;
+.cart-modal h1 {
+  font-size: 1.5rem;
+  color: black;
+  font-weight: 100;
+  margin: 0px 0px 0px 10%;
 }
 
-.main-cart{
-    background-color: #c3c3c3 ;
-    width: 95%;
-    height: 40%;
-    border-radius: 40px;
-    margin: 0 auto 0;
-    font-size: 18pt;
+.main-cart {
+  width: 95%;
+  height: 40%;
+
+  margin: 0 auto 0;
+  font-size: 18pt;
+  overflow: hidden;
+}
+
+.main-cart h2 {
+  font-size: 16pt;
+  color: black;
+  font-weight: 100;
+}
+
+.products {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.image-bckg {
+  grid-area: image;
+}
+.product-section h2 {
+    padding-left: 1rem;
+  grid-area: name-product;
+}
+.product-section button {
+  grid-area: btn-delete;
+}
+.product-section select {
+  grid-area: input-quantity;
+  height: 3rem;
+  width: 6rem;
+  padding: 0.5rem;
+  border: solid 1px #aeaeaeb6;
+  background: #ededed;
+}
+.product-section select:focus {
+outline: none;
+}
+.product-section span {
+  grid-area: price-prod;
+}
+
+.frete-section #info-01 {
+  grid-area: span;
+}
+
+
+.frete-section #info-02 {
+  grid-area: price-frete;
+}
+.frete-secttion #info-03 {
+  grid-area: text-frete;
+
+}
+
+#info-ft-01 {
+  grid-area: qtty-product;
+}
+#info-ft-02 {
+  grid-area: insert-cupom;
+}
+#info-ft-03 {
+  grid-area: subtotal;
+}
+.btn-compra {
+  grid-area: btn-compra;
+}
+
+.product-section {
+    background: #dfdfdf !important;
     overflow: hidden;
-}
-
-.main-cart h2{
-    font-size: 16pt;
-    color: black;
-    font-weight: 100;
-    
-}
-
-.products{
-    height: 60%;
-    overflow-y: auto;
-}
-
-.image-bckg{ grid-area: image;}
-.product-section h2{ grid-area: name-product;}
-.product-section button{ grid-area: btn-delete}
-.product-section select{ grid-area: input-quantity;}
-.product-section span{ grid-area: price-prod;}
-
-.frete-section #info-01{ grid-area: span;}
-.frete-section #info-02{ grid-area: price-frete;}
-.frete-secttion #info-03{ grid-area: text-frete;}
-
-#info-ft-01{ grid-area: qtty-product}
-#info-ft-02{ grid-area: insert-cupom}
-#info-ft-03{ grid-area: subtotal}
-.btn-compra{ grid-area: btn-compra}
-
-.product-section{
-    padding: 20px 20px 0px 20px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 20% 10% 10% 15% ;
-    grid-template-rows: 6rem 1rem;
-    grid-template-areas: 
-    'image name-product input-quantity price-prod btn-delete';
+    margin: 2rem;
+    display: flex;
+    padding: 2rem;
     align-items: center;
     justify-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 0.7rem 2rem;
-    border-bottom: solid rgba(0, 0, 0, 0.342) 1pt;
+    border-radius: 2rem;
 }
 
-button{
-    background: #ea1d1dd3;
-    border-radius: 4px;
-    border-style: solid;
-    border-color: #d70000;
-    border-width: 1px;
-    color: white;
-    font-size: 11pt;
-    padding: 2px;
-    
+button {
+  background: #ea1d1dd3;
+  border-radius: 4px;
+  border-style: solid;
+  border-color: #d70000;
+  border-width: 1px;
+  color: white;
+  font-size: 11pt;
+  padding: 2px;
 }
 
-button:hover{
-    background: hsla(0, 92%, 70%, 0.423);
-    cursor: pointer;
-    
+button:hover {
+  background: #ff4d4d27;
+  cursor: pointer;
 }
 
-.input-qntty{
-    background: #d1d1d1;
-    border: solid rgba(0, 0, 0, 0.748) 1px;
-    border-radius: 50px;
-    width: 4rem;
-    font-size: 12pt;
-    border-color: gray
+.input-qntty {
+  background: #d1d1d1;
+  border: solid rgba(0, 0, 0, 0.748) 1px;
+  border-radius: 50px;
+  width: 4rem;
+  font-size: 12pt;
+  border-color: gray;
 }
 
-.product-section > span{
-    display: inline-block;
+.product-section > span {
+  display: inline-block;
+}
+
+.image-bckg {
+
+  width: 7rem;
+  border-radius: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
 
 }
 
-.image-bckg{
-    background-color: gray;
-    width: 4rem;
-    height: 4rem;
-    border-radius: 100%;
+.image-product {
+  width: 100%;
+}
+
+hr {
+  border: solid rgba(0, 0, 0, 0.342) 1pt;
+}
+
+.frete-section {
     display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: center;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;   
-}
-
-.image-product{
-    width: 50%;  
-}
-
-hr{
-    border: solid rgba(0, 0, 0, 0.342) 1pt;
-}
-
-.frete-section{
-    display: grid;
-    grid-template-columns: 20% 33% 47%;
-    grid-template-rows: 1rem 4rem;
-    grid-template-areas: 
-    'span none price-frete'
-    'text-frente text-frete text-frete';
     gap: 0.7rem 2rem;
     justify-content: space-around;
     overflow: hidden;
-    padding: 20px 20px 0px 20px;
+    width: 80%;
     box-sizing: border-box;
     align-items: center;
+    height: 30%;
+    flex-direction: column;
 }
 
-#info-02{
-    justify-self: end;
-    padding-right: 4.5rem;
+#info-02 {
+  justify-self: end;
+
+}
+#info-01 {
+    height: fit-content;
+    color: #5170fc;
 }
 
-#info-03{
-    background-color: transparent;
+.excluir {
+color: #ff4d4d;
+background: transparent;
+border: none;
+font-size: 1.5rem;
+padding: 1rem;
+border-radius: 2rem;
+}
+
+#info-03 {
+  background-color: transparent;
+  width: 100%;
+  font-size: 1.2rem !important;
+}
+
+strong {
+    font-size: 1.2rem !important;
+}
+
+.nameandbutton {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.footer-cart {
+  background-color: #ffffff;
+  width: 100%;
+  height: 45%;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  box-shadow: 0px -1px 70px rgba(128, 128, 128, 0.701);
+  display: flex;
+  gap: 1.5rem;
+  padding: 0 0 7rem 0;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn-compra {
+  justify-self: center;
+  width: 80%;
+  height: 5rem;
+  border-radius: 14px;
+  background-color: #e3bf5f;
+  border-color: #e3bf5f;
+  color: #403619;
+  font-size: 2rem;
+}
+
+.btn-compra:hover {
+
+  background-color: #af944a;
+  border-color: #e3bf5f;
+  color: #403619;
+
+}
+
+
+.info-rigth {
+  display: flex;
+  width: 50%;
+height: 2rem;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-around;
+  align-items: center;
+  align-items: flex-end;
+  margin-right: 2rem;
+
+}
+.info-left {
+  display: flex;
+  width: 50%;
+  height: 2rem;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-left: 2rem;
+  margin-top: 1rem;
+  font-size: 0.5rem !important;
+}
+.info-footer {
     width: 100%;
-    height: 100%;
-    grid-row: 2;
-    grid-column: 1 / span 3;
-    font-size: 10pt;
-    box-sizing: border-box;
-    overflow-wrap: break-word;
-    white-space: normal;
-    word-wrap: break-word;
+    display: flex;
+    height: 25%;
+    align-items: center;
+    padding: 2rem;
+
 }
 
-.footer-cart{
-    font-size: 18pt;
-    background-color: #ffffff;
-    width: 100%;
-    height: 30%;    
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
-    box-shadow: 0px -5px 3px gray;
-    display: grid;
-    grid-template-columns: 50% 50%;
-    grid-template-rows: 10px 10px 40px;
-    grid-template-areas: 
-    'qtty-product none'
-    'insert-cupom subtotal'
-    'btn-compra btn-compra';
-    box-sizing: border-box;
-    gap:1.5rem;
-    padding: 20px 0px 0px 0px;
-    justify-content: center;
-    justify-items: center;
+.frete {
+    display: flex;display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+width: 100%;
 }
-
-.footer-cart > .btn-compra{
-    justify-self: center;
-    width: 80%;
-    border-radius: 14px;
-    padding: 30px auto auto 30px;
-    background-color: #e3bf5f;
-    border-color: #e3bf5f;
-    color: black;
-}
-
 
 
 </style>
