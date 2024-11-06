@@ -12,7 +12,6 @@ import java.util.List;
  */
 @Repository
 public interface CarrinhoRepository extends JpaRepository<Carrinho, Long> {
-public interface CarrinhoRepository extends JpaRepository<Carrinho, Long> {
     List<Carrinho> findByUserModelId(Long idUser);
 
     boolean existsByUserModelIdAndProdutoId(Long idUser, Long productId);
