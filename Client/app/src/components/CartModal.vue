@@ -14,13 +14,12 @@
                         <img class="image-product" :src="cartItem.imagem_produto" :alt="cartItem.nome_produto">
                     </div>
                         <h2>{{cartItem.nome_produto}}</h2>
-                        <button @click="removeItemOnCartUser(cartItem.produtoId, index)">REMOVER</button>
-                        <select name="Quantidade" class="input-qntty">
-                            <option :value="cartItem.quantidade">{{ cartItem.quantidade }}</option>
-                            <option value="1">1 Uni</option>
-                            <option value="2">2 Uni</option>
-                            <option value="3">3 Uni</option>
-                            <option value="4">4 Uni</option>
+                        <button @click="removeItemOnCartUser(cartItem.produtoId)">REMOVER</button>
+                        <select @change="updateQuantidadeItem(cartItem.produtoId, $event.target.value)" name="Quantidade" class="input-qntty" :value="cartItem.quantidade">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
                         </select>
                         <span>R${{cartItem.preco_produto}}</span>
                 </section>
@@ -34,7 +33,7 @@
             <div class="footer-cart">
                 <h3 id="info-ft-01">{{somaQuantidade}} Produtos</h3>
                 <span id="info-ft-02">Inserir cupom</span>
-                <span id="info-ft-03">R${{somaValorItens}}</span>
+                <span id="info-ft-03">R${{parseFloat(somaValorItens.toFixed(2))}}</span>
                 <button class="btn-compra">Continuar a compra</button>
             </div>
         </div>
@@ -50,15 +49,21 @@ export default{
         isModalVisible: {
         type: Boolean,
         required: true,
+        
     },
+    },
+    watch: {
+        isModalVisible(newValue){
+            if(newValue){
+                this.fetchCarts();
+            }
+        },
     },
     data(){
         return{
             cartItems: [],
             somaValorItens: 0,
             somaQuantidade: 0,
-            baseURL: import.meta.env.VITE_API_BASE_URL
-
         };
     },
     methods: {
@@ -67,7 +72,7 @@ export default{
         },
         async fetchCarts(){
             try{          
-                const responseCart = await axiosInstance.get(`${this.baseURL}/api/carrinho/`);
+                const responseCart = await axiosInstance.get(`/api/carrinho/`);
                 this.cartItems = responseCart.data;
                 console.log(this.cartItems)
                 this.somasCarrinho(responseCart.data);
@@ -77,9 +82,9 @@ export default{
                 this.isLoading = false;
             }
         },
-        async removeItemOnCartUser(productId, index){
+        async removeItemOnCartUser(productId){
             try{
-                const responseCart = await axiosInstance.delete(`${this.baseURL}/api/carrinho/${productId}`);
+                const responseCart = await axiosInstance.delete(`/api/carrinho/${productId}`);
                 this.fetchCarts();
             } catch (error){
                 console.error("Erro ao remover produto do carrinho", error);
@@ -87,13 +92,19 @@ export default{
                 this.isLoading = false;
             }
          },
-         somasCarrinho(itensCarrinho){            
+         somasCarrinho(itensCarrinho){    
+            this.somaValorItens = 0;
+            this.somaQuantidade = 0;            
             for(let index=0; index < itensCarrinho.length; index++){
                 this.somaValorItens += parseFloat(itensCarrinho[index].preco_produto) * parseFloat(itensCarrinho[index].quantidade);
                 this.somaQuantidade += parseInt(itensCarrinho[index].quantidade);
-
             }
          },
+         async updateQuantidadeItem(productId, quantity){
+            console.log(productId, quantity)
+            const responseCart = await axiosInstance.put(`/api/carrinho/${productId}/${parseInt(quantity)}`);
+            console.log(responseCart.data);
+         }
     },
     async mounted(){
         await this.fetchCarts();
