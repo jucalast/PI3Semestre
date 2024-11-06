@@ -84,8 +84,8 @@ public class MetodoPreparo {
      * Relacionamento com o Produto ao qual o método de preparo está associado.
      */
     @OneToOne
-    @JoinColumn(name = "produto_id", nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "produto_id")
+    @JsonBackReference // Para evitar loop de serialização
     private Produto produto;
 
     /**

@@ -2,6 +2,7 @@ package com.app.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -113,7 +114,7 @@ public class CafeEspecial {
      * Relacionamento com o Produto ao qual o café especial pertence.
      */
     @OneToOne
-    @JoinColumn(name = "produto_id", nullable = false)
-    @JsonManagedReference
+    @JoinColumn(name = "produto_id")
+    @JsonBackReference // Para evitar loop de serialização
     private Produto produto;
 }
