@@ -47,33 +47,32 @@ export default {
       this.selectedForm = formType;
     },
     async submitProduct(product) {
-      const toast = useToast();
-      if (this.isSubmitting) return;
+  const toast = useToast();
+  if (this.isSubmitting) return;
 
-      this.isSubmitting = true;
-      try {
-        const response = await fetch('http://localhost:8080/api/produtos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(product),
-        });
+  this.isSubmitting = true;
+  try {
+   
 
-        if (!response.ok) {
-          throw new Error('Erro ao criar o produto');
-        }
+    const response = await axiosInstance.post('/api/produtos/create/protected', product, {
+      
+    });
 
-        const data = await response.json();
-        console.log('Produto criado:', data);
+    if (response.status === 200) {
+      console.log('Produto criado:', response.data);
+      toast.success('Produto criado com sucesso!');
+      this.$emit('close');
+    } else {
+      throw new Error('Erro ao criar o produto');
+    }
+  } catch (error) {
+    console.error('Erro ao criar o produto:', error);
+    toast.error('Erro ao criar o produto');
+  } finally {
+    this.isSubmitting = false;
+  }
+},
 
-        toast.success('Produto criado com sucesso!');
-        this.$emit('close');
-      } catch (error) {
-        console.error('Erro ao criar o produto:', error);
-        toast.error('Erro ao criar o produto');
-      } finally {
-        this.isSubmitting = false;
-      }
-    },
   },
 };
 </script>

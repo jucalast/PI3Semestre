@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -102,7 +103,8 @@ public class ProdutoController {
      * @param produto O objeto Produto a ser criado.
      * @return O produto recém-criado.
      */
-    @PostMapping
+    @PostMapping("/protected/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
         if (produto.getCafeEspecial() != null) {
             produto.getCafeEspecial().setProduto(produto);
