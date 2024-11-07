@@ -26,6 +26,7 @@
 import SpecialCoffeeForm from './SpecialCoffeeForm.vue';
 import PreparationMethodForm from './PreparationMethodForm.vue';
 import { useToast } from 'vue-toastification';
+import axiosInstance from '../utils/axiosInstance'; // Certifique-se de importar a instância do axios
 
 export default {
   name: 'CreateProductModal',
@@ -47,36 +48,34 @@ export default {
       this.selectedForm = formType;
     },
     async submitProduct(product) {
-      const toast = useToast();
-      if (this.isSubmitting) return;
+  const toast = useToast();
+  if (this.isSubmitting) return;
 
-      this.isSubmitting = true;
-      try {
-        const response = await fetch('http://localhost:8080/api/produtos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(product),
-        });
+  this.isSubmitting = true;
+  try {
+  
+    const response = await axiosInstance.post('/api/produtos/protected', product, {
+      
+    });
 
-        if (!response.ok) {
-          throw new Error('Erro ao criar o produto');
-        }
-
-        const data = await response.json();
-        console.log('Produto criado:', data);
-
-        toast.success('Produto criado com sucesso!');
-        this.$emit('close');
-      } catch (error) {
-        console.error('Erro ao criar o produto:', error);
-        toast.error('Erro ao criar o produto');
-      } finally {
-        this.isSubmitting = false;
-      }
-    },
+    if (response.status === 200) {
+      console.log('Produto criado:', response.data);
+      toast.success('Produto criado com sucesso!');
+      this.$emit('close');
+    } else {
+      throw new Error('Erro ao criar o produto');
+    }
+  } catch (error) {
+    console.error('Erro ao criar o produto:', error);
+    toast.error('Erro ao criar o produto');
+  } finally {
+    this.isSubmitting = false;
+  }
+},
   },
 };
 </script>
+
 
 
 

@@ -1,12 +1,14 @@
 package com.app.controller;
 
+import com.app.model.Produto;
+import com.app.service.ProdutoService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.app.model.Produto;
-import com.app.service.ProdutoService;
 
 /**
  * Controlador responsável pela gestão das rotas relacionadas ao produto.
@@ -102,7 +101,8 @@ public class ProdutoController {
      * @param produto O objeto Produto a ser criado.
      * @return O produto recém-criado.
      */
-    @PostMapping
+    @PostMapping("/protected")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
         if (produto.getCafeEspecial() != null) {
             produto.getCafeEspecial().setProduto(produto);

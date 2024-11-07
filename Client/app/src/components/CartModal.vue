@@ -161,7 +161,7 @@ export default {
 .cart-modal-bckg {
   position: fixed;
   background-color: rgba(0, 0, 0, 0.7);
-  margin-top: 6rem;
+  margin-top: 5.7rem;
   left: 0;
   width: 100%;
   height: 100%;
