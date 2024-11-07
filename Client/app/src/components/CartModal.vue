@@ -287,21 +287,7 @@ outline: none;
     border-radius: 2rem;
 }
 
-button {
-  background: #ea1d1dd3;
-  border-radius: 4px;
-  border-style: solid;
-  border-color: #d70000;
-  border-width: 1px;
-  color: white;
-  font-size: 11pt;
-  padding: 2px;
-}
 
-button:hover {
-  background: #ff4d4d27;
-  cursor: pointer;
-}
 
 .input-qntty {
   background: #d1d1d1;
@@ -366,6 +352,10 @@ padding: 1rem;
 border-radius: 2rem;
 }
 
+.excluir:hover {
+  background: #ff4d4d2f;
+
+}
 #info-03 {
   background-color: transparent;
   width: 100%;

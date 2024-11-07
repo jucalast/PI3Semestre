@@ -53,8 +53,9 @@ export default {
 
   this.isSubmitting = true;
   try {
-  
-    const response = await axiosInstance.post('/api/produtos/protected', product, {
+   
+
+    const response = await axiosInstance.post('/api/produtos/create/protected', product, {
       
     });
 
@@ -72,6 +73,7 @@ export default {
     this.isSubmitting = false;
   }
 },
+
   },
 };
 </script>
