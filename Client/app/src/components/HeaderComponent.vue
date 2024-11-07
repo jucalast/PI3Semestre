@@ -47,7 +47,7 @@
               />
             </button>
             <div v-if="showModal" class="modal">
-              <div>favoritos:</div>
+              <div class="headerfav">favoritos:</div>
               <div v-if="!authenticated">
                 <p>Você precisa estar logado.</p>
                 <button @click="redirectToLogin" style="background: #2ecc71; color: white; border-radius: 20px; padding: 10px">Login</button>
@@ -59,14 +59,19 @@
                       <img :src="product.imagem" alt="Imagem do Produto">
                     </div>
                     <div class="product-details">
+                      <div class="nameandprice">
                       <h4>{{ product.nome }}</h4>
-                      <p>{{ product.preco.toFixed(2) }}</p>
-                      <button @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
+                      
+                      <button class="excluir" @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
+                    </div>
+                      <div>
+                        <p>{{ product.preco.toFixed(2) }}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
                </div>
-              <button v-if="authenticated" @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos</button>
+              <button v-if="authenticated" @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos ></button>
             </div>
           </div>
           <button class="action-button cart-button" @click="handleCartClick">
@@ -400,9 +405,9 @@
   .modal {
     position: absolute;
     right: 2px;
-    top: 5rem;
-    width: 300px;
-    max-height: 400px;
+    top: 7rem;
+    width: 30%;
+    max-height: 80vh;
     background-color: white;
     padding: 10px;
     border: 1px solid #ccc;
@@ -410,6 +415,7 @@
     z-index: 10;
     display: flex;
     flex-direction: column;
+    border-radius: 2rem;
   }
 
   .product-scroll-container {
@@ -421,22 +427,50 @@
   .all-favorites-button {
     width: 100%;
     padding: 10px;
-    background-color: gray; /* Customize according to your color scheme */
-    color: white;
+    background-color: transparent; /* Customize according to your color scheme */
+    color: #3a5bff;
     border: none;
     cursor: pointer;
-    margin-top: 10px;
+    
+    font-size: 1.3rem;
+    display:flex;
+  }
+
+  .excluir {
+    margin-top: 1rem;
+color: #ff4d4d !important;
+background: transparent;
+border: none;
+padding-right: 1rem;
+padding-left: 1rem;
+border-radius: 2rem;
+}
+
+
+
+.excluir:hover {
+  background: #ff4d4d2f;
+
+}
+
+  .headerfav {
+    padding: 1rem;
   }
 
   .product-card {
     display: flex;
     height: auto;
     margin: 5px;
-    border: 1px solid #ccc;
+    border: none;
+    border-radius: 2rem;
+    background: #dfdfdf !important;
+    padding: 1rem;
+    gap: 2rem
   }
 
+
   .product-image img {
-    width: 100px;
+    width: 5rem !important;
     height: auto;
   }
 
@@ -444,7 +478,10 @@
     color: black;
     display: flex;
     margin-right: 0.5em;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
   }
 
   </style>
