@@ -63,6 +63,10 @@ export default {
 </script>
 
 <style scoped>
+
+html {
+  background-color: white !important;
+}
 .product-list {
   display: flex;
   flex-wrap: wrap;
