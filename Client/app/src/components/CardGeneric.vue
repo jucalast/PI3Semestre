@@ -120,6 +120,7 @@ export default {
     handleEdit(produto) {
       this.selectedProduct = { ...produto };
       this.isEditModalVisible = true;
+      console.log(produto);
     },
 
     // Busca os detalhes do produto na API

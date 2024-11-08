@@ -2,34 +2,56 @@
   <div class="modal-overlay" @click="handleOverlayClick">
     <div class="modal-content" @click.stop>
       <div class="botoes">
-        <button @click="selectForm('cafeEspecial')" :class="{ 'active-link': selectedForm === 'cafeEspecial' }">
-          <img class="imgprod" src="@/assets/icons8-coffee-beans-90(1).png" alt="">Café Especial
+        <button
+          @click="selectForm('cafeEspecial')"
+          :class="{ 'active-link': selectedForm === 'cafeEspecial' }"
+        >
+          <img
+            class="imgprod"
+            src="@/assets/icons8-coffee-beans-90(1).png"
+            alt=""
+          />Café Especial
         </button>
-        <button @click="selectForm('metodoPreparo')" :class="{ 'active-link': selectedForm === 'metodoPreparo' }">
-          <img src="@/assets/icons8-v60-coffee-dripper-100 (1).png" alt=""> Método de Preparo
+        <button
+          @click="selectForm('metodoPreparo')"
+          :class="{ 'active-link': selectedForm === 'metodoPreparo' }"
+        >
+          <img src="@/assets/icons8-v60-coffee-dripper-100 (1).png" alt="" />
+          Método de Preparo
         </button>
       </div>
-      
-      <SpecialCoffeeForm v-if="selectedForm === 'cafeEspecial'" @submit-product="submitProduct" :disabled="isSubmitting" />
-      <PreparationMethodForm v-else-if="selectedForm === 'metodoPreparo'" @submit-product="submitProduct" :disabled="isSubmitting" />
-      
+
+      <SpecialCoffeeForm
+        v-if="selectedForm === 'cafeEspecial'"
+        @submit-product="submitProduct"
+        :disabled="isSubmitting"
+      />
+      <PreparationMethodForm
+        v-else-if="selectedForm === 'metodoPreparo'"
+        @submit-product="submitProduct"
+        :disabled="isSubmitting"
+      />
+
       <!-- Overlay de carregamento com GIF -->
       <div v-if="isSubmitting" class="loading-overlay">
-        <img src="@/assets/Logo Maven.gif" alt="Carregando" class="loading-gif" />
+        <img
+          src="@/assets/Logo Maven.gif"
+          alt="Carregando"
+          class="loading-gif"
+        />
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
-import SpecialCoffeeForm from './SpecialCoffeeForm.vue';
-import PreparationMethodForm from './PreparationMethodForm.vue';
-import { useToast } from 'vue-toastification';
-import axiosInstance from '../utils/axiosInstance'; // Certifique-se de importar a instância do axios
+import SpecialCoffeeForm from "./SpecialCoffeeForm.vue";
+import PreparationMethodForm from "./PreparationMethodForm.vue";
+import { useToast } from "vue-toastification";
+import axiosInstance from "../utils/axiosInstance"; // Certifique-se de importar a instância do axios
 
 export default {
-  name: 'CreateProductModal',
+  name: "CreateProductModal",
   components: {
     SpecialCoffeeForm,
     PreparationMethodForm,
@@ -42,44 +64,40 @@ export default {
   },
   methods: {
     handleOverlayClick() {
-      this.$emit('close');
+      this.$emit("close");
     },
     selectForm(formType) {
       this.selectedForm = formType;
     },
     async submitProduct(product) {
-  const toast = useToast();
-  if (this.isSubmitting) return;
+      const toast = useToast();
+      if (this.isSubmitting) return;
 
-  this.isSubmitting = true;
-  try {
-   
+      this.isSubmitting = true;
+      try {
+        const response = await axiosInstance.post(
+          "/api/produtos/protected/create",
+          product,
+          {}
+        );
 
-    const response = await axiosInstance.post('/api/produtos/create/protected', product, {
-      
-    });
-
-    if (response.status === 200) {
-      console.log('Produto criado:', response.data);
-      toast.success('Produto criado com sucesso!');
-      this.$emit('close');
-    } else {
-      throw new Error('Erro ao criar o produto');
-    }
-  } catch (error) {
-    console.error('Erro ao criar o produto:', error);
-    toast.error('Erro ao criar o produto');
-  } finally {
-    this.isSubmitting = false;
-  }
-},
-
+        if (response.status === 200) {
+          console.log("Produto criado:", response.data);
+          toast.success("Produto criado com sucesso!");
+          this.$emit("close");
+        } else {
+          throw new Error("Erro ao criar o produto");
+        }
+      } catch (error) {
+        console.error("Erro ao criar o produto:", error);
+        toast.error("Erro ao criar o produto");
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
   },
 };
 </script>
-
-
-
 
 <style scoped>
 .loading-overlay {
@@ -139,6 +157,5 @@ button {
 }
 button:hover {
   background: rgb(233, 233, 233);
-
 }
 </style>

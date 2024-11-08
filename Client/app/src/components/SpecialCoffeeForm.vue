@@ -1,14 +1,14 @@
 <template>
   <div class="form-container">
       <form @submit.prevent="submitForm">
-
+          <!-- Campos básicos do produto -->
           <input v-model="product.nome" placeholder="Nome" required />
           <textarea v-model="product.descricao" placeholder="Descrição" required></textarea>
           <input v-model.number="product.preco" type="number" placeholder="Preço" required />
           <input v-model.number="product.quantidade_estoque" type="number" placeholder="Quantidade em Estoque" required />
-
           <input class="imagem" v-model="product.imagem" type="url" placeholder="URL da Imagem" required />
-
+          
+          <!-- Inputs específicos de propriedades dentro de cafeEspecial -->
           <input v-model="product.cafeEspecial.notasSensoriais" placeholder="Notas Sensoriais" />
           <input v-model="product.cafeEspecial.origem" placeholder="Origem" />
           <input v-model="product.cafeEspecial.recomendacoesPreparo" placeholder="Recomendações de Preparo" />
@@ -16,15 +16,18 @@
           <input v-model="product.cafeEspecial.torrefacao" placeholder="Torrefação" />
           <input v-model="product.cafeEspecial.variedade" placeholder="Variedade" />
           <input v-model="product.cafeEspecial.beneficiamento" placeholder="Beneficiamento" />
+
+          <!-- Datas dentro de cafeEspecial -->
           <div class="dates">
-          <label for="dataTorra">Data de Torra:</label>
-          <input id="dataTorra" v-model="product.cafeEspecial.dataTorra" type="date" />
-        </div>
-        <div class="dates">
-          <label for="dataValidade">Data de Validade:</label>
-          <input id="dataValidade" v-model="product.cafeEspecial.dataValidade" type="date" />
-        </div>
-          <button type="submit">Criar Produto</button>
+              <label for="dataTorra">Data de Torra:</label>
+              <input id="dataTorra" v-model="product.cafeEspecial.dataTorra" type="date" />
+          </div>
+          <div class="dates">
+              <label for="dataValidade">Data de Validade:</label>
+              <input id="dataValidade" v-model="product.cafeEspecial.dataValidade" type="date" />
+          </div>
+
+          <button type="submit">Salvar Alterações</button>
       </form>
   </div>
 </template>
@@ -32,34 +35,69 @@
 <script>
 export default {
   data() {
-      return {
-          product: {
-              nome: '',
-              descricao: '',
-              preco: null,
-              imagem: '',
-              quantidade_estoque: null,
-              cafeEspecial: {
-                  notasSensoriais: '',
-                  origem: '',
-                  recomendacoesPreparo: '',
-                  torra: '',
-                  torrefacao: '',
-                  variedade: '',
-                  beneficiamento: '',
-                  dataTorra: '',
-                  dataValidade: ''
-              }
-          }
-      };
+    return {
+      product: {
+        nome: '',
+        descricao: '',
+        preco: null,
+        imagem: '',
+        quantidade_estoque: null,
+        cafeEspecial: {
+          notasSensoriais: '',
+          origem: '',
+          recomendacoesPreparo: '',
+          torra: '',
+          torrefacao: '',
+          variedade: '',
+          beneficiamento: '',
+          dataTorra: '',
+          dataValidade: ''
+        },
+        metodoDePreparo: ''  // Declarado, mas ignorado no envio
+      }
+    };
   },
   methods: {
-      submitForm() {
-          this.$emit('submit-product', this.product);
+    submitForm() {
+    // Cria um novo objeto excluindo 'metodoDePreparo'
+    const { metodoDePreparo, ...filteredProduct } = this.product;
+
+    // Remove 'cafeEspecial' se estiver vazio
+    const cafeEspecialFields = [
+      "notasSensoriais",
+      "origem",
+      "recomendacoesPreparo",
+      "torra",
+      "torrefacao",
+      "variedade",
+      "beneficiamento",
+      "dataTorra",
+      "dataValidade"
+    ];
+
+    // Clona apenas os campos preenchidos em 'cafeEspecial'
+    filteredProduct.cafeEspecial = {};
+    cafeEspecialFields.forEach(field => {
+      if (this.product.cafeEspecial[field]) {
+        filteredProduct.cafeEspecial[field] = this.product.cafeEspecial[field];
       }
-  }
+    });
+
+    // Remove 'cafeEspecial' do produto final se estiver vazio
+    if (Object.keys(filteredProduct.cafeEspecial).length === 0) {
+      delete filteredProduct.cafeEspecial;
+    }
+
+    // Exibe o objeto atualizado no console
+    console.log("Produto Atualizado:", filteredProduct);
+
+    // Emitimos o produto sem 'metodoDePreparo' e com 'cafeEspecial' ajustado
+    this.$emit('submit-product', filteredProduct);
+  },
+},
 };
 </script>
+
 
 <style scoped>
 .c1 {

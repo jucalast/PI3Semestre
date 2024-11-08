@@ -1,7 +1,6 @@
 <template>
-  <div v-if="isVisible" class="modal-backdrop">
+  <div v-if="isVisible" class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal-content">
-      <button class="close-btn" @click="$emit('close')">X</button>
       <h2>Editar Produto</h2>
       <div class="form-container">
         <form @submit.prevent="handleSubmit">
@@ -15,7 +14,6 @@
               required
             />
           </div>
-
           <button type="submit">Salvar Alterações</button>
         </form>
       </div>
@@ -44,10 +42,18 @@ export default {
     product: {
       handler(newProduct) {
         if (newProduct) {
+          // Desestrutura os campos básicos, cafeEspecial e metodoPreparo
+          const {
+            cafeEspecial = {},
+            metodoPreparo = {},
+            ...filteredProduct
+          } = newProduct;
+
+          // Inclui os campos básicos, cafeEspecial e metodoPreparo no formData
           this.formData = {
-            ...newProduct,
-            ...(newProduct.cafeEspecial || {}),
-            ...(newProduct.metodoPreparo || {}),
+            ...filteredProduct,
+            ...cafeEspecial,
+            ...metodoPreparo,
           };
         }
       },
@@ -69,10 +75,6 @@ export default {
   },
 };
 </script>
-
-
-
-
 
 <style scoped>
 .modal-backdrop {
@@ -127,7 +129,7 @@ label {
 .form-group {
   display: flex;
   flex-direction: column;
-  width: calc(32% - 10px); /* Duas colunas */
+  width: calc(32% - 10px);
 }
 
 .form-container form {
@@ -181,15 +183,5 @@ label {
 
 .form-container button:hover {
   background-color: #e04e4e;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
 }
 </style>
