@@ -50,13 +50,15 @@ public class SpringConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers( "/login/**", "/register", "/api/**", "/check-auth").permitAll()
-                .requestMatchers("/protected/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                .requestMatchers("/login/**", "/register", "/api/**").permitAll() // Permite essas rotas para todos
+                .requestMatchers("/check-auth").authenticated() // Rota /check-auth só pode ser acessada por usuários autenticados
+                .requestMatchers("/protected/**").hasRole("ADMIN") // Protege /protected/** com a role ADMIN
+                .anyRequest().authenticated() // Qualquer outra requisição precisa estar autenticada
                 )
                 .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
+                .failureUrl("/login?error") // Aqui, você mantém a configuração de login, mas ela não afetará /check-auth
                 )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
@@ -78,6 +80,17 @@ public class SpringConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
                 .expiredUrl("/login?expired")
+                )
+                .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    // Evita o redirecionamento para a tela de login e retorna um 401 quando o usuário não está autenticado
+                    if (request.getRequestURI().equals("/check-auth")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // Retorna 401 Unauthorized
+                        response.getWriter().write("{\"authenticated\": false}");
+                    } else {
+                        response.sendRedirect("/login");  // Para outras rotas protegidas, mantém o redirecionamento
+                    }
+                })
                 )
                 .build();
     }

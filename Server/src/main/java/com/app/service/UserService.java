@@ -1,8 +1,9 @@
 package com.app.service;
 
-import java.util.Collections;  
+import com.app.model.UserModel;
+import com.app.repository.UserRepository;
+import java.util.Collections;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -13,9 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.app.model.UserModel;
-import com.app.repository.UserRepository;   
 
 /**
  * Classe de serviço responsável pela lógica de negócios relacionada à entidade
@@ -66,7 +64,7 @@ public class UserService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmailId())
                 .password(user.getPassword())
-                .authorities(authorities) 
+                .authorities(authorities)
                 .accountExpired(false)
                 .accountLocked(false)
                 .credentialsExpired(false)
@@ -129,5 +127,29 @@ public class UserService implements UserDetailsService {
         String email = authentication.getName();
         return userRepository.findByEmailId(email);
     }
-    
+
+    /**
+     * Atualiza as informações de um usuário existente.
+     *
+     * @param userId O ID do usuário a ser atualizado.
+     * @param updatedUser O objeto UserModel com os dados atualizados do
+     * usuário.
+     * @throws RuntimeException Se o usuário com o ID fornecido não for
+     * encontrado.
+     */
+    public void updateUser(Long userId, UserModel updatedUser) {
+        UserModel existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+
+        existingUser.setUserName(updatedUser.getUserName());
+        existingUser.setEmailId(updatedUser.getEmailId());
+        existingUser.setRoles(updatedUser.getRoles());
+
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        userRepository.save(existingUser);
+    }
+
 }
