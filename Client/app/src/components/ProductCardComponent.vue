@@ -6,12 +6,10 @@
     <div v-else-if="produtos.length > 0" class="card-container">
       <div class="cards">
         <div
-          v-for="produto in filteredProdutos.length > 0
-            ? filteredProdutos
-            : produtos"
+          v-for="produto in filteredProdutos.length > 0 ? filteredProdutos : produtos"
           :key="produto.id"
           class="product-card"
-          
+          @click="openModal(produto)"
         >
           <h2>{{ produto.nome }}</h2>
           <div class="backcard">
@@ -26,19 +24,17 @@
               <div class="priceandfav">
                 <p>{{ produto.preco.toFixed(2) }}</p>
                 <button
-                    class="favorire-button"
-                    @click.stop="handleFavoriteClick(produto)"
+                  class="favorire-button"
+                  @click.stop="handleFavoriteClick(produto)"
                 >
                   <font-awesome-icon
-                      icon="star"
-                      :class="{'favoritocard': true, 'is-favorite': favoriteProductIds.includes(produto.id)}"
+                    icon="star"
+                    :class="{'favoritocard': true, 'is-favorite': favoriteProductIds.includes(produto.id)}"
                   />
-
                 </button>
-
                 <button
                   class="favorire-button"
-                  @click="handleCartClick(produto)"
+                  @click.stop="handleCartClick(produto)" 
                 >
                   <font-awesome-icon
                     icon="fa-solid fa-shopping-cart"
@@ -52,6 +48,7 @@
       </div>
 
       <ProductModal
+        v-if="selectedProduct"
         :product="selectedProduct"
         :isVisible="isModalVisible"
         @close="isModalVisible = false"
@@ -69,6 +66,7 @@ import axios from "axios";
 import axiosInstance from "@/utils/axiosInstance";
 import { globalState } from "@/state.js";
 import { computed } from "vue";
+
 export default {
   props: {
     produtos: {
@@ -95,30 +93,28 @@ export default {
     return {
       isModalVisible: false,
       selectedProduct: null,
-      baseURL: import.meta.env.VITE_API_BASE_URL
+      baseURL: import.meta.env.VITE_API_BASE_URL,
     };
   },
   setup() {
-    // Agora você pode acessar os IDs diretamente do estado reativo
     const favoriteProductIds = computed(() => globalState.favoriteProductIds);
     return {
-      // eslint-disable-next-line vue/no-dupe-keys
-      favoriteProductIds
+      favoriteProductIds,
+    };
+    const itemsOnCart = computed(() => globalState.itemsOnCart);
+    return {
+      itemsOnCart,
     };
   },
   computed: {
     filteredProdutos() {
-    if (!this.produtos.length) return [];
-    // Filtragem baseada na busca
-    const searchFiltered = this.produtos.filter((produto) =>
-      produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
-
-    // Retorna todos os produtos se não houver filtros selecionados
-    if (!this.selectedValues || Object.keys(this.selectedValues).length === 0) {
-      return searchFiltered; // Retorna todos os produtos filtrados pela busca
-    }
-
+      if (!this.produtos.length) return [];
+      const searchFiltered = this.produtos.filter((produto) =>
+        produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+      if (!this.selectedValues || Object.keys(this.selectedValues).length === 0) {
+        return searchFiltered;
+      }
       return this.filterBySelectedAttributes(searchFiltered);
     },
   },
@@ -130,37 +126,22 @@ export default {
       try {
         const response = await axiosInstance.get(`/api/favorites/list`);
         if (Array.isArray(response.data)) {
-          console.log('Favoritos:', response.data);
-          globalState.favoriteProductIds = response.data.map(fav => fav.productId);
+          globalState.favoriteProductIds = response.data.map((fav) => fav.productId);
         } else {
-          throw new Error('Resposta não é um array');
+          throw new Error("Resposta não é um array");
         }
       } catch (error) {
-        if (error.response) {
-          // A requisição foi feita e o servidor respondeu com um status fora do intervalo de 2xx
-          console.error('Erro no servidor:', error.response.status);
-        } else if (error.request) {
-          // A requisição foi feita mas não houve resposta
-          console.error('Nenhuma resposta do servidor:', error.request);
-        } else {
-          // Algo aconteceu na configuração da requisição que acionou um erro
-          console.error('Erro na requisição:', error.message);
-        }
-        console.error('Configuração da requisição:', error.config);
+        console.error("Erro ao buscar favoritos:", error.message);
       }
     },
     async openModal(product) {
       this.selectedProduct = { ...product };
       await this.fetchProductDetails(product.id);
-
-      if (
-        !this.selectedProduct.cafeEspecial &&
-        !this.selectedProduct.metodoPreparo
-      ) {
+      if (this.selectedProduct.cafeEspecial || this.selectedProduct.metodoPreparo) {
+        this.isModalVisible = true;
+      } else {
         this.selectedProduct = null;
         alert("Nenhum detalhe encontrado para este produto.");
-      } else {
-        this.isModalVisible = true;
       }
     },
     async fetchProductDetails(productId) {
@@ -168,18 +149,13 @@ export default {
         const cafeResponse = await axios.get(
           `http://localhost:8080/api/cafes-especiais/produto/${productId}`
         );
-
         if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
           this.selectedProduct.cafeEspecial = cafeResponse.data;
         } else {
           const metodoResponse = await axios.get(
             `http://localhost:8080/api/metodo-preparo/produto/${productId}`
           );
-
-          if (
-            metodoResponse.data &&
-            Object.keys(metodoResponse.data).length > 0
-          ) {
+          if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
             this.selectedProduct.metodoPreparo = metodoResponse.data;
           } else {
             throw new Error(
@@ -189,62 +165,53 @@ export default {
         }
       } catch (error) {
         console.error("Erro ao buscar detalhes do produto:", error.message);
-        this.selectedProduct = {};
+        this.selectedProduct = null;
         alert(`Erro: ${error.message}`);
       }
     },
     filterBySelectedAttributes(produtos) {
-      const hasSelectedValues = Object.values(this.selectedValues).some(
-        (valor) => valor
-      );
+      const hasSelectedValues = Object.values(this.selectedValues).some((valor) => valor);
       if (!hasSelectedValues) {
-        return produtos; // Retorna todos os produtos se nenhum filtro estiver selecionado
+        return produtos;
       }
-
       let filtered = produtos;
       for (const [atributo, valor] of Object.entries(this.selectedValues)) {
         if (valor) {
           filtered = filtered.filter((produto) => produto[atributo] === valor);
         }
       }
-
       return filtered;
     },
     async handleFavoriteClick(produto) {
       try {
         const params = new URLSearchParams();
-        params.append('productId', produto.id);
-
+        params.append("productId", produto.id);
         const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
         if (response.status === 200) {
-          console.log('Produto adicionado aos favoritos com sucesso!');
-          await this.fetchFavorites(); // Atualiza a lista de favoritos após adicionar um novo
+          await this.fetchFavorites();
         } else {
-          console.error('Falha ao adicionar produto aos favoritos');
+          console.error("Falha ao adicionar produto aos favoritos");
         }
       } catch (error) {
-        console.error('Erro ao enviar requisição para adicionar aos favoritos:', error);
+        console.error("Erro ao adicionar aos favoritos:", error);
       }
     },
     async handleCartClick(produto) {
-      try{
-        const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`)
-        console.log(responseCart.status);
-        if(responseCart.status === 200){
-          
-        } else {
-          console.error("Falha ao adicionar produto ao carrinho.");
-        } 
-       } catch (error){
-          console.error("Erro ao enviar requisição para adicionar ao carrinho: ", error);
+      try {
+        const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`);
+        if (responseCart.status === 200) {
+          } else {
+            console.error("Falha ao adicionar produto ao carrinho.");
         }
+      } catch (error) {
+        console.error("Erro ao adicionar ao carrinho:", error);
+      }
     },
   },
-
   watch: {
     selectedValues: {
-      handler(newValue) {
-        this.$forceUpdate(); // Força a atualização do componente
+      handler() {
+        this.$forceUpdate();
       },
       deep: true,
     },

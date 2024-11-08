@@ -1,14 +1,17 @@
 package com.app.controller;
 
-import com.app.model.UserModel;
-import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.app.model.UserModel;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Controlador principal da aplicação.
@@ -54,7 +57,7 @@ public class MainController {
      * em formato JSON, ou uma resposta de erro 401 se o usuário não estiver
      * autenticado.
      */
-    @GetMapping("/user-info")
+    @GetMapping("/login/user-info")
     public ResponseEntity<Map<String, Object>> userInfo(HttpServletRequest request, Principal user) {
         Map<String, Object> userAttributes = new HashMap<>();
 
@@ -62,6 +65,7 @@ public class MainController {
 
         if (authenticatedUser != null) {
             userAttributes.put("id", authenticatedUser.getId()); 
+            userAttributes.put("role", authenticatedUser.getRoles());
             userAttributes.put("name", authenticatedUser.getUserName());
             userAttributes.put("email", authenticatedUser.getEmailId());
             userAttributes.put("phone", authenticatedUser.getMobileNumber());
@@ -79,7 +83,7 @@ public class MainController {
      * @return Um ResponseEntity com status 200 se o usuário estiver
      * autenticado, ou 401 se não estiver.
      */
-    @GetMapping("/is-authenticated")
+    @GetMapping("/login/is-authenticated")
     public ResponseEntity<Void> isAuthenticated(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
         
@@ -89,5 +93,7 @@ public class MainController {
             return ResponseEntity.status(401).build(); 
         }
     }
+
+    
 
 }

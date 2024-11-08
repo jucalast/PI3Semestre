@@ -6,7 +6,7 @@
     <div v-else-if="produtos.length > 0" class="card-container">
       <div class="cards">
         <div
-          v-for="produto in filteredProdutos.length > 0 ? filteredProdutos : produtos"
+          v-for="produto in produtos"
           :key="produto.id"
           class="product-card"
           @mouseover="showButtons = produto.id"
@@ -30,27 +30,30 @@
             <button class="excluir" @click.stop="confirmDeleteProduct(produto.id)">
               <i class="fas fa-trash"></i>
             </button>
-            <button class="editar" @click.stop="editProduct(produto)">
+            <button class="editar" @click.stop="handleEdit(produto)">
               <i class="fas fa-edit"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Modal de Edição -->
+      <!-- Modal de edição -->
       <EditProductModal
-        :product="productToEdit"
+        v-if="isEditModalVisible"
+        :product="selectedProduct"
         :isVisible="isEditModalVisible"
         @close="isEditModalVisible = false"
-        @save="saveProductEdit"
+        @save="handleSave"
       />
 
       <!-- Modal de produto existente -->
       <ProductModal
+        v-if="selectedProduct"
         :product="selectedProduct"
         :isVisible="isModalVisible"
         @close="isModalVisible = false"
       />
+
       <!-- Confirmação de exclusão -->
       <div v-if="isConfirmationVisible" class="confirmation-modal">
         <p>Tem certeza que deseja excluir este produto?</p>
@@ -85,9 +88,8 @@ export default {
     return {
       isConfirmationVisible: false,
       productToDelete: null,
-      isEditModalVisible: false,
-      productToEdit: null,
       isModalVisible: false,
+      isEditModalVisible: false,
       selectedProduct: null,
       showButtons: null,
     };
@@ -96,100 +98,85 @@ export default {
     const toast = useToast();
     return { toast };
   },
-  computed: {
-    filteredProdutos() {
-      const searchFiltered = this.produtos.filter((produto) =>
-        produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-      return this.selectedValues && Object.keys(this.selectedValues).length
-        ? this.filterBySelectedAttributes(searchFiltered)
-        : searchFiltered;
-    },
-  },
   methods: {
+    // Formatação da descrição do produto
     formattedDescription(descricao) {
       return descricao.length > 30 ? descricao.slice(0, 30) + "..." : descricao;
     },
+
+    // Abertura do modal para visualizar detalhes do produto
     async openModal(product) {
-      this.selectedProduct = product;
+      this.selectedProduct = { ...product };
       await this.fetchProductDetails(product.id);
-      this.isModalVisible = !!this.selectedProduct;
+      if (this.selectedProduct.cafeEspecial || this.selectedProduct.metodoPreparo) {
+        this.isModalVisible = true;
+      } else {
+        this.selectedProduct = null;
+        alert("Nenhum detalhe encontrado para este produto.");
+      }
     },
+
+    // Lida com o clique no botão "editar"
+    handleEdit(produto) {
+      this.selectedProduct = { ...produto };
+      this.isEditModalVisible = true;
+    },
+
+    // Busca os detalhes do produto na API
     async fetchProductDetails(productId) {
       try {
         const cafeResponse = await axios.get(
           `http://localhost:8080/api/cafes-especiais/produto/${productId}`
         );
-        if (cafeResponse.data) {
+        if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
           this.selectedProduct.cafeEspecial = cafeResponse.data;
         } else {
           const metodoResponse = await axios.get(
             `http://localhost:8080/api/metodo-preparo/produto/${productId}`
           );
-          if (metodoResponse.data) {
+          if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
             this.selectedProduct.metodoPreparo = metodoResponse.data;
           } else {
-            throw new Error(`Produto com ID ${productId} não encontrado.`);
+            throw new Error(
+              `Produto com ID ${productId} não encontrado em nenhum dos endpoints.`
+            );
           }
         }
       } catch (error) {
         console.error("Erro ao buscar detalhes do produto:", error.message);
+        this.selectedProduct = null;
         alert(`Erro: ${error.message}`);
       }
     },
-    filterBySelectedAttributes(produtos) {
-      let filtered = produtos;
-      for (const [atributo, valor] of Object.entries(this.selectedValues)) {
-        if (valor) {
-          filtered = filtered.filter((produto) => produto[atributo] === valor);
+
+    // Salvar alterações do produto
+    async handleSave(updatedProduct) {
+      try {
+        await axios.put(`http://localhost:8080/api/produtos/${updatedProduct.id}`, updatedProduct);
+        const index = this.produtos.findIndex(prod => prod.id === updatedProduct.id);
+        if (index !== -1) {
+          this.produtos[index] = updatedProduct; // Atualiza o produto na lista
+          this.toast.success("Produto atualizado com sucesso!");
         }
+      } catch (error) {
+        console.error("Erro ao atualizar o produto:", error);
+        this.toast.error("Erro ao atualizar o produto.");
+      } finally {
+        this.isEditModalVisible = false; // Fecha o modal após salvar
       }
-      return filtered;
     },
-    editProduct(produto) {
-      this.productToEdit = { ...produto };
-      console.log("Produto para edição:", this.productToEdit);
 
-      this.isEditModalVisible = true;
-    },
-    async saveProductEdit(updatedProduct) {
-  try {
-    // Acesso ao ID do produto correto
-    const productId = updatedProduct.id; // Use o ID do produto aqui
-
-    // Montagem do payload
-    const payload = {
-      nome: updatedProduct.nome,
-      descricao: updatedProduct.descricao,
-      preco: updatedProduct.preco,
-      imagem: updatedProduct.imagem,
-      // Inclua outros campos que você deseja atualizar
-    };
-
-    console.log("Dados formatados para envio:", payload);
-
-    // Chamada da API com o ID correto
-    const response = await axios.put(`http://localhost:8080/api/produtos/${productId}`, payload);
-
-    console.log("Produto atualizado com sucesso:", response.data);
-    // Faça o que for necessário após a atualização (por exemplo, fechar o modal ou atualizar a lista de produtos)
-  } catch (error) {
-    console.error("Erro ao atualizar produto:", error.response.data);
-    alert(`Erro ao atualizar produto: ${error.response.data.message}`);
-  }
-},
+    // Confirmação da exclusão do produto
     confirmDeleteProduct(produtoId) {
       this.productToDelete = produtoId;
       this.isConfirmationVisible = true;
     },
+
+    // Exclusão do produto
     async deleteProduct() {
       try {
-        await axios.delete(
-          `http://localhost:8080/api/produtos/${this.productToDelete}`
-        );
-        const index = this.produtos.findIndex(
-          (prod) => prod.id === this.productToDelete
-        );
+        await axios.delete(`http://localhost:8080/api/produtos/${this.productToDelete}`);
+        const index = this.produtos.findIndex((prod) => prod.id === this.productToDelete);
         if (index !== -1) {
           this.produtos.splice(index, 1);
           this.toast.success("Produto excluído com sucesso!");
@@ -198,14 +185,12 @@ export default {
         console.error("Erro ao excluir o produto:", error);
         this.toast.error("Erro ao excluir o produto.");
       } finally {
-        this.isConfirmationVisible = false;
+        this.isConfirmationVisible = false; // Esconde a confirmação após a ação
       }
     },
   },
 };
 </script>
-
-
 
 
 <style scoped>
@@ -253,7 +238,7 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
-  margin-top: 7rem;
+
 }
 
 .deletesim:hover,
@@ -276,6 +261,7 @@ body {
   align-items: flex-start;
   align-content: flex-start;
   width: 100%;
+  gap:1rem;
 }
 
 .name {
@@ -359,7 +345,7 @@ p {
 .action-buttons {
   height: 100%;
   position: absolute;
-  right: -74px;
+  right: -53px;
   gap: 0rem;
   width: 4rem;
   display: flex;
@@ -381,6 +367,7 @@ p {
   transition: background-color 0.3s;
   height: 50%;
   border-radius: 1.5rem;
+  width: 5rem;
 }
 
 .editar {

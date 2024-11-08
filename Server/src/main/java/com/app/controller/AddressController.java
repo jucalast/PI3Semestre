@@ -43,6 +43,7 @@ public class AddressController {
      */
     @PostMapping
     public ResponseEntity<AddressModel> addAddress(HttpServletRequest request, @RequestBody AddressModel address) {
+        
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
         
         if (authenticatedUser == null) {

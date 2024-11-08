@@ -85,6 +85,9 @@ public class UserModel {
     )
     private List<AddressModel> addresses;
 
+    /**
+     * Relação N:N com Carrinho
+     */
     @ManyToMany
     @JoinTable(
             name = "carrinho",

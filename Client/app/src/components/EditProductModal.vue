@@ -55,18 +55,9 @@ export default {
       deep: true,
     },
   },
-  created() {
-    if (this.product) {
-      this.formData = {
-        ...this.product,
-        ...(this.product.cafeEspecial || {}),
-        ...(this.product.metodoPreparo || {}),
-      };
-    }
-  },
   methods: {
     formatLabel(key) {
-      return key.charAt(0).toUpperCase() + key.slice(1);
+      return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
     },
     formatPriceInput(event) {
       const value = event.target.value;
@@ -78,6 +69,9 @@ export default {
   },
 };
 </script>
+
+
+
 
 
 <style scoped>
