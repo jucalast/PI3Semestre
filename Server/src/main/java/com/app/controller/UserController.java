@@ -1,5 +1,9 @@
 package com.app.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -202,11 +206,19 @@ public class UserController {
      * @return Uma mensagem informando se o usuário está autenticado ou não.
      */
     @GetMapping("/check-auth")
-    public ResponseEntity<String> checkAuth() {
+    public ResponseEntity<Map<String, Object>> checkAuth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Map<String, Object> response = new HashMap<>();
+
         if (authentication != null && authentication.isAuthenticated()) {
-            return ResponseEntity.ok("Usuário autenticado: " + authentication.getName());
+            response.put("authenticated", true);
+            response.put("username", authentication.getName());
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+
+        response.put("authenticated", false);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+
 }

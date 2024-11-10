@@ -405,7 +405,7 @@
   .modal {
     position: absolute;
     right: 2px;
-    top: 5rem;
+    top: 7rem;
     width: 30%;
     max-height: 80vh;
     background-color: white;
