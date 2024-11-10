@@ -10,7 +10,7 @@ const mutations = {
 
 const actions = {
   updateProdutosFiltrados({ commit }, produtos) {
-    commit("setProdutosFiltrados", produtos);
+    commit('setProdutosFiltrados', produtos);
   },
 };
 

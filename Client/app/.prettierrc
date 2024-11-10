@@ -4,7 +4,7 @@
   "trailingComma": "es5",
   "tabWidth": 2,
   "useTabs": false,
-  "printWidth": 1,
+  "printWidth": 150,
   "bracketSpacing": true,
   "arrowParens": "always",
   "endOfLine": "lf",
@@ -13,9 +13,18 @@
   "vueIndentScriptAndStyle": true,
   "quoteProps": "as-needed",
   "proseWrap": "always",
-  "importOrder": [
-    "^[./]"
-  ],
+  "importOrder": ["^[./]", "^react", "^@/.*"],
   "importOrderSeparation": true,
-  "jsxBracketSameLine": false
+  "jsxBracketSameLine": false,
+  "embeddedLanguageFormatting": "auto",
+  "singleAttributePerLine": false,
+  "overrides": [
+    {
+      "files": "*.vue",
+      "options": {
+        "htmlWhitespaceSensitivity": "ignore",
+        "vueIndentScriptAndStyle": true
+      }
+    }
+  ]
 }
