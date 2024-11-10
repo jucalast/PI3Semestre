@@ -20,11 +20,11 @@
               />
             </div>
             <div class="nameandbutton">
-            <h2>{{ cartItem.nome_produto }}</h2>
-            <button class="excluir" @click="removeItemOnCartUser(cartItem.produtoId)">
-              Excluir
-            </button>
-        </div>
+              <h2>{{ cartItem.nome_produto }}</h2>
+              <button class="excluir" @click="removeItemOnCartUser(cartItem.produtoId)">
+                Excluir
+              </button>
+            </div>
             <select
               @change="
                 updateQuantidadeItem(cartItem.produtoId, $event.target.value)
@@ -55,22 +55,21 @@
 
           <div class="info-rigth">
             <span id="info-ft-02">Inserir cupom</span>
-            <span id="info-ft-03"
-              >R${{ parseFloat(somaValorItens.toFixed(2)) }}</span
-            >
+            <span id="info-ft-03">
+              R${{ parseFloat(somaValorItens.toFixed(2)) }}
+            </span>
           </div>
-          
         </div>
         <section class="frete-section">
-            <div class="frete">
-          <span id="info-01">Frete</span>
-          <span id="info-02">R$14,59</span>
-        </div>
+          <div class="frete">
+            <span id="info-01">Frete</span>
+            <span id="info-02">R$14,59</span>
+          </div>
           <p id="info-03">
             Aproveite o <strong>frete grátis</strong> adicionando mais produtos ao pedido
           </p>
         </section>
-        <button class="btn-compra">Continuar a compra</button>
+        <button class="btn-compra" @click="handleContinuePurchase">Continuar a compra</button>
       </div>
     </div>
   </div>
@@ -140,11 +139,21 @@ export default {
       }
     },
     async updateQuantidadeItem(productId, quantity) {
-      console.log(productId, quantity);
-      const responseCart = await axiosInstance.put(
-        `/api/carrinho/${productId}/${parseInt(quantity)}`
-      );
-      console.log(responseCart.data);
+      try {
+        const responseCart = await axiosInstance.put(
+          `/api/carrinho/${productId}/${quantity}`
+        );
+        console.log("Quantidade atualizada:", responseCart.data);
+        // Recarregue os itens do carrinho após a atualização
+        this.fetchCarts();
+      } catch (error) {
+        console.error("Erro ao atualizar quantidade no carrinho:", error);
+      }
+    },
+
+    // Método para logar o carrinho no console
+    handleContinuePurchase() {
+      console.log("Carrinho de compras:", JSON.stringify(this.cartItems, null, 2));
     },
   },
   async mounted() {
