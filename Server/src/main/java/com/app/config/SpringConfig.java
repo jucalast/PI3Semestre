@@ -50,13 +50,15 @@ public class SpringConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers( "/login/**", "/register", "/api/**", "/check-auth").permitAll()
+                .requestMatchers("/login/**", "/register", "/api/**").permitAll()
+                .requestMatchers("/check-auth").authenticated() 
                 .requestMatchers("/protected/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                .anyRequest().authenticated() 
                 )
                 .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
+                .failureUrl("/login?error") 
                 )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
@@ -78,6 +80,17 @@ public class SpringConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
                 .expiredUrl("/login?expired")
+                )
+                .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    // Evita o redirecionamento para a tela de login e retorna um 401 quando o usuário não está autenticado
+                    if (request.getRequestURI().equals("/check-auth")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // Retorna 401 Unauthorized
+                        response.getWriter().write("{\"authenticated\": false}");
+                    } else {
+                        response.sendRedirect("/login");  // Para outras rotas protegidas, mantém o redirecionamento
+                    }
+                })
                 )
                 .build();
     }
