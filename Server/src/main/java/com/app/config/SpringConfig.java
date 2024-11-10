@@ -50,15 +50,15 @@ public class SpringConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login/**", "/register", "/api/**").permitAll() // Permite essas rotas para todos
-                .requestMatchers("/check-auth").authenticated() // Rota /check-auth só pode ser acessada por usuários autenticados
-                .requestMatchers("/protected/**").hasRole("ADMIN") // Protege /protected/** com a role ADMIN
-                .anyRequest().authenticated() // Qualquer outra requisição precisa estar autenticada
+                .requestMatchers("/login/**", "/register", "/api/**").permitAll()
+                .requestMatchers("/check-auth").authenticated() 
+                .requestMatchers("/protected/**").hasRole("ADMIN")
+                .anyRequest().authenticated() 
                 )
                 .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
-                .failureUrl("/login?error") // Aqui, você mantém a configuração de login, mas ela não afetará /check-auth
+                .failureUrl("/login?error") 
                 )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
