@@ -70,8 +70,9 @@
 <script>
 import ProductModal from "@/components/ProductModal.vue";
 import EditProductModal from "@/components/EditProductModal.vue";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // Certifique-se de importar a instância do axios
 import { useToast } from "vue-toastification";
+import axios from "axios";  
 
 export default {
   props: {
@@ -150,23 +151,44 @@ export default {
       }
     },
 
-    // Salvar alterações do produto
     async handleSave(updatedProduct) {
-      try {
-        await axios.put(`http://localhost:8080/api/produtos/${updatedProduct.id}`, updatedProduct);
-        const index = this.produtos.findIndex(prod => prod.id === updatedProduct.id);
-        if (index !== -1) {
-          this.produtos[index] = updatedProduct; // Atualiza o produto na lista
-          this.toast.success("Produto atualizado com sucesso!");
-        }
-      } catch (error) {
-        console.error("Erro ao atualizar o produto:", error);
-        this.toast.error("Erro ao atualizar o produto.");
-      } finally {
-        this.isEditModalVisible = false; // Fecha o modal após salvar
-      }
-    },
+  const toast = useToast();  // Acesso à toast para feedback
 
+  // Certifique-se de que todos os campos obrigatórios estejam presentes
+  const productData = {
+    nome: updatedProduct.nome,
+    descricao: updatedProduct.descricao,
+    preco: updatedProduct.preco,
+    avaliacao: updatedProduct.avaliacao,
+    imagem: updatedProduct.imagem,
+    quantidade_estoque: updatedProduct.quantidade_estoque,
+    cafeEspecial: updatedProduct.cafeEspecial || {}
+  };
+
+  try {
+    // Usando axiosInstance para fazer a requisição PUT
+    const response = await axiosInstance.put(
+      `/api/produtos/protected/update/${updatedProduct.id}`,
+      productData
+    );
+
+    // Verificando a resposta e atualizando a lista de produtos
+    if (response.status === 200) {
+      const index = this.produtos.findIndex(prod => prod.id === updatedProduct.id);
+      if (index !== -1) {
+        this.produtos[index] = updatedProduct;  // Atualiza o produto na lista local
+        toast.success("Produto atualizado com sucesso!");
+      }
+    } else {
+      throw new Error("Erro ao atualizar o produto.");
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar o produto:", error);
+    toast.error("Erro ao atualizar o produto: " + (error.response?.data?.message || error.message));
+  } finally {
+    this.isEditModalVisible = false;  // Fecha o modal após salvar
+  }
+},
     // Confirmação da exclusão do produto
     confirmDeleteProduct(produtoId) {
       this.productToDelete = produtoId;

@@ -123,7 +123,8 @@ public class ProdutoController {
      * @return O produto atualizado ou uma resposta 404 se o produto não for
      * encontrado.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/protected/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Produto> updateProduto(@PathVariable Long id, @RequestBody Produto produto) {
         Optional<Produto> existingProduto = Optional.ofNullable(produtoService.getProdutoById(id));
         if (existingProduto.isPresent()) {
