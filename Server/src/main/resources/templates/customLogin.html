@@ -60,8 +60,8 @@
 
         .form-container {
             margin-top: 40px;
-            width: 100%;
-            max-width: 300px;
+            width: 120%;
+            max-width: 400px;
             background: transparent;
         }
 
@@ -71,6 +71,7 @@
             gap: 20px;
             background: transparent !important;
             align-items: center;
+            width: 100% !important;
         }
 
         .form-container input {
@@ -80,7 +81,7 @@
             border-radius: 2rem;
             width: 100%;
             height: 5rem;
-            padding-left: 1rem !important;
+            padding-left: 2rem !important;
             font-size: 2rem !important;
             outline: none;
             padding: 0;
@@ -212,7 +213,7 @@
     <h1 class="main-title">A um passo dos<br><strong class="melhorescafes">melhores cafés</strong><br> Brasil</h1>
     <div class="form-container">
         <!-- Formulário de login -->
-        <form action="/form-process" method="POST">
+        <form action="/login/form-process" method="POST">
             <input type="email" name="email" placeholder="E-mail" required>
             <input type="password" name="password" placeholder="Senha" required>
             <button type="submit" class="login-button">Entrar</button>

@@ -1,10 +1,17 @@
 package com.app.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
+/**
+ * Representa a entidade Carrinho para a aplicação.
+ * Esta classe está mapeada para a tabela 'Carrinho' no bando de dados
+ *
+ * @author Ricardo L. Ferreira
+ */
 
 @Entity
 @Builder
@@ -14,23 +21,45 @@ import java.math.BigDecimal;
 @Setter
 public class Carrinho {
 
+    /**
+     * Identificador único do carrinho
+     * Este campo é gerado e incrementado automaticamente
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="Id_Carrinho")
     private Long id;
 
-    //@OneToOne
-    //JoinColumn(name = "Id_Usuario", referencedColumnName ="id", @ForeignKey(name = "fk_carrinho_usuario")
-    //private User user;
+    /**
+     * Relação N:1 com UserModel
+     */
+    @ManyToOne
+    @JsonProperty("id_user")
+    @JoinColumn(name = "id_user")
+    private UserModel userModel;
 
-    /*@ManyToMany
-    @JoinTable(
-            name = "carrinho_produto",
-            joinColumns = @JoinColumn(name = "Id_Carrinho"),
-            inverseJoinColumns = @JoinColumn(name = "Id_Produto")
-    )
-    */
+    /**
+     * Relação N:1 com Produto
+     */
+    @JsonIgnore
+    @ManyToOne
+    @JsonProperty("id_produto")
+    @JoinColumn(name = "id_produto", referencedColumnName = "id", nullable = false)
+    private Produto produto;
 
-    @Column(name = "preco", precision =10, scale = 2)
-    private BigDecimal valorFrete;
+    /**
+     * Quantidade unitária do item presente no carrinho
+     */
+    @Column(nullable = false, name = "quantidade")
+    private int quantidade;
+
+
+    public Carrinho(Long userId, Long productId) {
+
+    }
+
+    public Carrinho(UserModel userModel, Produto produto, int quantidade) {
+        this.userModel = userModel;
+        this.produto = produto;
+        this.quantidade = quantidade;
+    }
 }
