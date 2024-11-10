@@ -62,8 +62,9 @@
                   </div>
                 </div>
               </div>
-              <button v-if="authenticated" @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos
-                ></button>
+              <button v-if="authenticated" @click="goToFavorites" class="all-favorites-button">
+                Ver todos os favoritos
+              </button>
             </div>
           </div>
           <button class="action-button cart-button" @click="handleCartClick">
@@ -77,8 +78,12 @@
               <div v-if="isAuthenticated" class="useroptions">
                 <router-link to="/profile">Perfil</router-link>
                 <router-link to="/settings">Configurações</router-link>
-                <button class="exitbtn" @click="handleLogout">Sair <img src="@/assets/icons8-sair-96.png"
-                    alt=""></button>
+
+                <router-link v-if="isAdmin" to="/manage">Gerenciar</router-link>
+
+                <button class="exitbtn" @click="handleLogout">
+                  Sair <img src="@/assets/icons8-sair-96.png" alt="" />
+                </button>
               </div>
               <div v-else>
                 <a :href="`${baseURL}/login`">Login</a>
@@ -98,7 +103,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import axiosInstance from "@/utils/axiosInstance";
-import { globalState, updateFavorites } from "@/state.js";
+import { updateFavorites } from "@/state.js";
 import CartModal from './CartModal.vue';
 
 export default {
@@ -118,7 +123,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'user']),
+    ...mapGetters('auth', ['isAuthenticated', 'isAdmin', 'user', 'roles']),
   },
   methods: {
     ...mapActions('auth', ['checkAuth', 'logout']),
