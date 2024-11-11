@@ -7,18 +7,7 @@
       </div>
 
       <header>
-        <!-- Código existente do header -->
-        <div class="action-buttons">
-          <button class="action-button favorite-button" @click="handleFavoriteClick">
-            <img src="@/assets/estrela.png" alt="Favorites" />
-          </button>
-          <button class="action-button cart-button" @click="handleCartClick">
-            <img src="@/assets/carrinho.png" alt="Cart" />
-          </button>
-          <button class="action-button user-button" @click="handleUserClick">
-            <img src="@/assets/user.png" alt="User" />
-          </button>
-        </div>
+      
       </header>
       <div class="infoprod">
         <div class="product-rating">
