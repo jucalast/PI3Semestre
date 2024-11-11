@@ -6,6 +6,7 @@ import AddressPage from '@/views/AddressPage.vue';
 import FavoritePage from '@/views/FavoritePage.vue';
 import AdminDashboard from '@/views/AdminDashboard.vue';
 import ProfilePage from '@/views/ProfilePage.vue';
+import LoginPage from '@/views/LoginPage.vue';
 
 const routes = [
   { path: '/', component: HomePage },
@@ -15,6 +16,7 @@ const routes = [
   { path: '/favorites', component: FavoritePage, name: 'FavoritePage' },
   { path: '/admin', component: AdminDashboard, name: 'AdminDashboard' },
   { path: '/profile', component: ProfilePage, name: 'ProfilePage' },
+  { path: '/login', component: LoginPage, name: 'LoginPage' },
   { path: '/:notFound(.*)', redirect: '/' },
 ];
 
