@@ -122,18 +122,6 @@ export default {
     await this.fetchFavorites();
   },
   methods: {
-    async fetchFavorites() {
-      try {
-        const response = await axiosInstance.get(`/api/favorites/list`);
-        if (Array.isArray(response.data)) {
-          globalState.favoriteProductIds = response.data.map((fav) => fav.productId);
-        } else {
-          throw new Error("Resposta não é um array");
-        }
-      } catch (error) {
-        console.error("Erro ao buscar favoritos:", error.message);
-      }
-    },
     async openModal(product) {
       this.selectedProduct = { ...product };
       await this.fetchProductDetails(product.id);
@@ -186,20 +174,36 @@ export default {
       try {
         const params = new URLSearchParams();
         params.append("productId", produto.id);
+        // Presumo que esta chamada post agora trata adicionar/remover favoritos automaticamente
         const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
+
         if (response.status === 200) {
-          await this.fetchFavorites();
+          await this.fetchFavorites();  // Isto re-fetch os favoritos atualizados do servidor
         } else {
-          console.error("Falha ao adicionar produto aos favoritos");
+          console.error("Falha ao alterar o estado do favorito");
         }
       } catch (error) {
-        console.error("Erro ao adicionar aos favoritos:", error);
+        console.error("Erro ao alterar o estado do favorito:", error);
+      }
+    },
+    async fetchFavorites() {
+      try {
+        const response = await axiosInstance.get(`/api/favorites/list`);
+        if (Array.isArray(response.data)) {
+          globalState.favoriteProductIds = response.data.map((fav) => fav.productId);
+        } else {
+          globalState.favoriteProductIds = [];  // Limpa a lista se a resposta não for um array
+        }
+      } catch (error) {
+        console.error("Erro ao buscar favoritos:", error.message);
+        globalState.favoriteProductIds = [];  // Limpa a lista em caso de erro na requisição
       }
     },
     async handleCartClick(produto) {
       try {
         const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`);
         if (responseCart.status === 200) {
+          return
           } else {
             console.error("Falha ao adicionar produto ao carrinho.");
         }
