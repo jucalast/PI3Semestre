@@ -4,7 +4,8 @@ import com.app.model.AvaliacaoModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
+
 /**
  * Repositório para a entidade AvaliacaoModel.
  * Esta interface herda JpaRepository para fornecer operações CRUD
@@ -16,10 +17,10 @@ import java.util.Optional;
 public interface AvaliacaoRepository extends JpaRepository<AvaliacaoModel, Integer> {
 
     /**
-     * Encontra uma avaliação baseada no ID do ProdutoPedido.
+     * Encontra todas as avaliações baseadas no ID do ProdutoPedido.
      *
-     * @param produtoPedidoId ID do ProdutoPedido para o qual buscar a avaliação.
-     * @return Um Optional contendo a avaliação encontrada ou vazio caso não exista.
+     * @param produtoPedidoId ID do ProdutoPedido para o qual buscar as avaliações.
+     * @return Uma lista de AvaliacaoModel contendo as avaliações encontradas ou uma lista vazia caso não existam avaliações.
      */
-    Optional<AvaliacaoModel> findByProdutoPedidoId(Integer produtoPedidoId);
+    List<AvaliacaoModel> findByProdutoPedidoId(Integer produtoPedidoId);
 }

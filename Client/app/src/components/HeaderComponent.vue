@@ -47,32 +47,37 @@
               />
             </button>
             <div v-if="showModal" class="modal">
-              <div class="headerfav">favoritos:</div>
+              <div class="headerfav">Favoritos:</div>
               <div v-if="!authenticated">
                 <p>Você precisa estar logado.</p>
                 <button @click="redirectToLogin" style="background: #2ecc71; color: white; border-radius: 20px; padding: 10px">Login</button>
               </div>
               <div v-else class="product-scroll-container">
-                <div>
+                <!-- Verifica se há produtos favoritos e se o usuário está autenticado -->
+                <div v-if="favorite_products.length > 0">
                   <div v-for="product in favorite_products" :key="product.id" class="product-card">
                     <div class="product-image">
                       <img :src="product.imagem" alt="Imagem do Produto">
                     </div>
                     <div class="product-details">
                       <div class="nameandprice">
-                      <h4>{{ product.nome }}</h4>
-                      
-                      <button class="excluir" @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
-                    </div>
+                        <h4>{{ product.nome }}</h4>
+                        <button class="excluir" @click="deleteProduct(product.id)" style="color: darkred">Excluir</button>
+                      </div>
                       <div>
                         <p>{{ product.preco.toFixed(2) }}</p>
                       </div>
                     </div>
                   </div>
                 </div>
-               </div>
+                <!-- Mensagem de não há favoritos -->
+                <div v-else class="empty-favorites">
+                  <p>Você não tem produtos favoritos ainda.</p>
+                </div>
+              </div>
               <button v-if="authenticated" @click="goToFavorites" class="all-favorites-button">Ver todos os favoritos ></button>
             </div>
+
           </div>
           <button class="action-button cart-button" @click="handleCartClick">
             <img src="@/assets/carrinho.png" alt="Cart" />
@@ -154,28 +159,29 @@
       },
       handleFavoriteLeave() {
         this.showModal = false;
-        console.log("Mouse leave"); // Debugging
       },
       async handleFavoriteHover() {
+        this.showModal = true;  // Movendo esta linha para fora das condições de resposta
         try {
           const response = await axiosInstance.get(`/api/favorites/favorited-products`);
           if (response.data.length) {
             this.favorite_products = response.data;
             this.authenticated = true;
-            this.showModal = true;
-            console.log(this.favorite_products);
+          } else {
+            // Se não houver produtos favoritos, podemos definir um estado para mostrar uma mensagem específica
+            this.favorite_products = [];
           }
         } catch (error) {
           console.error('Erro ao verificar a autenticação do usuário', error);
           if (error.response && error.response.status === 401) {
             // Se a resposta da API for 401, defina o modal para mostrar a mensagem de não autenticado
             this.authenticated = false;
-            this.showModal = true;
           } else {
-            this.showModal = false;
+            this.showModal = false;  // Feche o modal se outro erro ocorrer
           }
         }
       },
+
       async deleteProduct(productId) {
         try {
           const response = await axiosInstance.delete(`/api/favorites/remove?productId=${productId}`);
@@ -405,7 +411,7 @@
   .modal {
     position: absolute;
     right: 2px;
-    top: 7rem;
+    top: 4.8rem;
     width: 30%;
     max-height: 80vh;
     background-color: white;
@@ -417,6 +423,13 @@
     flex-direction: column;
     border-radius: 2rem;
   }
+
+  .empty-favorites {
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+  }
+
 
   .product-scroll-container {
     overflow-y: auto;

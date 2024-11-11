@@ -88,23 +88,34 @@ public class AvaliacaoController {
     }
 
     /**
-     * Retorna informações detalhadas sobre uma avaliação específica.
+     * Retorna todas as avaliações associadas a um produto específico.
      *
-     * @param id ID da avaliação a ser buscada.
-     * @return Mapa contendo nota, descrição e nome do usuário da avaliação.
+     * @param produtoId ID do produto cujas avaliações serão listadas.
+     * @return Lista de Mapas contendo detalhes de avaliações para o produto especificado.
      */
-    @GetMapping("/{id}")
-    public Map<String, Object> getAvaliacao(@PathVariable Integer id) {
-        AvaliacaoModel avaliacao = avaliacaoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada para o ID: " + id));
+    @GetMapping("/produto/{produtoId}")
+    public List<Map<String, Object>> getAvaliacoesPorProduto(@PathVariable Integer produtoId) {
+        List<ProdutoPedidoModel> produtoPedidos = produtoPedidoRepository.findByProdutoId(produtoId);
+        if (produtoPedidos.isEmpty()) {
+            throw new NoSuchElementException("Nenhum ProdutoPedido encontrado para o produto ID: " + produtoId);
+        }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("nota", avaliacao.getNota());
-        response.put("descricao", avaliacao.getDescricao());
-        response.put("userName", avaliacao.getUser().getUserName());
-
-        return response;
+        List<Map<String, Object>> avaliacoesResponse = new ArrayList<>();
+        for (ProdutoPedidoModel produtoPedido : produtoPedidos) {
+            // Use a instância avaliacaoRepository para chamar o método
+            List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(produtoPedido.getId());
+            for (AvaliacaoModel avaliacao : avaliacoes) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("avaliacaoId", avaliacao.getId());
+                response.put("nota", avaliacao.getNota());
+                response.put("descricao", avaliacao.getDescricao());
+                response.put("userName", avaliacao.getUser().getUserName());
+                avaliacoesResponse.add(response);
+            }
+        }
+        return avaliacoesResponse;
     }
+
 
     /**
      * Calcula a média de avaliações de um produto específico.
@@ -119,13 +130,22 @@ public class AvaliacaoController {
             throw new NoSuchElementException("Nenhum ProdutoPedido encontrado para o produto ID: " + produtoId);
         }
 
-        OptionalDouble media = produtoPedidos.stream()
-                .mapToInt(produtoPedido -> avaliacaoRepository.findByProdutoPedidoId(produtoPedido.getId())
-                        .map(AvaliacaoModel::getNota)
-                        .orElse(0))
-                .average();
+        double totalNotas = 0;
+        int countAvaliacoes = 0;
+        for (ProdutoPedidoModel produtoPedido : produtoPedidos) {
+            List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(produtoPedido.getId());
+            for (AvaliacaoModel avaliacao : avaliacoes) {
+                totalNotas += avaliacao.getNota();
+                countAvaliacoes++;
+            }
+        }
 
-        return media.orElseThrow(() -> new IllegalArgumentException("Não foram encontradas avaliações para os produtos pedidos."));
+        if (countAvaliacoes == 0) {
+            throw new IllegalArgumentException("Não foram encontradas avaliações para os produtos pedidos.");
+        }
+
+        return totalNotas / countAvaliacoes;
     }
+
 }
 
