@@ -146,9 +146,10 @@ public class UserController {
         String name = token.getPrincipal().getAttribute("name");
         String email = token.getPrincipal().getAttribute("email");
 
-        userService.saveUserIfNotExists(name, email);
+        UserModel user = userService.saveUserIfNotExists(name, email);
 
         UserModel authenticatedUser = new UserModel();
+        authenticatedUser.setId(user.getId());
         authenticatedUser.setUserName(name);
         authenticatedUser.setEmailId(email);
         authenticatedUser.setRoles("ROLE_USER");
