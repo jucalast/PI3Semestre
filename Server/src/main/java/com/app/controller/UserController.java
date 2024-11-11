@@ -102,8 +102,7 @@ public class UserController {
      * ou retorno à página de login em caso de falha.
      */
     @PostMapping("/login/form-process")
-    public String loginUser(@RequestParam String email, @RequestParam String password, Model model, HttpServletRequest request) {
-
+    public ResponseEntity<?> loginUser(@RequestParam String email, @RequestParam String password, HttpServletRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
@@ -120,10 +119,10 @@ public class UserController {
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("userId", user.getId());
 
-            return "redirect:" + frontendUrl;
+            return ResponseEntity.ok().body(Map.of("message", "Login bem-sucedido", "userId", user.getId()));
+
         } catch (AuthenticationException e) {
-            model.addAttribute("error", "Credenciais inválidas");
-            return "customLogin";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Credenciais inválidas"));
         }
     }
 
