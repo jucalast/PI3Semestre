@@ -135,7 +135,7 @@ img {
 
 .botoes {
   display: flex;
-  padding-bottom: 2rem;
+
   gap: 2rem;
 }
 
