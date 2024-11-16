@@ -46,131 +46,143 @@
   import { globalState } from '@/state.js';
   import { computed } from 'vue';
 
-  export default {
-    props: {
-      produtos: {
-        type: Array,
-        default: () => [],
-      },
-      isLoading: {
-        type: Boolean,
-        default: false,
-      },
-      searchQuery: {
-        type: String,
-        default: '',
-      },
-      selectedValues: {
-        type: Object,
-        default: () => ({}),
-      },
+export default {
+  props: {
+    produtos: {
+      type: Array,
+      default: () => [],
     },
-    components: {
-      ProductModal,
+    isLoading: {
+      type: Boolean,
+      default: false,
     },
-    data() {
-      return {
-        isModalVisible: false,
-        selectedProduct: null,
-        baseURL: import.meta.env.VITE_API_BASE_URL,
-      };
+    searchQuery: {
+      type: String,
+      default: "",
     },
-    setup() {
-      const favoriteProductIds = computed(() => globalState.favoriteProductIds);
-      return {
-        favoriteProductIds,
-      };
-      const itemsOnCart = computed(() => globalState.itemsOnCart);
-      return {
-        itemsOnCart,
-      };
+    selectedValues: {
+      type: Object,
+      default: () => ({}),
     },
-    computed: {
-      filteredProdutos() {
-        if (!this.produtos.length) return [];
-        const searchFiltered = this.produtos.filter((produto) => produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase()));
-        if (!this.selectedValues || Object.keys(this.selectedValues).length === 0) {
-          return searchFiltered;
-        }
-        return this.filterBySelectedAttributes(searchFiltered);
-      },
+  },
+  components: {
+    ProductModal,
+  },
+  data() {
+    return {
+      isModalVisible: false,
+      selectedProduct: null,
+      baseURL: import.meta.env.VITE_API_BASE_URL,
+    };
+  },
+  setup() {
+    const favoriteProductIds = computed(() => globalState.favoriteProductIds);
+    return {
+      favoriteProductIds,
+    };
+    const itemsOnCart = computed(() => globalState.itemsOnCart);
+    return {
+      itemsOnCart,
+    };
+  },
+  computed: {
+    filteredProdutos() {
+      if (!this.produtos.length) return [];
+      const searchFiltered = this.produtos.filter((produto) =>
+        produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+      if (!this.selectedValues || Object.keys(this.selectedValues).length === 0) {
+        return searchFiltered;
+      }
+      return this.filterBySelectedAttributes(searchFiltered);
     },
-    async mounted() {
-      await this.fetchFavorites();
+  },
+  async mounted() {
+    await this.fetchFavorites();
+  },
+  methods: {
+    async openModal(product) {
+      this.selectedProduct = { ...product };
+      await this.fetchProductDetails(product.id);
+      if (this.selectedProduct.cafeEspecial || this.selectedProduct.metodoPreparo) {
+        this.isModalVisible = true;
+      } else {
+        this.selectedProduct = null;
+        alert("Nenhum detalhe encontrado para este produto.");
+      }
     },
-    methods: {
-      async fetchFavorites() {
-        try {
-          const response = await axiosInstance.get(`/api/favorites/list`);
-          if (Array.isArray(response.data)) {
-            globalState.favoriteProductIds = response.data.map((fav) => fav.productId);
-          } else {
-            throw new Error('Resposta não é um array');
-          }
-        } catch (error) {
-          console.error('Erro ao buscar favoritos:', error.message);
-        }
-      },
-      async openModal(product) {
-        this.selectedProduct = { ...product };
-        await this.fetchProductDetails(product.id);
-        if (this.selectedProduct.cafeEspecial || this.selectedProduct.metodoPreparo) {
-          this.isModalVisible = true;
+    async fetchProductDetails(productId) {
+      try {
+        const cafeResponse = await axios.get(
+          `http://localhost:8080/api/cafes-especiais/produto/${productId}`
+        );
+        if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
+          this.selectedProduct.cafeEspecial = cafeResponse.data;
         } else {
-          this.selectedProduct = null;
-          alert('Nenhum detalhe encontrado para este produto.');
-        }
-      },
-      async fetchProductDetails(productId) {
-        try {
-          const cafeResponse = await axios.get(`http://localhost:8080/api/cafes-especiais/produto/${productId}`);
-          if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
-            this.selectedProduct.cafeEspecial = cafeResponse.data;
+          const metodoResponse = await axios.get(
+            `http://localhost:8080/api/metodo-preparo/produto/${productId}`
+          );
+          if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
+            this.selectedProduct.metodoPreparo = metodoResponse.data;
           } else {
-            const metodoResponse = await axios.get(`http://localhost:8080/api/metodo-preparo/produto/${productId}`);
-            if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
-              this.selectedProduct.metodoPreparo = metodoResponse.data;
-            } else {
-              throw new Error(`Produto com ID ${productId} não encontrado em nenhum dos endpoints.`);
-            }
-          }
-        } catch (error) {
-          console.error('Erro ao buscar detalhes do produto:', error.message);
-          this.selectedProduct = null;
-          alert(`Erro: ${error.message}`);
-        }
-      },
-      filterBySelectedAttributes(produtos) {
-        const hasSelectedValues = Object.values(this.selectedValues).some((valor) => valor);
-        if (!hasSelectedValues) {
-          return produtos;
-        }
-        let filtered = produtos;
-        for (const [atributo, valor] of Object.entries(this.selectedValues)) {
-          if (valor) {
-            filtered = filtered.filter((produto) => produto[atributo] === valor);
+            throw new Error(
+              `Produto com ID ${productId} não encontrado em nenhum dos endpoints.`
+            );
           }
         }
-        return filtered;
-      },
-      async handleFavoriteClick(produto) {
-        try {
-          const params = new URLSearchParams();
-          params.append('productId', produto.id);
-          const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
-          if (response.status === 200) {
-            await this.fetchFavorites();
-          } else {
-            console.error('Falha ao adicionar produto aos favoritos');
-          }
-        } catch (error) {
-          console.error('Erro ao adicionar aos favoritos:', error);
+      } catch (error) {
+        console.error("Erro ao buscar detalhes do produto:", error.message);
+        this.selectedProduct = null;
+        alert(`Erro: ${error.message}`);
+      }
+    },
+    filterBySelectedAttributes(produtos) {
+      const hasSelectedValues = Object.values(this.selectedValues).some((valor) => valor);
+      if (!hasSelectedValues) {
+        return produtos;
+      }
+      let filtered = produtos;
+      for (const [atributo, valor] of Object.entries(this.selectedValues)) {
+        if (valor) {
+          filtered = filtered.filter((produto) => produto[atributo] === valor);
         }
-      },
-      async handleCartClick(produto) {
-        try {
-          const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`);
-          if (responseCart.status === 200) {
+      }
+      return filtered;
+    },
+    async handleFavoriteClick(produto) {
+      try {
+        const params = new URLSearchParams();
+        params.append("productId", produto.id);
+        // Presumo que esta chamada post agora trata adicionar/remover favoritos automaticamente
+        const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
+
+        if (response.status === 200) {
+          await this.fetchFavorites();  // Isto re-fetch os favoritos atualizados do servidor
+        } else {
+          console.error("Falha ao alterar o estado do favorito");
+        }
+      } catch (error) {
+        console.error("Erro ao alterar o estado do favorito:", error);
+      }
+    },
+    async fetchFavorites() {
+      try {
+        const response = await axiosInstance.get(`/api/favorites/list`);
+        if (Array.isArray(response.data)) {
+          globalState.favoriteProductIds = response.data.map((fav) => fav.productId);
+        } else {
+          globalState.favoriteProductIds = [];  // Limpa a lista se a resposta não for um array
+        }
+      } catch (error) {
+        console.error("Erro ao buscar favoritos:", error.message);
+        globalState.favoriteProductIds = [];  // Limpa a lista em caso de erro na requisição
+      }
+    },
+    async handleCartClick(produto) {
+      try {
+        const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`);
+        if (responseCart.status === 200) {
+          return
           } else {
             console.error('Falha ao adicionar produto ao carrinho.');
           }

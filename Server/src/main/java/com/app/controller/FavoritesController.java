@@ -55,6 +55,7 @@ public class FavoritesController {
                 // Se for, remove
                 boolean isRemoved = favoritesService.removeFavorite(authenticatedUser.getId(), productId);
                 if (isRemoved) {
+                    System.out.println("Removendo favorito - UserId: " + authenticatedUser.getId() + ", ProductId: " + productId);
                     return ResponseEntity.ok("Produto " + productId + " removido dos favoritos.");
                 } else {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado nos favoritos.");
@@ -63,7 +64,6 @@ public class FavoritesController {
                 // Se não for, adiciona
                 FavoritesModel favorite = favoritesService.addFavorite(authenticatedUser.getId(), productId);
                 System.out.println("Adicionando favorito - UserId: " + authenticatedUser.getId() + ", ProductId: " + productId);
-
                 return ResponseEntity.ok("Produto " + productId + " adicionado aos favoritos.");
 
             }
