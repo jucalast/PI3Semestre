@@ -16,10 +16,11 @@
                     </div>
 
                     <div class="forms">
-                        <input type="tel" v-model="phone" id="phone" placeholder="(XX) XXXXX-XXXX" required
-                            class="input-field phone" />
-                        <input type="text" v-model="cpf" v-mask="'###.###.###-##'" placeholder="CPF" required class="input-field cpf" />
-                    </div>
+                        <vue-tel-input v-model="phone" :input-options="{ placeholder: phonePlaceholder }"
+                            class="input-field phone" v-mask="'(##) #####-####'" />
+                        <input type="text" v-model="cpf" v-mask="'###.###.###-##'" placeholder="CPF" required
+                            class="input-field cpf" />
+                    </div>  
 
                     <div class="forms">
                         <input type="password" v-model="password" placeholder="Senha" required
@@ -50,11 +51,15 @@
 </template>
 
 <script>
-import axiosInstance from "@/utils/axiosInstance";
+import { VueTelInput } from 'vue-tel-input';
 
 export default {
+    components: {
+        VueTelInput,
+    },
     data() {
         return {
+            phonePlaceholder: '(XX) XXXXX-XXXX',
             userName: "",
             email: "",
             phone: "",
@@ -93,18 +98,8 @@ export default {
             window.location.href = `${apiBaseUrl}/oauth2/authorization/google`;
         },
     },
-    mounted() {
-        const phoneInputField = document.querySelector("#phone");
-        window.intlTelInput(phoneInputField, {
-            initialCountry: "br", // Define o Brasil como país inicial
-            preferredCountries: ["br", "us", "gb", "ca"], // Países preferenciais para mostrar no topo
-            separateDialCode: true, // Exibe o código do DDD separado
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js",
-        });
-    },
 };
 </script>
-
 
 <style scoped>
 * {
@@ -216,6 +211,17 @@ body {
 
 .phone {
     width: 75%;
+    color: #ff4d4d;
+    border: solid 2px #ff4d4d;
+    background: #ededed;
+}
+
+.phone .vue-tel-input__input {
+    color: #ff4d4d;
+    border: none;
+    background-color: transparent;
+    font-size: 1.4rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 .login-button {
@@ -253,7 +259,7 @@ body {
     color: #3e3e3e;
     font-size: 16px;
     font-weight: 500;
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDMgMS40IDMgMi4xTDE1IDIuMWE4LjggOC44IDAgMCAwIDEgNS41LTMuN3oiIGZpbGw9IiNGRkJCQzAiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik00Ljk2IDE3LjJ2LTMuMWwtMS4zLTQuOGh6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
     background-repeat: no-repeat;
     background-position: 12px center;
     background-size: 30px;
@@ -281,4 +287,5 @@ body {
     text-decoration: none;
     font-weight: bold;
 }
+
 </style>
