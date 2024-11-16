@@ -2,7 +2,8 @@ package com.app.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.stream.Collectors;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -100,8 +102,7 @@ public class UserController {
      * ou retorno à página de login em caso de falha.
      */
     @PostMapping("/login/form-process")
-    public String loginUser(@RequestParam String email, @RequestParam String password, Model model, HttpServletRequest request) {
-
+    public ResponseEntity<?> loginUser(@RequestParam String email, @RequestParam String password, HttpServletRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
@@ -118,10 +119,10 @@ public class UserController {
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("userId", user.getId());
 
-            return "redirect:" + frontendUrl;
+            return ResponseEntity.ok().body(Map.of("message", "Login bem-sucedido", "userId", user.getId()));
+
         } catch (AuthenticationException e) {
-            model.addAttribute("error", "Credenciais inválidas");
-            return "customLogin";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Credenciais inválidas"));
         }
     }
 
@@ -144,9 +145,10 @@ public class UserController {
         String name = token.getPrincipal().getAttribute("name");
         String email = token.getPrincipal().getAttribute("email");
 
-        userService.saveUserIfNotExists(name, email);
+        UserModel user = userService.saveUserIfNotExists(name, email);
 
         UserModel authenticatedUser = new UserModel();
+        authenticatedUser.setId(user.getId());
         authenticatedUser.setUserName(name);
         authenticatedUser.setEmailId(email);
         authenticatedUser.setRoles("ROLE_USER");
@@ -214,6 +216,12 @@ public class UserController {
         if (authentication != null && authentication.isAuthenticated()) {
             response.put("authenticated", true);
             response.put("username", authentication.getName());
+
+            List<String> roles = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+            response.put("roles", roles);
+
             return ResponseEntity.ok(response);
         }
 

@@ -3,6 +3,7 @@ package com.app.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,13 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class SpringConfig {
 
     /**
+     * URL do frontend, injetada a partir das configurações do aplicativo para
+     * ser usado de forma dinâmica.
+     */
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
+    /**
      * Configura o filtro de segurança da aplicação.
      * <p>
      * Este método configura a segurança HTTP da aplicação, incluindo a
@@ -51,14 +59,14 @@ public class SpringConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login/**", "/register", "/api/**").permitAll()
-                .requestMatchers("/check-auth").authenticated() 
+                .requestMatchers("/check-auth").authenticated()
                 .requestMatchers("/protected/**").hasRole("ADMIN")
-                .anyRequest().authenticated() 
+                .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
-                .failureUrl("/login?error") 
+                .failureUrl("/login?error")
                 )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
@@ -83,12 +91,11 @@ public class SpringConfig {
                 )
                 .exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint((request, response, authException) -> {
-                    // Evita o redirecionamento para a tela de login e retorna um 401 quando o usuário não está autenticado
                     if (request.getRequestURI().equals("/check-auth")) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // Retorna 401 Unauthorized
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         response.getWriter().write("{\"authenticated\": false}");
                     } else {
-                        response.sendRedirect("/login");  // Para outras rotas protegidas, mantém o redirecionamento
+                        response.sendRedirect(frontendUrl + "login");
                     }
                 })
                 )

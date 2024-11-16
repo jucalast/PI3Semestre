@@ -459,11 +459,8 @@ padding-left: 1rem;
 border-radius: 2rem;
 }
 
-
-
 .excluir:hover {
   background: #ff4d4d2f;
-
 }
 
   .headerfav {

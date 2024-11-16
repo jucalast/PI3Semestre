@@ -2,8 +2,8 @@
 import { reactive } from 'vue';
 
 export const globalState = reactive({
-    favoriteProductIds: [],
-    itemsOnCart: []
+  favoriteProductIds: [],
+  itemsOnCart: [],
 });
 
 export function updateFavorites(newFavorites) {
