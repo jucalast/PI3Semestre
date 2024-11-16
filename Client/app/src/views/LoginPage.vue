@@ -58,7 +58,6 @@ export default {
 
         if (response.status === 200) {
           const { userId } = response.data;
-          alert("Login bem-sucedido! Bem-vindo.");
           this.$router.push(`/home?userId=${userId}`);
         }
       } catch (error) {
