@@ -20,9 +20,13 @@
                     </div>
                     <div class="forms">
                         <div class="password-input-wrapper">
-                            <input type="password" v-model="password" placeholder="Senha" required
-                                class="input-field senha-input" @focus="showPasswordTooltip = true"
+                            <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Senha"
+                                required class="input-field senha-input" @focus="showPasswordTooltip = true"
                                 @blur="showPasswordTooltip = false" @input="validatePassword" />
+                            <!-- Ícone de olho -->
+                            <span class="eye-icon" @click="togglePasswordVisibility">
+                                <i :class="showPassword ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                            </span>
                             <!-- Tooltip de validação -->
                             <div v-show="showPasswordTooltip" class="password-tooltip">
                                 <p :class="{ valid: passwordLengthValid }">
@@ -35,8 +39,8 @@
                                     <span class="icon"></span> Sem sequência numérica
                                 </p>
                             </div>
-
                         </div>
+
                         <input type="password" v-model="passwordConfirm" placeholder="Confirme Senha" required
                             class="input-field senha-confirm" @blur="checkPasswords" />
                     </div>
@@ -87,6 +91,7 @@ export default {
             passwordLengthValid: false,
             specialCharValid: false,
             noSequentialCharsValid: false,
+            showPassword: false,
         };
     },
     computed: {
@@ -109,10 +114,12 @@ export default {
             this.showPasswordError = this.password !== this.passwordConfirm;
         },
         validatePassword() {
-            // Validações dinâmicas enquanto o usuário digita a senha
             this.passwordLengthValid = this.password.length >= 6;
             this.specialCharValid = /[!@#$%^&*(),.?":{}|<>]/.test(this.password);
             this.noSequentialCharsValid = !/(\d)\1\1/.test(this.password);
+        },
+        togglePasswordVisibility() {
+            this.showPassword = !this.showPassword;
         },
         async handleRegister() {
             if (this.showPasswordError) {
@@ -484,5 +491,19 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.eye-icon {
+    position: absolute;
+    right: 5%;
+    top: 40%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #ff4d4d;
+    font-size: 1.5rem;
+}
+
+.eye-icon i {
+    font-size: 1.8rem;
 }
 </style>
