@@ -1,6 +1,5 @@
 <template>
   <div class="login-container">
-
     <div class="left-side"></div>
 
     <div class="right-side">
@@ -13,7 +12,22 @@
       <div class="form-container">
         <form @submit.prevent="handleLogin" class="login-form">
           <input type="email" v-model="email" placeholder="E-mail" required class="input-field" />
-          <input type="password" v-model="password" placeholder="Senha" required class="input-field" />
+
+          <!-- Campo de senha com alternância para visibilidade -->
+          <div class="password-container">
+            <input 
+              :type="isPasswordVisible ? 'text' : 'password'" 
+              v-model="password" 
+              placeholder="Senha" 
+              required 
+              class="input-field" 
+            />
+            <!-- Ícone de olho para alternar a visibilidade da senha -->
+            <div class="eye-icon" @click="togglePasswordVisibility">
+              <i :class="isPasswordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            </div>
+          </div>
+
           <button type="submit" class="login-button">Entrar</button>
         </form>
 
@@ -44,6 +58,7 @@ export default {
       email: "",
       password: "",
       errorMessage: null,
+      isPasswordVisible: false,
     };
   },
   methods: {
@@ -72,6 +87,9 @@ export default {
     handleGoogleLogin() {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
       window.location.href = `${apiBaseUrl}/oauth2/authorization/google`;
+    },
+    togglePasswordVisibility() {
+      this.isPasswordVisible = !this.isPasswordVisible;
     },
   },
 };
@@ -258,5 +276,24 @@ body {
 
 .register-container a:hover {
   text-decoration: underline;
+}
+
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 5%;
+  top: 45%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #ff4d4d;
+  font-size: 1.5rem;
+}
+
+.eye-icon i {
+  font-size: 1.8rem;
 }
 </style>
