@@ -5,9 +5,17 @@
 </template>
 
 <script>
-export default {
-  name: 'App'
-}
+  import { mapActions } from 'vuex';
+
+  export default {
+    name: 'App',
+    mounted() {
+      this.checkAuth();
+    },
+    methods: {
+      ...mapActions('auth', ['checkAuth']),
+    },
+  };
 </script>
 
 <style src="./assets/styles/global.css"></style>

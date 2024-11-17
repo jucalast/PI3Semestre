@@ -27,59 +27,59 @@
 </template>
 
 <script>
-export default {
-  name: 'FooterComponent',
-};
+  export default {
+    name: 'FooterComponent',
+  };
 </script>
 
 <style scoped>
-footer {
-  background-color: #212121;
-  color: white;
-  text-align: center;
-  padding: 20px;
-  width: 100vw;
-}
+  footer {
+    background-color: #212121;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    width: 100vw;
+  }
 
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
-.footer-links {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  border-bottom: 1px solid #333; 
-  padding-bottom: 20px;
-}
+  .footer-links {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #333;
+    padding-bottom: 20px;
+  }
 
-.footer-section {
-  flex: 1;
-  min-width: 150px; 
-  margin: 10px;
-}
+  .footer-section {
+    flex: 1;
+    min-width: 150px;
+    margin: 10px;
+  }
 
-.footer-section h4 {
-  margin-bottom: 10px;
-  color: #ffa500; 
-}
+  .footer-section h4 {
+    margin-bottom: 10px;
+    color: #ffa500;
+  }
 
-.footer-link {
-  color: white;
-  text-decoration: none;
-}
+  .footer-link {
+    color: white;
+    text-decoration: none;
+  }
 
-.footer-link:hover {
-  text-decoration: underline;
-}
+  .footer-link:hover {
+    text-decoration: underline;
+  }
 
-.footer-bottom {
-  margin-top: 20px;
-}
+  .footer-bottom {
+    margin-top: 20px;
+  }
 
-footer p {
-  margin: 0;
-  background: transparent;
-}
+  footer p {
+    margin: 0;
+    background: transparent;
+  }
 </style>

@@ -7,7 +7,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: update  
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -24,7 +24,7 @@ spring:
 
   output:
     ansi:
-      enabled: ALWAYS  # Habilita a saída ANSI para cores
+      enabled: ALWAYS
   logging:
     level:
       root: INFO 

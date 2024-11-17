@@ -3,12 +3,15 @@ package com.app.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +28,15 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class SpringConfig {
+
+    /**
+     * URL do frontend, injetada a partir das configurações do aplicativo para
+     * ser usado de forma dinâmica.
+     */
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     /**
      * Configura o filtro de segurança da aplicação.
@@ -47,13 +58,15 @@ public class SpringConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/**", "/login", "/register", "/api/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/login/**", "/register", "/api/**").permitAll()
+                .requestMatchers("/check-auth").authenticated()
+                .requestMatchers("/protected/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
+                .failureUrl("/login?error")
                 )
                 .oauth2Login(oauth2Login -> {
                     oauth2Login
@@ -61,15 +74,30 @@ public class SpringConfig {
                             .successHandler(new AuthenticationSuccessHandler() {
                                 @Override
                                 public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-                                    response.sendRedirect("/google-process");
+                                    response.sendRedirect("/login/google-process");
                                 }
                             });
                 })
                 .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout") 
+                .logoutSuccessUrl("/login?logout")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID") 
+                .deleteCookies("JSESSIONID")
+                )
+                .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .expiredUrl("/login?expired")
+                )
+                .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (request.getRequestURI().equals("/check-auth")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.getWriter().write("{\"authenticated\": false}");
+                    } else {
+                        response.sendRedirect(frontendUrl + "login");
+                    }
+                })
                 )
                 .build();
     }
