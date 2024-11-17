@@ -19,10 +19,26 @@
                             class="input-field cpf" />
                     </div>
                     <div class="forms">
-                        <input type="password" v-model="password" placeholder="Senha" required
-                            class="input-field senha" />
+                        <div class="password-input-wrapper">
+                            <input type="password" v-model="password" placeholder="Senha" required
+                                class="input-field senha-input" @focus="showPasswordTooltip = true"
+                                @blur="showPasswordTooltip = false" @input="validatePassword" />
+                            <!-- Tooltip de validação -->
+                            <div v-show="showPasswordTooltip" class="password-tooltip">
+                                <p :class="{ valid: passwordLengthValid }">
+                                    <span class="icon"></span> Mínimo de 6 caracteres
+                                </p>
+                                <p :class="{ valid: specialCharValid }">
+                                    <span class="icon"></span> Pelo menos 1 caractere especial
+                                </p>
+                                <p :class="{ valid: noSequentialCharsValid }">
+                                    <span class="icon"></span> Sem sequência numérica
+                                </p>
+                            </div>
+
+                        </div>
                         <input type="password" v-model="passwordConfirm" placeholder="Confirme Senha" required
-                            class="input-field senha" @blur="checkPasswords" />
+                            class="input-field senha-confirm" @blur="checkPasswords" />
                     </div>
                     <transition name="fade">
                         <p v-if="showPasswordError" class="error-text">As senhas não coincidem.</p>
@@ -47,6 +63,7 @@
     </div>
 </template>
 
+
 <script>
 import { VueTelInput } from 'vue-tel-input';
 import axiosInstance from "@/utils/axiosInstance";
@@ -66,6 +83,10 @@ export default {
             passwordConfirm: "",
             errorMessage: null,
             showPasswordError: false,
+            showPasswordTooltip: false,
+            passwordLengthValid: false,
+            specialCharValid: false,
+            noSequentialCharsValid: false,
         };
     },
     computed: {
@@ -87,6 +108,12 @@ export default {
         checkPasswords() {
             this.showPasswordError = this.password !== this.passwordConfirm;
         },
+        validatePassword() {
+            // Validações dinâmicas enquanto o usuário digita a senha
+            this.passwordLengthValid = this.password.length >= 6;
+            this.specialCharValid = /[!@#$%^&*(),.?":{}|<>]/.test(this.password);
+            this.noSequentialCharsValid = !/(\d)\1\1/.test(this.password);
+        },
         async handleRegister() {
             if (this.showPasswordError) {
                 this.errorMessage = "As senhas não coincidem.";
@@ -94,7 +121,6 @@ export default {
             }
 
             try {
-
                 const response = await axiosInstance.post("/register", null, {
                     params: {
                         userName: this.userName,
@@ -106,8 +132,8 @@ export default {
                 });
 
                 if (response.status === 200) {
-                    console.log(response.data); 
-                    this.$router.push("/login"); 
+                    console.log(response.data);
+                    this.$router.push("/login");
                 }
             } catch (error) {
                 console.error("Erro no registro:", error);
@@ -121,6 +147,7 @@ export default {
     },
 };
 </script>
+
 
 <style scoped>
 * {
@@ -226,8 +253,14 @@ body {
     width: 50%;
 }
 
-.senha {
-    width: 48%;
+
+
+.senha-input {
+    width: 100%;
+}
+
+.senha-confirm {
+    width: 50%;
 }
 
 .phone {
@@ -353,6 +386,103 @@ body {
     to {
         transform: translateY(0);
         opacity: 1;
+    }
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-tooltip {
+    position: absolute;
+    left: -85%;
+    top: 0;
+    width: 250px;
+    padding: 12px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 1.2rem;
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.password-tooltip .icon {
+    margin-right: 10px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.password-tooltip p {
+    margin: 5px 0;
+    color: #ff4d4d;
+    transition: color 0.3s ease-in-out;
+}
+
+.password-tooltip p.valid {
+    color: #4caf50;
+    font-weight: bold;
+}
+
+.password-input-wrapper:hover .password-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.password-tooltip::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: -16px;
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent #ffffff;
+}
+
+.password-tooltip p.valid {
+    color: #4caf50;
+}
+
+/* Para o ícone de erro (❌) */
+.password-tooltip p:not(.valid) .icon {
+    background-color: #ff4d4d;
+    color: white;
+    content: "❌";
+}
+
+.password-tooltip p.valid .icon {
+    background-color: #4caf50;
+    color: white;
+    content: "✔";
+}
+
+.password-tooltip p {
+    color: #ff4d4d;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 </style>
