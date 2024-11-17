@@ -20,16 +20,23 @@
                             class="input-field phone" v-mask="'(##) #####-####'" />
                         <input type="text" v-model="cpf" v-mask="'###.###.###-##'" placeholder="CPF" required
                             class="input-field cpf" />
-                    </div>  
+                    </div>
 
                     <div class="forms">
                         <input type="password" v-model="password" placeholder="Senha" required
                             class="input-field senha" />
                         <input type="password" v-model="passwordConfirm" placeholder="Confirme Senha" required
-                            class="input-field senha" />
+                            class="input-field senha" @blur="checkPasswords" />
                     </div>
 
-                    <button type="submit" class="login-button">Cadastrar</button>
+                    <transition name="fade">
+                        <p v-if="showPasswordError" class="error-text">As senhas não coincidem.</p>
+                    </transition>
+
+                    <button type="submit" class="login-button" :disabled="!isFormValid">
+                        Cadastrar
+                    </button>
+
                 </form>
 
                 <button class="login-with-google-btn" @click="handleGoogleLogin">
@@ -67,11 +74,30 @@ export default {
             password: "",
             passwordConfirm: "",
             errorMessage: null,
+            showPasswordError: false,
         };
     },
+    computed: {
+        isFormValid() {
+            const allFieldsFilled =
+                this.userName &&
+                this.email &&
+                this.phone &&
+                this.cpf &&
+                this.password &&
+                this.passwordConfirm;
+
+            const passwordsMatch = this.password === this.passwordConfirm;
+
+            return allFieldsFilled && passwordsMatch;
+        },
+    },
     methods: {
+        checkPasswords() {
+            this.showPasswordError = this.password !== this.passwordConfirm;
+        },
         async handleRegister() {
-            if (this.password !== this.passwordConfirm) {
+            if (this.showPasswordError) {
                 this.errorMessage = "As senhas não coincidem.";
                 return;
             }
@@ -100,6 +126,66 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.input-field {
+    color: #ff4d4d;
+    border: solid 2px #ff4d4d;
+    background: #ededed;
+    border-radius: 1.5rem;
+    width: 100%;
+    height: 4rem;
+    padding: 0 1.5rem;
+    font-size: 1.4rem;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 15px;
+    cursor: pointer;
+    box-shadow: 0px 2px 5px rgba(255, 77, 77, 0.4);
+    transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.error-text {
+    color: #ff4d4d;
+    font-size: 1.2rem;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    text-align: center;
+    background: #ffe6e6;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(255, 77, 77, 0.2);
+    animation: slide-down 0.3s ease-out;
+}
+
+.login-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+</style>
+
 
 <style scoped>
 * {
@@ -240,6 +326,14 @@ body {
     margin-bottom: 15px;
 }
 
+.login-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none;
+}
+
 .login-button:hover {
     box-shadow: 0px 4px 10px rgba(82, 113, 255, 0.6);
     transform: scale(1.03);
@@ -259,7 +353,7 @@ body {
     color: #3e3e3e;
     font-size: 16px;
     font-weight: 500;
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDMgMS40IDMgMi4xTDE1IDIuMWE4LjggOC44IDAgMCAwIDEgNS41LTMuN3oiIGZpbGw9IiNGRkJCQzAiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik00Ljk2IDE3LjJ2LTMuMWwtMS4zLTQuOGh6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
     background-repeat: no-repeat;
     background-position: 12px center;
     background-size: 30px;
@@ -288,4 +382,8 @@ body {
     font-weight: bold;
 }
 
+
+.input-field.phone {
+    background-color: white;
+}
 </style>
