@@ -12,7 +12,11 @@
       <div class="product-list">
         <h3>Edite ou exclua produtos</h3>
         <!-- Mude de ProductCard para CardGeneric -->
-        <CardGeneric :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
+        <CardGeneric
+          :produtos="filteredProducts"
+          :searchQuery="searchQuery"
+          :isLoading="isLoading"
+        />
       </div>
     </section>
     <!-- Outros conteúdos do dashboard -->
@@ -44,13 +48,17 @@
         if (!this.searchQuery) {
           return this.produtos;
         }
-        return this.produtos.filter((produto) => produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase()));
+        return this.produtos.filter((produto) =>
+          produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
       },
     },
     methods: {
       async fetchProdutos() {
         try {
-          const response = await axios.get('http://localhost:8080/api/produtos');
+          const response = await axios.get(
+            'http://localhost:8080/api/produtos'
+          );
           this.produtos = response.data;
         } catch (error) {
           console.error('Erro ao buscar produtos:', error);

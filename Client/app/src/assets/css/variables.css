@@ -13,7 +13,12 @@
   --btns-color: #d1d1d1; /* Cor dos botões */
   --card-background: #cacaca; /* Cor de fundo do card */
   --card-text-color: white; /* Cor do texto no card */
-  --element-background: rgba(59, 59, 59, 0.26); /* Cor do fundo dos elementos do card */
+  --element-background: rgba(
+    59,
+    59,
+    59,
+    0.26
+  ); /* Cor do fundo dos elementos do card */
   --price-background: #49494933; /* Cor do fundo do preço */
   --header-background: #e4bf5f; /* Cor de fundo do cabeçalho do card */
   --header-text-color: #fff2d2; /* Cor do texto no cabeçalho do card */

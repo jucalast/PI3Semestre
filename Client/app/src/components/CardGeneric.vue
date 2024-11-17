@@ -13,7 +13,11 @@
           @mouseleave="showButtons = null"
         >
           <div class="imgcardcont">
-            <img :src="produto.imagem" :alt="produto.nome" class="product-image" />
+            <img
+              :src="produto.imagem"
+              :alt="produto.nome"
+              class="product-image"
+            />
           </div>
           <div class="name">
             <h3 class="product-name" @click="openModal(produto)">
@@ -27,7 +31,10 @@
             </div>
           </div>
           <div v-if="showButtons === produto.id" class="action-buttons">
-            <button class="excluir" @click.stop="confirmDeleteProduct(produto.id)">
+            <button
+              class="excluir"
+              @click.stop="confirmDeleteProduct(produto.id)"
+            >
               <i class="fas fa-trash"></i>
             </button>
             <button class="editar" @click.stop="handleEdit(produto)">
@@ -47,13 +54,20 @@
       />
 
       <!-- Modal de produto existente -->
-      <ProductModal v-if="selectedProduct" :product="selectedProduct" :isVisible="isModalVisible" @close="isModalVisible = false" />
+      <ProductModal
+        v-if="selectedProduct"
+        :product="selectedProduct"
+        :isVisible="isModalVisible"
+        @close="isModalVisible = false"
+      />
 
       <!-- Confirmação de exclusão -->
       <div v-if="isConfirmationVisible" class="confirmation-modal">
         <p>Tem certeza que deseja excluir este produto?</p>
         <button class="deletesim" @click="deleteProduct">Sim</button>
-        <button class="deletenao" @click="isConfirmationVisible = false">Não</button>
+        <button class="deletenao" @click="isConfirmationVisible = false">
+          Não
+        </button>
       </div>
     </div>
     <div class="not" v-else>
@@ -96,14 +110,19 @@
     methods: {
       // Formatação da descrição do produto
       formattedDescription(descricao) {
-        return descricao.length > 30 ? descricao.slice(0, 30) + '...' : descricao;
+        return descricao.length > 30
+          ? descricao.slice(0, 30) + '...'
+          : descricao;
       },
 
       // Abertura do modal para visualizar detalhes do produto
       async openModal(product) {
         this.selectedProduct = { ...product };
         await this.fetchProductDetails(product.id);
-        if (this.selectedProduct.cafeEspecial || this.selectedProduct.metodoPreparo) {
+        if (
+          this.selectedProduct.cafeEspecial ||
+          this.selectedProduct.metodoPreparo
+        ) {
           this.isModalVisible = true;
         } else {
           this.selectedProduct = null;
@@ -120,15 +139,24 @@
       // Busca os detalhes do produto na API
       async fetchProductDetails(productId) {
         try {
-          const cafeResponse = await axios.get(`http://localhost:8080/api/cafes-especiais/produto/${productId}`);
+          const cafeResponse = await axios.get(
+            `http://localhost:8080/api/cafes-especiais/produto/${productId}`
+          );
           if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
             this.selectedProduct.cafeEspecial = cafeResponse.data;
           } else {
-            const metodoResponse = await axios.get(`http://localhost:8080/api/metodo-preparo/produto/${productId}`);
-            if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
+            const metodoResponse = await axios.get(
+              `http://localhost:8080/api/metodo-preparo/produto/${productId}`
+            );
+            if (
+              metodoResponse.data &&
+              Object.keys(metodoResponse.data).length > 0
+            ) {
               this.selectedProduct.metodoPreparo = metodoResponse.data;
             } else {
-              throw new Error(`Produto com ID ${productId} não encontrado em nenhum dos endpoints.`);
+              throw new Error(
+                `Produto com ID ${productId} não encontrado em nenhum dos endpoints.`
+              );
             }
           }
         } catch (error) {
@@ -141,8 +169,13 @@
       // Salvar alterações do produto
       async handleSave(updatedProduct) {
         try {
-          await axios.put(`http://localhost:8080/api/produtos/${updatedProduct.id}`, updatedProduct);
-          const index = this.produtos.findIndex((prod) => prod.id === updatedProduct.id);
+          await axios.put(
+            `http://localhost:8080/api/produtos/${updatedProduct.id}`,
+            updatedProduct
+          );
+          const index = this.produtos.findIndex(
+            (prod) => prod.id === updatedProduct.id
+          );
           if (index !== -1) {
             this.produtos[index] = updatedProduct; // Atualiza o produto na lista
             this.toast.success('Produto atualizado com sucesso!');
@@ -164,8 +197,12 @@
       // Exclusão do produto
       async deleteProduct() {
         try {
-          await axios.delete(`http://localhost:8080/api/produtos/${this.productToDelete}`);
-          const index = this.produtos.findIndex((prod) => prod.id === this.productToDelete);
+          await axios.delete(
+            `http://localhost:8080/api/produtos/${this.productToDelete}`
+          );
+          const index = this.produtos.findIndex(
+            (prod) => prod.id === this.productToDelete
+          );
           if (index !== -1) {
             this.produtos.splice(index, 1);
             this.toast.success('Produto excluído com sucesso!');

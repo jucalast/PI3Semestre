@@ -3,11 +3,18 @@
     <div class="product-page">
       <div class="sessiontwo">
         <!-- Adicionando o Acordeon para selecionar os filtros -->
-        <AtributosProduto @produtos-filtrados-atualizados="updateFilteredProducts" @update-selected-radios="updateSelectedRadios" />
+        <AtributosProduto
+          @produtos-filtrados-atualizados="updateFilteredProducts"
+          @update-selected-radios="updateSelectedRadios"
+        />
 
         <div class="product-list no-margin">
           <!-- Componente para exibir a lista de produtos filtrados -->
-          <ProductCard :produtos="produtos" :searchQuery="searchQuery" :isLoading="isLoading" />
+          <ProductCard
+            :produtos="produtos"
+            :searchQuery="searchQuery"
+            :isLoading="isLoading"
+          />
         </div>
       </div>
     </div>
@@ -36,7 +43,9 @@
     methods: {
       async fetchProdutos() {
         try {
-          const response = await axios.get('http://localhost:8080/api/produtos');
+          const response = await axios.get(
+            'http://localhost:8080/api/produtos'
+          );
           this.produtos = response.data;
         } catch (error) {
           console.error('Erro ao buscar produtos:', error);

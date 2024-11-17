@@ -2,26 +2,66 @@
   <div class="form-container">
     <form @submit.prevent="submitForm">
       <input v-model="product.nome" placeholder="Nome" required />
-      <textarea v-model="product.descricao" placeholder="Descrição" required></textarea>
-      <input v-model.number="product.preco" type="number" placeholder="Preço" required />
-      <input v-model.number="product.quantidade_estoque" type="number" placeholder="Quantidade em Estoque" required />
+      <textarea
+        v-model="product.descricao"
+        placeholder="Descrição"
+        required
+      ></textarea>
+      <input
+        v-model.number="product.preco"
+        type="number"
+        placeholder="Preço"
+        required
+      />
+      <input
+        v-model.number="product.quantidade_estoque"
+        type="number"
+        placeholder="Quantidade em Estoque"
+        required
+      />
 
-      <input class="imagem" v-model="product.imagem" type="url" placeholder="URL da Imagem" required />
+      <input
+        class="imagem"
+        v-model="product.imagem"
+        type="url"
+        placeholder="URL da Imagem"
+        required
+      />
 
-      <input v-model="product.cafeEspecial.notasSensoriais" placeholder="Notas Sensoriais" />
+      <input
+        v-model="product.cafeEspecial.notasSensoriais"
+        placeholder="Notas Sensoriais"
+      />
       <input v-model="product.cafeEspecial.origem" placeholder="Origem" />
-      <input v-model="product.cafeEspecial.recomendacoesPreparo" placeholder="Recomendações de Preparo" />
+      <input
+        v-model="product.cafeEspecial.recomendacoesPreparo"
+        placeholder="Recomendações de Preparo"
+      />
       <input v-model="product.cafeEspecial.torra" placeholder="Torra" />
-      <input v-model="product.cafeEspecial.torrefacao" placeholder="Torrefação" />
+      <input
+        v-model="product.cafeEspecial.torrefacao"
+        placeholder="Torrefação"
+      />
       <input v-model="product.cafeEspecial.variedade" placeholder="Variedade" />
-      <input v-model="product.cafeEspecial.beneficiamento" placeholder="Beneficiamento" />
+      <input
+        v-model="product.cafeEspecial.beneficiamento"
+        placeholder="Beneficiamento"
+      />
       <div class="dates">
         <label for="dataTorra">Data de Torra:</label>
-        <input id="dataTorra" v-model="product.cafeEspecial.dataTorra" type="date" />
+        <input
+          id="dataTorra"
+          v-model="product.cafeEspecial.dataTorra"
+          type="date"
+        />
       </div>
       <div class="dates">
         <label for="dataValidade">Data de Validade:</label>
-        <input id="dataValidade" v-model="product.cafeEspecial.dataValidade" type="date" />
+        <input
+          id="dataValidade"
+          v-model="product.cafeEspecial.dataValidade"
+          type="date"
+        />
       </div>
       <button type="submit">Criar Produto</button>
     </form>

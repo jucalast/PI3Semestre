@@ -7,27 +7,54 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="col-span-1">
             <label class="block text-gray-700" for="name">Nome</label>
-            <input type="text" v-model="user.name" id="name" disabled class="input-field" />
+            <input
+              type="text"
+              v-model="user.name"
+              id="name"
+              disabled
+              class="input-field"
+            />
           </div>
 
           <div class="col-span-1">
             <label class="block text-gray-700" for="email">E-mail</label>
-            <input type="email" v-model="user.email" id="email" disabled class="input-field" />
+            <input
+              type="email"
+              v-model="user.email"
+              id="email"
+              disabled
+              class="input-field"
+            />
           </div>
 
           <div class="col-span-1">
             <label class="block text-gray-700" for="phone">Telefone</label>
-            <input type="text" v-model="user.phone" id="phone" disabled class="input-field" />
+            <input
+              type="text"
+              v-model="user.phone"
+              id="phone"
+              disabled
+              class="input-field"
+            />
           </div>
 
           <div class="col-span-1">
             <label class="block text-gray-700" for="address">Endereço</label>
-            <input type="text" v-model="user.address" id="address" disabled class="input-field" />
+            <input
+              type="text"
+              v-model="user.address"
+              id="address"
+              disabled
+              class="input-field"
+            />
           </div>
         </div>
 
         <div class="flex mt-6">
-          <button @click="editProfile" class="mr-4 px-4 py-2 bg-headerBackground text-white rounded-md hover:bg-yellow-600 transition duration-200">
+          <button
+            @click="editProfile"
+            class="mr-4 px-4 py-2 bg-headerBackground text-white rounded-md hover:bg-yellow-600 transition duration-200"
+          >
             Editar Perfil
           </button>
         </div>
@@ -39,23 +66,50 @@
         <form @submit.prevent="submitPasswordChange">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="col-span-1">
-              <label class="block text-gray-700" for="currentPassword">Senha Atual</label>
-              <input type="password" v-model="passwords.currentPassword" id="currentPassword" required class="input-field" />
+              <label class="block text-gray-700" for="currentPassword">
+                Senha Atual
+              </label>
+              <input
+                type="password"
+                v-model="passwords.currentPassword"
+                id="currentPassword"
+                required
+                class="input-field"
+              />
             </div>
 
             <div class="col-span-1">
-              <label class="block text-gray-700" for="newPassword">Nova Senha</label>
-              <input type="password" v-model="passwords.newPassword" id="newPassword" required class="input-field" />
+              <label class="block text-gray-700" for="newPassword">
+                Nova Senha
+              </label>
+              <input
+                type="password"
+                v-model="passwords.newPassword"
+                id="newPassword"
+                required
+                class="input-field"
+              />
             </div>
 
             <div class="col-span-1">
-              <label class="block text-gray-700" for="confirmPassword">Confirmar Nova Senha</label>
-              <input type="password" v-model="passwords.confirmPassword" id="confirmPassword" required class="input-field" />
+              <label class="block text-gray-700" for="confirmPassword">
+                Confirmar Nova Senha
+              </label>
+              <input
+                type="password"
+                v-model="passwords.confirmPassword"
+                id="confirmPassword"
+                required
+                class="input-field"
+              />
             </div>
           </div>
 
           <div class="flex mt-6">
-            <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-200">
+            <button
+              type="submit"
+              class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-200"
+            >
               Alterar Senha
             </button>
           </div>
@@ -116,7 +170,11 @@
             newPassword: this.passwords.newPassword,
           });
           alert('Senha alterada com sucesso!');
-          this.passwords = { currentPassword: '', newPassword: '', confirmPassword: '' };
+          this.passwords = {
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+          };
         } catch (error) {
           console.error('Erro ao alterar a senha:', error);
         }

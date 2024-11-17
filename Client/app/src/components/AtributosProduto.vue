@@ -3,7 +3,11 @@
     <div v-if="atributos">
       <!-- Exibindo os cards criados através da computed property -->
       <div class="cards-atributos">
-        <div v-for="(valor, key) in filteredSelectedValues" :key="key" class="card">
+        <div
+          v-for="(valor, key) in filteredSelectedValues"
+          :key="key"
+          class="card"
+        >
           {{ valor }}
           <button @click="removeCard(key)">X</button>
         </div>
@@ -17,7 +21,13 @@
           <li v-if="key === 'preco'">
             <div class="input-group">
               <label for="precoDe">De:</label>
-              <input type="number" id="precoDe" class="input-preco" placeholder="Preço de" @change="onPriceChange('precoDe', $event.target.value)" />
+              <input
+                type="number"
+                id="precoDe"
+                class="input-preco"
+                placeholder="Preço de"
+                @change="onPriceChange('precoDe', $event.target.value)"
+              />
             </div>
             <div class="input-group">
               <label for="precoAte">Até:</label>
@@ -72,17 +82,26 @@
     },
     computed: {
       filteredSelectedValues() {
-        return Object.fromEntries(Object.entries(this.selectedValues).filter(([key, value]) => value));
+        return Object.fromEntries(
+          Object.entries(this.selectedValues).filter(([key, value]) => value)
+        );
       },
     },
     methods: {
       async fetchAtributos() {
         try {
-          const response = await fetch('http://localhost:8080/api/produtos/atributos');
+          const response = await fetch(
+            'http://localhost:8080/api/produtos/atributos'
+          );
           const data = await response.json();
           const atributosMap = this.initializeAttributesMap(data);
 
-          this.atributos = Object.fromEntries(Object.entries(atributosMap).map(([key, value]) => [key, Array.from(value)]));
+          this.atributos = Object.fromEntries(
+            Object.entries(atributosMap).map(([key, value]) => [
+              key,
+              Array.from(value),
+            ])
+          );
         } catch (error) {
           this.erro = error.message || 'Erro desconhecido';
         }
@@ -126,14 +145,18 @@
         this.updateFilteredProducts();
       },
       async updateFilteredProducts() {
-        const selectedFilters = Object.entries(this.selectedValues).filter(([key, value]) => value);
+        const selectedFilters = Object.entries(this.selectedValues).filter(
+          ([key, value]) => value
+        );
         const { dataDe, dataAte } = this.dateRange;
         const { precoDe, precoAte } = this.priceRange;
 
         this.$emit('update-selected-radios', this.selectedValues);
 
         // Montando os parâmetros de consulta
-        let queryParams = selectedFilters.map(([atributo, valor]) => `${atributo}=${valor}`).join('&');
+        let queryParams = selectedFilters
+          .map(([atributo, valor]) => `${atributo}=${valor}`)
+          .join('&');
 
         // Adicionando filtros de data
         if (dataDe) queryParams += `&dataDe=${dataDe}`;
@@ -142,7 +165,9 @@
         if (precoAte) queryParams += `&precoAte=${precoAte}`;
 
         // Fazendo a requisição
-        const response = await fetch(`http://localhost:8080/api/produtos/buscar-por-atributos?${queryParams}`);
+        const response = await fetch(
+          `http://localhost:8080/api/produtos/buscar-por-atributos?${queryParams}`
+        );
         const produtosFiltrados = await response.json();
         this.produtosFiltrados = produtosFiltrados;
         this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
@@ -154,9 +179,12 @@
       },
       async updateFilteredByDate() {
         const { dataDe, dataAte } = this.dateRange;
-        const response = await fetch(`http://localhost:8080/api/produtos/buscar-por-data/${dataDe}/${dataAte}`);
+        const response = await fetch(
+          `http://localhost:8080/api/produtos/buscar-por-data/${dataDe}/${dataAte}`
+        );
         const produtosFiltrados = await response.json();
-        this.produtosFiltrados = this.combineFilteredProducts(produtosFiltrados);
+        this.produtosFiltrados =
+          this.combineFilteredProducts(produtosFiltrados);
         this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
       },
       onPriceChange(type, value) {
@@ -165,9 +193,12 @@
       },
       async updateFilteredByPrice() {
         const { precoDe, precoAte } = this.priceRange;
-        const response = await fetch(`http://localhost:8080/api/produtos/buscar-por-preco/${precoDe}/${precoAte}`);
+        const response = await fetch(
+          `http://localhost:8080/api/produtos/buscar-por-preco/${precoDe}/${precoAte}`
+        );
         const produtosFiltrados = await response.json();
-        this.produtosFiltrados = this.combineFilteredProducts(produtosFiltrados);
+        this.produtosFiltrados =
+          this.combineFilteredProducts(produtosFiltrados);
         this.$emit('produtos-filtrados-atualizados', this.produtosFiltrados);
       },
       toggle(key) {

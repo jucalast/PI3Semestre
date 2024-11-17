@@ -11,7 +11,9 @@
 
         <div>
           <button class="comprar-btn">Comprar</button>
-          <button class="delete-btn" @click="deleteProduct(produto.id)">Excluir</button>
+          <button class="delete-btn" @click="deleteProduct(produto.id)">
+            Excluir
+          </button>
         </div>
       </div>
     </div>
@@ -48,7 +50,9 @@
       },
       async deleteProduct(productId) {
         try {
-          const response = await axiosInstance.delete(`/api/favorites/remove?productId=${productId}`);
+          const response = await axiosInstance.delete(
+            `/api/favorites/remove?productId=${productId}`
+          );
           if (response.status === 200) {
             this.$emit('product-deleted', productId);
           } else {

@@ -2,7 +2,12 @@
   <DefaultLayout>
     <div class="favorite-page">
       <div class="product-list">
-        <FavoriteProductCard v-for="produto in produtosFiltrados" :key="produto.id" :produto="produto" @product-deleted="handleProductDeleted" />
+        <FavoriteProductCard
+          v-for="produto in produtosFiltrados"
+          :key="produto.id"
+          :produto="produto"
+          @product-deleted="handleProductDeleted"
+        />
       </div>
     </div>
   </DefaultLayout>
@@ -31,7 +36,9 @@
     methods: {
       async fetchFavoritos() {
         try {
-          const response = await axiosInstance.get('/api/favorites/favorited-products');
+          const response = await axiosInstance.get(
+            '/api/favorites/favorited-products'
+          );
           if (response && response.data) {
             this.produtos = response.data;
           } else {

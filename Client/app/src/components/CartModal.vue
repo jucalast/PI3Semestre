@@ -7,16 +7,31 @@
       </div>
       <div class="main-cart">
         <section class="products">
-          <section v-for="(cartItem, index) in cartItems" :key="index" class="product-section">
+          <section
+            v-for="(cartItem, index) in cartItems"
+            :key="index"
+            class="product-section"
+          >
             <div class="image-bckg">
-              <img class="image-product" :src="cartItem.imagem_produto" :alt="cartItem.nome_produto" />
+              <img
+                class="image-product"
+                :src="cartItem.imagem_produto"
+                :alt="cartItem.nome_produto"
+              />
             </div>
             <div class="nameandbutton">
               <h2>{{ cartItem.nome_produto }}</h2>
-              <button class="excluir" @click="removeItemOnCartUser(cartItem.produtoId)">Excluir</button>
+              <button
+                class="excluir"
+                @click="removeItemOnCartUser(cartItem.produtoId)"
+              >
+                Excluir
+              </button>
             </div>
             <select
-              @change="updateQuantidadeItem(cartItem.produtoId, $event.target.value)"
+              @change="
+                updateQuantidadeItem(cartItem.produtoId, $event.target.value)
+              "
               name="Quantidade"
               class="input-qntty"
               :value="cartItem.quantidade"
@@ -43,7 +58,9 @@
 
           <div class="info-rigth">
             <span id="info-ft-02">Inserir cupom</span>
-            <span id="info-ft-03">R${{ parseFloat(somaValorItens.toFixed(2)) }}</span>
+            <span id="info-ft-03">
+              R${{ parseFloat(somaValorItens.toFixed(2)) }}
+            </span>
           </div>
         </div>
         <section class="frete-section">
@@ -106,7 +123,9 @@
       },
       async removeItemOnCartUser(productId) {
         try {
-          const responseCart = await axiosInstance.delete(`/api/carrinho/${productId}`);
+          const responseCart = await axiosInstance.delete(
+            `/api/carrinho/${productId}`
+          );
           this.fetchCarts();
         } catch (error) {
           console.error('Erro ao remover produto do carrinho', error);
@@ -118,13 +137,17 @@
         this.somaValorItens = 0;
         this.somaQuantidade = 0;
         for (let index = 0; index < itensCarrinho.length; index++) {
-          this.somaValorItens += parseFloat(itensCarrinho[index].preco_produto) * parseFloat(itensCarrinho[index].quantidade);
+          this.somaValorItens +=
+            parseFloat(itensCarrinho[index].preco_produto) *
+            parseFloat(itensCarrinho[index].quantidade);
           this.somaQuantidade += parseInt(itensCarrinho[index].quantidade);
         }
       },
       async updateQuantidadeItem(productId, quantity) {
         console.log(productId, quantity);
-        const responseCart = await axiosInstance.put(`/api/carrinho/${productId}/${parseInt(quantity)}`);
+        const responseCart = await axiosInstance.put(
+          `/api/carrinho/${productId}/${parseInt(quantity)}`
+        );
         console.log(responseCart.data);
       },
     },

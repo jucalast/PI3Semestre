@@ -2,15 +2,44 @@
   <div class="form-container">
     <form @submit.prevent="submitForm">
       <input v-model="product.nome" placeholder="Nome" required />
-      <textarea v-model="product.descricao" placeholder="Descrição" required></textarea>
-      <input v-model.number="product.preco" type="number" placeholder="Preço" required />
-      <input v-model.number="product.quantidade_estoque" type="number" placeholder="Quantidade em Estoque" required />
-      <input class="imagem" v-model="product.imagem" type="url" placeholder="URL da Imagem" required />
+      <textarea
+        v-model="product.descricao"
+        placeholder="Descrição"
+        required
+      ></textarea>
+      <input
+        v-model.number="product.preco"
+        type="number"
+        placeholder="Preço"
+        required
+      />
+      <input
+        v-model.number="product.quantidade_estoque"
+        type="number"
+        placeholder="Quantidade em Estoque"
+        required
+      />
+      <input
+        class="imagem"
+        v-model="product.imagem"
+        type="url"
+        placeholder="URL da Imagem"
+        required
+      />
 
-      <input v-model="product.metodoPreparo.tipo_preparo" placeholder="Tipo de Preparo" />
+      <input
+        v-model="product.metodoPreparo.tipo_preparo"
+        placeholder="Tipo de Preparo"
+      />
       <input v-model="product.metodoPreparo.material" placeholder="Material" />
-      <input v-model="product.metodoPreparo.acessorios" placeholder="Acessórios" />
-      <input v-model="product.metodoPreparo.complexidade" placeholder="Complexidade" />
+      <input
+        v-model="product.metodoPreparo.acessorios"
+        placeholder="Acessórios"
+      />
+      <input
+        v-model="product.metodoPreparo.complexidade"
+        placeholder="Complexidade"
+      />
       <input v-model="product.metodoPreparo.marca" placeholder="Marca" />
 
       <button type="submit">Criar Produto</button>

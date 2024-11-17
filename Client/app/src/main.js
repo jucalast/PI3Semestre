@@ -20,13 +20,14 @@ app.use(VueTheMask);
 
 const globalOptions = {
   placeholder: 'teste',
-  initialCountry: 'br', 
-  preferredCountries: ['br', 'us', 'gb', 'ca'], 
+  initialCountry: 'br',
+  preferredCountries: ['br', 'us', 'gb', 'ca'],
   separateDialCode: true,
-  utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js', 
+  utilsScript:
+    'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js',
 };
 
-app.use(VueTelInput, globalOptions); 
+app.use(VueTelInput, globalOptions);
 
 app.use(Toast, {
   position: POSITION.TOP_RIGHT,

@@ -9,7 +9,13 @@
             <label :for="key">{{ formatLabel(key) }}:</label>
             <input
               v-model="formData[key]"
-              :type="key === 'preco' ? 'text' : typeof value === 'number' ? 'number' : 'text'"
+              :type="
+                key === 'preco'
+                  ? 'text'
+                  : typeof value === 'number'
+                    ? 'number'
+                    : 'text'
+              "
               :id="key"
               @input="key === 'preco' ? formatPriceInput($event) : null"
               required

@@ -2,22 +2,44 @@
   <div class="modal-overlay" @click="handleOverlayClick">
     <div class="modal-content" @click.stop>
       <div class="botoes">
-        <button @click="selectForm('cafeEspecial')" :class="{ 'active-link': selectedForm === 'cafeEspecial' }">
-          <img class="imgprod" src="@/assets/icons8-coffee-beans-90(1).png" alt="" />
+        <button
+          @click="selectForm('cafeEspecial')"
+          :class="{ 'active-link': selectedForm === 'cafeEspecial' }"
+        >
+          <img
+            class="imgprod"
+            src="@/assets/icons8-coffee-beans-90(1).png"
+            alt=""
+          />
           Café Especial
         </button>
-        <button @click="selectForm('metodoPreparo')" :class="{ 'active-link': selectedForm === 'metodoPreparo' }">
+        <button
+          @click="selectForm('metodoPreparo')"
+          :class="{ 'active-link': selectedForm === 'metodoPreparo' }"
+        >
           <img src="@/assets/icons8-v60-coffee-dripper-100 (1).png" alt="" />
           Método de Preparo
         </button>
       </div>
 
-      <SpecialCoffeeForm v-if="selectedForm === 'cafeEspecial'" @submit-product="submitProduct" :disabled="isSubmitting" />
-      <PreparationMethodForm v-else-if="selectedForm === 'metodoPreparo'" @submit-product="submitProduct" :disabled="isSubmitting" />
+      <SpecialCoffeeForm
+        v-if="selectedForm === 'cafeEspecial'"
+        @submit-product="submitProduct"
+        :disabled="isSubmitting"
+      />
+      <PreparationMethodForm
+        v-else-if="selectedForm === 'metodoPreparo'"
+        @submit-product="submitProduct"
+        :disabled="isSubmitting"
+      />
 
       <!-- Overlay de carregamento com GIF -->
       <div v-if="isSubmitting" class="loading-overlay">
-        <img src="@/assets/Logo Maven.gif" alt="Carregando" class="loading-gif" />
+        <img
+          src="@/assets/Logo Maven.gif"
+          alt="Carregando"
+          class="loading-gif"
+        />
       </div>
     </div>
   </div>
@@ -53,7 +75,11 @@
 
         this.isSubmitting = true;
         try {
-          const response = await axiosInstance.post('/api/produtos/create/protected', product, {});
+          const response = await axiosInstance.post(
+            '/api/produtos/create/protected',
+            product,
+            {}
+          );
 
           if (response.status === 200) {
             console.log('Produto criado:', response.data);
