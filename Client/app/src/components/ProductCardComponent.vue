@@ -80,10 +80,10 @@ export default {
     return {
       favoriteProductIds,
     };
-    const itemsOnCart = computed(() => globalState.itemsOnCart);
-    return {
-      itemsOnCart,
-    };
+    // const itemsOnCart = computed(() => globalState.itemsOnCart);
+    // return {
+    //   itemsOnCart,
+    // };
   },
   computed: {
     filteredProdutos() {
@@ -99,6 +99,7 @@ export default {
   },
   async mounted() {
     await this.fetchFavorites();
+    // await this.fetchCart();
   },
   methods: {
     async openModal(product) {
@@ -177,7 +178,18 @@ export default {
         console.error("Erro ao buscar favoritos:", error.message);
         globalState.favoriteProductIds = [];  // Limpa a lista em caso de erro na requisição
       }
+
     },
+    // Precisa criar a rota /list no carrinho pra funcionar
+    // async fetchCart(){
+    //   try {
+    //     const responseCart = await axiosInstance.get(`/api/carrinho/list`);
+    //     Array.isArray(responseCart.data) ? globalState.itemsOnCart = response.data.map((cart) => cart.produtoId)
+    //                                      : globalState.itemsOnCart = [];
+    //   } catch {
+    //     globalState.itemsOnCart = [];
+    //   }
+    //},
     async handleCartClick(produto) {
       try {
         const responseCart = await axiosInstance.post(`${this.baseURL}/api/carrinho/${produto.id}`);
@@ -346,6 +358,11 @@ export default {
   }
 
   .caricon:hover {
+    color: var(--secondary-color);
+    transform: scale(1.2); /* Aumenta o ícone em 20% */
+  }
+
+  .caricon.is-OnCart {
     color: var(--secondary-color);
     transform: scale(1.2); /* Aumenta o ícone em 20% */
   }
