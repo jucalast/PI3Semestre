@@ -3,7 +3,7 @@
         <div class="left-side"></div>
         <div class="right-side">
             <h1 class="main-title">
-                A um passo dos<br><strong class="melhorescafes">melhores cafés</strong><br> do Brasil
+                Prepare-se para o<br><strong class="melhorescafes">sabor único</strong>
             </h1>
             <div class="form-container">
                 <form @submit.prevent="handleRegister" class="login-form">
@@ -121,66 +121,6 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.input-field {
-    color: #ff4d4d;
-    border: solid 2px #ff4d4d;
-    background: #ededed;
-    border-radius: 1.5rem;
-    width: 100%;
-    height: 4rem;
-    padding: 0 1.5rem;
-    font-size: 1.4rem;
-    outline: none;
-    font-family: 'Poppins', sans-serif;
-    margin-bottom: 15px;
-    cursor: pointer;
-    box-shadow: 0px 2px 5px rgba(255, 77, 77, 0.4);
-    transition: box-shadow 0.3s, transform 0.3s;
-}
-
-.error-text {
-    color: #ff4d4d;
-    font-size: 1.2rem;
-    margin-top: -10px;
-    margin-bottom: 15px;
-    text-align: center;
-    background: #ffe6e6;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(255, 77, 77, 0.2);
-    animation: slide-down 0.3s ease-out;
-}
-
-.login-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
-@keyframes slide-down {
-    from {
-        transform: translateY(-10px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-</style>
-
 
 <style scoped>
 * {
@@ -363,7 +303,7 @@ body {
 .error-message {
     color: #ff4d4d;
     font-size: 1.2rem;
-    margin-top: 10px;
+    margin-top: 50px;
 }
 
 .register-container {
@@ -377,8 +317,42 @@ body {
     font-weight: bold;
 }
 
-
 .input-field.phone {
     background-color: white;
+}
+
+.error-text {
+    color: #ff4d4d;
+    font-size: 1.2rem;
+
+    margin-bottom: 15px;
+    text-align: center;
+    background: #ffe6e6;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(255, 77, 77, 0.2);
+    animation: slide-down 0.3s ease-out;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 </style>
