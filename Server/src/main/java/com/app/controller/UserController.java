@@ -185,9 +185,9 @@ public class UserController {
      * @return Um redirecionamento para a URL da home page.
      */
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute UserModel user) {
+    public ResponseEntity<String> registerUser(@ModelAttribute UserModel user) {
         userService.registerUser(user);
-        return "customLogin";
+        return ResponseEntity.ok("Usuário registrado com sucesso!");
     }
 
     /**

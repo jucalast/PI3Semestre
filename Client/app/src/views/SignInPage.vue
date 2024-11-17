@@ -1,12 +1,10 @@
 <template>
     <div class="login-container">
         <div class="left-side"></div>
-
         <div class="right-side">
             <h1 class="main-title">
                 A um passo dos<br><strong class="melhorescafes">melhores cafés</strong><br> do Brasil
             </h1>
-
             <div class="form-container">
                 <form @submit.prevent="handleRegister" class="login-form">
                     <div class="forms">
@@ -14,39 +12,31 @@
                             class="input-field" />
                         <input type="email" v-model="email" placeholder="E-mail" required class="input-field" />
                     </div>
-
                     <div class="forms">
                         <vue-tel-input v-model="phone" :input-options="{ placeholder: phonePlaceholder }"
                             class="input-field phone" v-mask="'(##) #####-####'" />
                         <input type="text" v-model="cpf" v-mask="'###.###.###-##'" placeholder="CPF" required
                             class="input-field cpf" />
                     </div>
-
                     <div class="forms">
                         <input type="password" v-model="password" placeholder="Senha" required
                             class="input-field senha" />
                         <input type="password" v-model="passwordConfirm" placeholder="Confirme Senha" required
                             class="input-field senha" @blur="checkPasswords" />
                     </div>
-
                     <transition name="fade">
                         <p v-if="showPasswordError" class="error-text">As senhas não coincidem.</p>
                     </transition>
-
                     <button type="submit" class="login-button" :disabled="!isFormValid">
                         Cadastrar
                     </button>
-
                 </form>
-
                 <button class="login-with-google-btn" @click="handleGoogleLogin">
                     Logar com o Google
                 </button>
-
                 <div v-if="errorMessage" class="error-message">
                     {{ errorMessage }}
                 </div>
-
                 <div class="register-container">
                     <p>
                         Já tem uma conta? <a href="/login">Faça login ></a>
@@ -59,6 +49,7 @@
 
 <script>
 import { VueTelInput } from 'vue-tel-input';
+import axiosInstance from "@/utils/axiosInstance";
 
 export default {
     components: {
@@ -103,16 +94,20 @@ export default {
             }
 
             try {
-                const response = await axiosInstance.post("/register", {
-                    userName: this.userName,
-                    email: this.email,
-                    phone: this.phone,
-                    cpf: this.cpf,
-                    password: this.password,
+
+                const response = await axiosInstance.post("/register", null, {
+                    params: {
+                        userName: this.userName,
+                        emailId: this.email,
+                        mobileNumber: this.phone,
+                        cpf: this.cpf,
+                        password: this.password,
+                    },
                 });
 
                 if (response.status === 200) {
-                    this.$router.push(`/home?userId=${response.data.userId}`);
+                    console.log(response.data); 
+                    this.$router.push("/login"); 
                 }
             } catch (error) {
                 console.error("Erro no registro:", error);

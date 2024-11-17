@@ -27,7 +27,7 @@
 
         <div class="register-container">
           <p>
-            Ainda não tem uma conta? <a href="/register">Registre-se ></a>
+            Ainda não tem uma conta? <a href="/SignIn">Registre-se ></a>
           </p>
         </div>
       </div>

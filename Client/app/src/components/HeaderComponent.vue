@@ -86,7 +86,7 @@
             </div>
             <div v-else>
               <router-link to="/login">Login</router-link>
-              <a :href="`${baseURL}/register`">Registrar</a>
+              <router-link to="/signin">Registrar</router-link>
             </div>
           </div>
         </div>
