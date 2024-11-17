@@ -102,6 +102,7 @@ import { mapGetters, mapActions } from 'vuex';
 import axiosInstance from '@/utils/axiosInstance';
 import { updateFavorites } from '@/state.js';
 import CartModal from './CartModal.vue';
+import axios from 'axios';
 
 export default {
   components: {
@@ -193,8 +194,10 @@ export default {
     redirectToLogin() {
       window.location.href = `${this.baseURL}/login`;
     },
-    handleCartClick() {
-      this.isCartModalVisible = !this.isCartModalVisible;
+    async handleCartClick() {
+      const responseCart = await axios.get('http://localhost:8080/api/check-auth');
+      console.log(responseCart.status);
+      responseCart.status === 200 ? this.isCartModalVisible = !this.isCartModalVisible : window.location.href = 'http://localhost:8080/login';
     },
   },
   mounted() {

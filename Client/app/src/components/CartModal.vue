@@ -3,11 +3,11 @@
     <div class="cart-modal">
       <div class="header-cart">
         <h1>Carrinho de compras</h1>
-        <h1>Av. Dos Teste, No 123 - Bairro dos Testes</h1>
       </div>
       <div class="main-cart">
         <section class="products">
           <section v-for="(cartItem, index) in cartItems" :key="index" class="product-section">
+            {{console.log(cartItem[index])}}
             <div class="image-bckg">
               <img class="image-product" :src="cartItem.imagem_produto" :alt="cartItem.nome_produto" />
             </div>
@@ -25,12 +25,12 @@
               <option value="2">2</option>
               <option value="3">3</option>
               <option value="4">4</option>
-              <option value="1">5</option>
-              <option value="2">6</option>
-              <option value="3">7</option>
-              <option value="4">8</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
             </select>
-            <span>R${{ cartItem.preco_produto }}</span>
+            <span>R${{ cartItem.preco_produto * cartItem.quantidade }}</span>
           </section>
         </section>
       </div>
@@ -42,11 +42,11 @@
           </div>
 
           <div class="info-rigth">
+            <span id="info-ft-03">Total: R${{ parseFloat(somaValorItens.toFixed(2)) }}</span>
             <span id="info-ft-02">Inserir cupom</span>
-            <span id="info-ft-03">R${{ parseFloat(somaValorItens.toFixed(2)) }}</span>
           </div>
         </div>
-        <section class="frete-section">
+        <section v-if="false" class="frete-section">
           <div class="frete">
             <span id="info-01">Frete</span>
             <span id="info-02">R$14,59</span>
@@ -126,6 +126,7 @@
         console.log(productId, quantity);
         const responseCart = await axiosInstance.put(`/api/carrinho/${productId}/${parseInt(quantity)}`);
         console.log(responseCart.data);
+        this.fetchCarts();
       },
     },
     async mounted() {
@@ -142,7 +143,7 @@
   .cart-modal-bckg {
     position: fixed;
     background-color: rgba(0, 0, 0, 0.7);
-    margin-top: 6rem;
+    margin-top: 5rem;
     left: 0;
     width: 100%;
     height: 100%;
@@ -155,7 +156,7 @@
 
   .cart-modal {
     background-color: #ffffff;
-    width: 40%;
+    width: 35%;
     height: 100%;
     z-index: 21;
     display: flex;
@@ -348,13 +349,13 @@
   .footer-cart {
     background-color: #ffffff;
     width: 100%;
-    height: 45%;
+    /*height: 45%;*/
     border-top-left-radius: 40px;
     border-top-right-radius: 40px;
     box-shadow: 0px -1px 70px rgba(128, 128, 128, 0.701);
     display: flex;
     gap: 1.5rem;
-    padding: 0 0 7rem 0;
+    padding: 0 0 3rem 0;
     flex-direction: column;
     align-items: center;
   }
