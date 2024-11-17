@@ -7,5 +7,5 @@ export const globalState = reactive({
 });
 
 export function updateFavorites(newFavorites) {
-    globalState.favoriteProductIds = [...newFavorites.map(fav => fav.id)];
+  globalState.favoriteProductIds = [...newFavorites.map((fav) => fav.id)];
 }

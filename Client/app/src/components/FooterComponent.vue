@@ -14,9 +14,33 @@
         </div>
         <div class="footer-section">
           <h4>Redes Sociais</h4>
-          <p><a href="https://www.facebook.com" target="_blank" class="footer-link">Facebook</a></p>
-          <p><a href="https://www.instagram.com" target="_blank" class="footer-link">Instagram</a></p>
-          <p><a href="https://www.twitter.com" target="_blank" class="footer-link">Twitter</a></p>
+          <p>
+            <a
+              href="https://www.facebook.com"
+              target="_blank"
+              class="footer-link"
+            >
+              Facebook
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://www.instagram.com"
+              target="_blank"
+              class="footer-link"
+            >
+              Instagram
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://www.twitter.com"
+              target="_blank"
+              class="footer-link"
+            >
+              Twitter
+            </a>
+          </p>
         </div>
       </div>
       <div class="footer-bottom">

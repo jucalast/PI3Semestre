@@ -6,7 +6,9 @@
     <div v-else-if="produtos.length > 0" class="card-container">
       <div class="cards">
         <div
-          v-for="produto in filteredProdutos.length > 0 ? filteredProdutos : produtos"
+          v-for="produto in filteredProdutos.length > 0
+            ? filteredProdutos
+            : produtos"
           :key="produto.id"
           class="product-card"
           @click="openModal(produto)"
@@ -14,16 +16,35 @@
           <h2>{{ produto.nome }}</h2>
           <div class="backcard">
             <div class="imgcardcont">
-              <img :src="produto.imagem" :alt="produto.nome" class="product-image" />
+              <img
+                :src="produto.imagem"
+                :alt="produto.nome"
+                class="product-image"
+              />
             </div>
             <div class="elements-card">
               <div class="priceandfav">
                 <p>{{ produto.preco.toFixed(2) }}</p>
-                <button class="favorire-button" @click.stop="handleFavoriteClick(produto)">
-                  <font-awesome-icon icon="star" :class="{ favoritocard: true, 'is-favorite': favoriteProductIds.includes(produto.id) }" />
+                <button
+                  class="favorire-button"
+                  @click.stop="handleFavoriteClick(produto)"
+                >
+                  <font-awesome-icon
+                    icon="star"
+                    :class="{
+                      favoritocard: true,
+                      'is-favorite': favoriteProductIds.includes(produto.id),
+                    }"
+                  />
                 </button>
-                <button class="favorire-button" @click.stop="handleCartClick(produto)">
-                  <font-awesome-icon icon="fa-solid fa-shopping-cart" class="caricon" />
+                <button
+                  class="favorire-button"
+                  @click.stop="handleCartClick(produto)"
+                >
+                  <font-awesome-icon
+                    icon="fa-solid fa-shopping-cart"
+                    class="caricon"
+                  />
                 </button>
               </div>
             </div>
@@ -31,7 +52,12 @@
         </div>
       </div>
 
-      <ProductModal v-if="selectedProduct" :product="selectedProduct" :isVisible="isModalVisible" @close="isModalVisible = false" />
+      <ProductModal
+        v-if="selectedProduct"
+        :product="selectedProduct"
+        :isVisible="isModalVisible"
+        @close="isModalVisible = false"
+      />
     </div>
     <div class="not" v-else>
       <p>Nenhum produto encontrado.</p>
@@ -373,7 +399,9 @@ export default {
   }
 
   .favoritocard.is-favorite {
-    color: var(--favoritocard-hover-color); /* Altera a cor para a cor de favorito ativo */
+    color: var(
+      --favoritocard-hover-color
+    ); /* Altera a cor para a cor de favorito ativo */
   }
 
   .favorire-button {

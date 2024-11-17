@@ -6,7 +6,11 @@
       </div>
       <div class="sessiontwo">
         <div class="product-list">
-          <ProductCard :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
+          <ProductCard
+            :produtos="filteredProducts"
+            :searchQuery="searchQuery"
+            :isLoading="isLoading"
+          />
         </div>
       </div>
     </div>
@@ -35,13 +39,17 @@
         if (!this.searchQuery) {
           return this.produtos;
         }
-        return this.produtos.filter((produto) => produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase()));
+        return this.produtos.filter((produto) =>
+          produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
       },
     },
     methods: {
       async fetchProdutos() {
         try {
-          const response = await axios.get('http://localhost:8080/api/produtos');
+          const response = await axios.get(
+            'http://localhost:8080/api/produtos'
+          );
           this.produtos = response.data;
         } catch (error) {
           console.error('Erro ao buscar produtos:', error);

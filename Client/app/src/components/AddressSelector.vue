@@ -1,6 +1,10 @@
 <template>
-  <div class="address-selector p-6 bg-white rounded-lg shadow-lg h-full w-full flex flex-col">
-    <h3 class="text-2xl font-semibold mb-4 text-gray-800 text-left">Endereços Cadastrados</h3>
+  <div
+    class="address-selector p-6 bg-white rounded-lg shadow-lg h-full w-full flex flex-col"
+  >
+    <h3 class="text-2xl font-semibold mb-4 text-gray-800 text-left">
+      Endereços Cadastrados
+    </h3>
 
     <div class="address-list overflow-y-auto flex-grow mb-4">
       <ul class="space-y-4">
@@ -18,9 +22,9 @@
               class="mr-4 text-blue-600 focus:ring-blue-500"
             />
             <span class="text-gray-800 text-lg">
-              {{ address.street }}, {{ address.number }} - {{ address.neighborhood }}, {{ address.city }} - {{ address.state }} ({{
-                address.zipCode
-              }})
+              {{ address.street }}, {{ address.number }} -
+              {{ address.neighborhood }}, {{ address.city }} -
+              {{ address.state }} ({{ address.zipCode }})
             </span>
           </label>
         </li>
