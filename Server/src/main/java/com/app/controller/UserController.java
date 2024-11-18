@@ -217,39 +217,30 @@ public class UserController {
 
         Map<String, Object> response = new HashMap<>();
 
-        log.info("Usuário autenticado: {}", authentication.getName());
-        log.info("Authorities do usuário: {}", authentication.getAuthorities());
-        log.info("Principal do usuário: {}", authentication.getPrincipal());
-        log.info("Detalhes do usuário: {}", authentication.getDetails());
-        log.info("Token do usuário: {}", authentication.getCredentials());
-
         if (authentication != null && authentication.isAuthenticated()) {
             response.put("authenticated", true);
             response.put("email", authentication.getName());
 
             if (authentication.getPrincipal() instanceof OAuth2User) {
                 OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
-                log.info("Usuário autenticado via OAuth2: {}", oauthUser);
+
                 String photoUrl = oauthUser.getAttribute("picture");
                 response.put("photoUrl", photoUrl);
+
                 String firstName = oauthUser.getAttribute("given_name");
                 response.put("username", firstName);
-                log.info("Usuário autenticado via OAuth2. Foto: {}", photoUrl);
 
+                List<String> oauthRoles = Collections.singletonList("ROLE_USER");
+                response.put("roles", oauthRoles);
             } else if (authentication.getPrincipal() instanceof UserDetails) {
-
                 response.put("username", userService.getUserFromAuthentication(authentication).getUserName());
                 response.put("photoUrl", null);
-                log.info("Usuário autenticado via Form Login. Foto: null");
 
+                List<String> formLoginRoles = authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
+                response.put("roles", formLoginRoles);
             }
-
-            List<String> roles = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
-            response.put("roles", roles);
-
-            log.info("\n###\nusuário autenticado com as seguintes funções: {}\n###\n", roles);
 
             return ResponseEntity.ok(response);
         }
