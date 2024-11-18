@@ -10,8 +10,6 @@ package com.app.model;
  * Importa a anotação @Data do Lombok para geração automática de métodos
  * import lombok.Data;
  */
-import java.math.BigDecimal;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity; 
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import lombok.Data;
 
 /**
@@ -143,7 +142,11 @@ public class PedidoModel {
      * - CANCELADO (5)
      */
     public enum StatusPedido {
-        NOVO(1), PROCESSANDO(2), ENVIADO(3), ENTREGUE(4), CANCELADO(5);
+        NOVO(1),
+        PROCESSANDO(2),
+        ENVIADO(3),
+        ENTREGUE(4),
+        CANCELADO(5);
 
         private final int code;
 

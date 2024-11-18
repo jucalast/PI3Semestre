@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.List;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,8 +15,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -213,14 +217,39 @@ public class UserController {
 
         Map<String, Object> response = new HashMap<>();
 
+        log.info("Usuário autenticado: {}", authentication.getName());
+        log.info("Authorities do usuário: {}", authentication.getAuthorities());
+        log.info("Principal do usuário: {}", authentication.getPrincipal());
+        log.info("Detalhes do usuário: {}", authentication.getDetails());
+        log.info("Token do usuário: {}", authentication.getCredentials());
+
         if (authentication != null && authentication.isAuthenticated()) {
             response.put("authenticated", true);
-            response.put("username", authentication.getName());
+            response.put("email", authentication.getName());
+
+            if (authentication.getPrincipal() instanceof OAuth2User) {
+                OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+                log.info("Usuário autenticado via OAuth2: {}", oauthUser);
+                String photoUrl = oauthUser.getAttribute("picture");
+                response.put("photoUrl", photoUrl);
+                String firstName = oauthUser.getAttribute("given_name");
+                response.put("username", firstName);
+                log.info("Usuário autenticado via OAuth2. Foto: {}", photoUrl);
+
+            } else if (authentication.getPrincipal() instanceof UserDetails) {
+
+                response.put("username", userService.getUserFromAuthentication(authentication).getUserName());
+                response.put("photoUrl", null);
+                log.info("Usuário autenticado via Form Login. Foto: null");
+
+            }
 
             List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
             response.put("roles", roles);
+
+            log.info("\n###\nusuário autenticado com as seguintes funções: {}\n###\n", roles);
 
             return ResponseEntity.ok(response);
         }

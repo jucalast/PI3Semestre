@@ -73,7 +73,11 @@ public class SpringConfig {
                             .loginPage("/login")
                             .successHandler(new AuthenticationSuccessHandler() {
                                 @Override
-                                public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+                                public void onAuthenticationSuccess(
+                                    HttpServletRequest request, 
+                                    HttpServletResponse response, 
+                                    Authentication authentication
+                                    ) throws IOException {
                                     response.sendRedirect("/login/google-process");
                                 }
                             });

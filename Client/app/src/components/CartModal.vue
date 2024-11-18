@@ -6,8 +6,12 @@
       </div>
       <div class="main-cart">
         <section class="products">
-          <section v-for="(cartItem, index) in cartItems" :key="index" class="product-section">
-            {{console.log(cartItem[index])}}
+          <section
+            v-for="(cartItem, index) in cartItems"
+            :key="index"
+            class="product-section"
+          >
+            {{ console.log(cartItem[index]) }}
             <div class="image-bckg">
               <img
                 class="image-product"
@@ -53,7 +57,9 @@
           </div>
 
           <div class="info-rigth">
-            <span id="info-ft-03">Total: R${{ parseFloat(somaValorItens.toFixed(2)) }}</span>
+            <span id="info-ft-03">
+              Total: R${{ parseFloat(somaValorItens.toFixed(2)) }}
+            </span>
             <span id="info-ft-02">Inserir cupom</span>
           </div>
         </div>
