@@ -27,7 +27,6 @@ import lombok.Data;
  * A entidade está vinculada ao produto ao qual pertence e contém informações
  * detalhadas para categorização e recomendação de preparo.
  *
- * @author João
  * @version 1.0
  * @since 2024-10-05
  */
@@ -117,4 +116,8 @@ public class CafeEspecial {
     @JoinColumn(name = "produto_id")
     @JsonBackReference // Para evitar loop de serialização
     private Produto produto;
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
 }

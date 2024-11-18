@@ -5,16 +5,20 @@
       <p>Explore e gerencie todos seu negócio com facilidade e rapidez.</p>
     </section>
     <section class="principal-section">
-      <CreateProductComponent />
+      <CreateProductComponent @product-created="handleProductCreated" />
       <div class="product-list">
-        <h3>Edite ou exclua produtos</h3>
-        <!-- Mude de ProductCard para CardGeneric -->
+        <div class="header">
+          <h3>Edite ou exclua produtos</h3>
+          <button @click="fetchProdutos" class="refresh-button">
+            <i class="fas fa-sync-alt"></i> Atualizar
+          </button>
+        </div>
         <CardGeneric :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
       </div>
     </section>
-    <!-- Outros conteúdos do dashboard -->
   </AdminLayout>
 </template>
+
 
 <script>
 import AdminLayout from '@/layouts/AdminLayout.vue';
@@ -56,6 +60,9 @@ export default {
       } finally {
         this.isLoading = false;
       }
+    },
+    handleProductCreated(newProduct) {
+      this.produtos.push(newProduct);  // Adiciona o novo produto diretamente à lista
     },
     updateSearchQuery(query) {
       this.searchQuery = query;
@@ -132,5 +139,31 @@ h3 {
   font-size: 3rem;
   line-height: 1 !important;
   padding-bottom:2rem ;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.refresh-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  border:solid 2px #dfdfdf !important;
+  padding: 1rem;
+  border-radius:1rem ;
+}
+
+.refresh-button:hover {
+  background: #ebebeb;
+}
+
+.refresh-button i {
+  margin-right: 0.5rem;
 }
 </style>

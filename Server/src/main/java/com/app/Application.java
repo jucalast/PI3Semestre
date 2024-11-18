@@ -40,6 +40,7 @@ public class Application {
      *
      * @param args Argumentos de linha de comando passados durante a inicialização.
      */
+    
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
         System.setProperty("DB_URL", dotenv.get("DB_URL"));

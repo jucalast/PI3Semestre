@@ -315,6 +315,7 @@ button {
 .accordion {
   width: 100%;
   position: relative;
+
 }
 
 h3 {

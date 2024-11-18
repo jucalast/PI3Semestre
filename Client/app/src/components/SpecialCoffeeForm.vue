@@ -4,73 +4,105 @@
       <div class="dados-imagem">
         <div class="dados">
           <!-- Campos básicos do produto -->
-          <input v-model="product.nome" placeholder="Nome" required />
-          <textarea v-model="product.descricao" placeholder="Descrição" required></textarea>
-          <input v-model.number="product.preco" type="number" placeholder="Preço" required />
-          <input v-model.number="product.quantidade_estoque" type="number" placeholder="Quantidade em Estoque" required />
+          <div class="form-group">
+            <label v-if="isEditMode" for="nome">Nome:</label>
+            <input id="nome" v-model="localProduct.nome" placeholder="Nome" required />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="descricao">Descrição:</label>
+            <textarea id="descricao" v-model="localProduct.descricao" placeholder="Descrição" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="preco">Preço:</label>
+            <input id="preco" v-model="localProduct.preco" @input="formatPrice" type="text" placeholder="Preço" required />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="quantidade_estoque">Quantidade em Estoque:</label>
+            <input id="quantidade_estoque" v-model.number="localProduct.quantidade_estoque" type="number" placeholder="Quantidade em Estoque" required />
+          </div>
 
           <!-- Inputs específicos de propriedades dentro de cafeEspecial -->
-          <input v-model="product.cafeEspecial.notasSensoriais" placeholder="Notas Sensoriais" />
-          <input v-model="product.cafeEspecial.origem" placeholder="Origem" />
-          <input v-model="product.cafeEspecial.recomendacoesPreparo" placeholder="Recomendações de Preparo" />
-          <input v-model="product.cafeEspecial.torra" placeholder="Torra" />
-          <input v-model="product.cafeEspecial.torrefacao" placeholder="Torrefação" />
-          <input v-model="product.cafeEspecial.variedade" placeholder="Variedade" />
-          <input v-model="product.cafeEspecial.beneficiamento" placeholder="Beneficiamento" />
+          <div class="form-group">
+            <label v-if="isEditMode" for="notasSensoriais">Notas Sensoriais:</label>
+            <input id="notasSensoriais" v-model="localProduct.cafeEspecial.notasSensoriais" placeholder="Notas Sensoriais" />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="origem">Origem:</label>
+            <input id="origem" v-model="localProduct.cafeEspecial.origem" placeholder="Origem" />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="recomendacoesPreparo">Recomendações de Preparo:</label>
+            <input id="recomendacoesPreparo" v-model="localProduct.cafeEspecial.recomendacoesPreparo" placeholder="Recomendações de Preparo" />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="torra">Torra:</label>
+            <input id="torra" v-model="localProduct.cafeEspecial.torra" placeholder="Torra" />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="torrefacao">Torrefação:</label>
+            <input id="torrefacao" v-model="localProduct.cafeEspecial.torrefacao" placeholder="Torrefação" />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="variedade">Variedade:</label>
+            <input id="variedade" v-model="localProduct.cafeEspecial.variedade" placeholder="Variedade" />
+          </div>
+          
+          <div class="form-group">
+            <label v-if="isEditMode" for="beneficiamento">Beneficiamento:</label>
+            <input id="beneficiamento" v-model="localProduct.cafeEspecial.beneficiamento" placeholder="Beneficiamento" />
+          </div>
 
           <!-- Datas dentro de cafeEspecial -->
-          <div class="dates">
-            <label for="dataTorra">Data de Torra:</label>
-            <input id="dataTorra" v-model="product.cafeEspecial.dataTorra" type="date" />
+          <div class="form-group dates">
+            <label v-if="isEditMode" for="dataTorra">Data de Torra:</label>
+            <input id="dataTorra" v-model="localProduct.cafeEspecial.dataTorra" type="date" />
           </div>
-          <div class="dates">
-            <label for="dataValidade">Data de Validade:</label>
-            <input id="dataValidade" v-model="product.cafeEspecial.dataValidade" type="date" />
+          <div class="form-group dates">
+            <label v-if="isEditMode" for="dataValidade">Data de Validade:</label>
+            <input id="dataValidade" v-model="localProduct.cafeEspecial.dataValidade" type="date" />
           </div>
         </div>
-<div class="imagenanddrop">
 
-
-        <!-- Upload de Imagens -->
-        <div
-          class="imagem-container"
-          @drop.prevent="onDrop"
-          @dragover.prevent
-        >
-          <input
-            class="imagem"
-            type="file"
-            multiple
-            @change="onFileChange"
-            accept="image/*"
-          />
-          <p>Arraste e solte as imagens aqui ou clique para selecionar</p>
-        </div>
-
-        <!-- Pré-visualização das Imagens -->
-        <div class="preview-container">
-          <div v-for="(image, index) in imagePreviews" :key="index" class="preview-item">
-            <img :src="image.preview" alt="Preview" class="preview" />
-            <button @click="removeImage(index)">Remover</button>
+        <div class="imagenanddrop">
+          <!-- Passando o método onImageUpload como prop para o ImageUpload -->
+          <ImageUpload :onImageUpload="handleImageUpload" />
+          <div class="image-preview" v-if="localProduct.imagens.length">
+            <div v-for="(image, index) in localProduct.imagens" :key="index" class="image-container">
+              <img :src="image" alt="Imagem do produto" class="preview-image" />
+              <button @click="removeImage(index)" class="remove-image"></button>
+            </div>
           </div>
         </div>
       </div>
-      </div>
 
-      <button class="enviar" type="submit">Salvar Alterações</button>
+      <button class="enviar" type="submit">{{ isEditMode ? 'Atualizar café especial' : 'Criar café especial' }}</button>
     </form>
   </div>
 </template>
 
 <script>
+import ImageUpload from './ImageUploader.vue';
+
 export default {
-  data() {
-    return {
-      product: {
+  components: {
+    ImageUpload,
+  },
+  props: {
+    product: {
+      type: Object,
+      default: () => ({
         nome: "",
         descricao: "",
         preco: null,
-        imagens: [], // Guardará as imagens em VARBINARY
+        imagens: [],
         quantidade_estoque: null,
         cafeEspecial: {
           notasSensoriais: "",
@@ -83,80 +115,65 @@ export default {
           dataTorra: "",
           dataValidade: "",
         },
-      },
-      imagePreviews: [], // Guarda pré-visualizações e dados binários das imagens
+      }),
+    },
+    isEditMode: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      localProduct: { ...this.product },
     };
   },
+  watch: {
+    product: {
+      immediate: true,
+      handler(newVal) {
+        this.localProduct = { ...newVal };
+      },
+    },
+  },
   methods: {
-    async onFileChange(event) {
-      const files = event.target.files;
-      await this.handleFiles(files);
-    },
-    async onDrop(event) {
-      const files = event.dataTransfer.files;
-      await this.handleFiles(files);
-    },
-    async handleFiles(files) {
-      for (const file of files) {
-        await this.convertToBinary(file);
-      }
-    },
-    async convertToBinary(file) {
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagePreviews.push({
-          preview: e.target.result,
-          binary: null, // Inicializamos o binário como null para definir posteriormente
-        });
-      };
-      reader.readAsDataURL(file);
-
-      const binaryReader = new FileReader();
-      binaryReader.onload = (e) => {
-        const binaryData = e.target.result;
-        this.product.imagens.push(binaryData);
-        this.imagePreviews[this.imagePreviews.length - 1].binary = binaryData;
-      };
-      binaryReader.readAsArrayBuffer(file);
+    handleImageUpload(newImages) {
+      this.localProduct.imagens = [...this.localProduct.imagens, ...newImages];
     },
     removeImage(index) {
-      this.product.imagens.splice(index, 1);
-      this.imagePreviews.splice(index, 1);
+      this.localProduct.imagens.splice(index, 1);
     },
     submitForm() {
-      const { metodoDePreparo, ...filteredProduct } = this.product;
+      const filteredProduct = {
+        ...this.localProduct,
+        preco: parseFloat(this.localProduct.preco.replace(/\./g, '').replace(',', '.')), // Converte para BigDecimal
+        cafeEspecial: Object.entries(this.localProduct.cafeEspecial).reduce(
+          (acc, [key, value]) => {
+            if (value) acc[key] = value;
+            return acc;
+          },
+          {}
+        ),
+      };
 
-      const cafeEspecialFields = [
-        "notasSensoriais",
-        "origem",
-        "recomendacoesPreparo",
-        "torra",
-        "torrefacao",
-        "variedade",
-        "beneficiamento",
-        "dataTorra",
-        "dataValidade",
-      ];
-
-      filteredProduct.cafeEspecial = {};
-      cafeEspecialFields.forEach((field) => {
-        if (this.product.cafeEspecial[field]) {
-          filteredProduct.cafeEspecial[field] = this.product.cafeEspecial[field];
-        }
-      });
-
-      if (Object.keys(filteredProduct.cafeEspecial).length === 0) {
+      if (!Object.keys(filteredProduct.cafeEspecial).length) {
         delete filteredProduct.cafeEspecial;
       }
 
       console.log("Produto Atualizado:", filteredProduct);
       this.$emit("submit-product", filteredProduct);
     },
+    formatPrice(event) {
+      let value = event.target.value;
+      value = value.replace(/\D/g, ""); // Remove tudo que não é dígito
+      value = value.replace(/(\d)(\d{2})$/, "$1,$2"); // Coloca a vírgula antes dos últimos 2 dígitos
+      value = value.replace(/(?=(\d{3})+(\D))\B/g, "."); // Coloca o ponto a cada 3 dígitos
+      this.localProduct.preco = value;
+    },
   },
 };
 </script>
+
+
 
 <style scoped>
 .dados-imagem {
@@ -171,93 +188,39 @@ export default {
   background: #e3e3e3;
   width: 40%;
   border-radius: 2rem;
+
 }
-
-.imagem-container {
-  border: 2px dashed #ccc;
-  border-radius: 2rem;
-  margin: 1rem;
-  padding: 20px;
-  text-align: center;
-  position: relative;
-  height: 30%;
-  display: flex;
-}
-
-.imagem-container input[type="file"] {
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  cursor: pointer;
-}
-
-.preview-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.preview-item {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.preview {
-  width: 100px;
-  height: auto;
-}
-
-.preview-item button {
-  background-color: #ff4d4d;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 5px;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-
 
 .enviar {
   position: absolute;
-  top:13%;
+  top: 13%;
   right: 13%;
 }
 
 .dados {
   display: flex;
-    flex-direction: row;
-    gap: 1rem !important;
-    flex-wrap: wrap;
-    width: 60%
-}
-.c1 {
-  display: flex;
+  flex-direction: row;
   gap: 1rem !important;
+  flex-wrap: wrap;
+  width: 60%;
+  flex-wrap: wrap;
 }
 
-.c2 {
+.form-group {
   display: flex;
   flex-direction: column;
-  gap: 1rem !important;
+  width: 100%;
+}
+
+label {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #6d6d6d;
 }
 
 .dates {
   display: flex;
   flex-direction: column;
-}
-
-label {
-  font-size: 1.5rem;
-  margin-left: 1rem;
-  color: #6d6d6d;
 }
 
 .c3 {
@@ -283,12 +246,12 @@ label {
 
 .form-container form {
   display: flex;
-    gap: 20px;
-    background: transparent !important;
-    align-items: center;
-    width: fit-content !important;
-    padding: 1rem;
-    flex-direction: row;
+  gap: 20px;
+  background: transparent !important;
+  align-items: center;
+  width: fit-content !important;
+  padding: 1rem;
+  flex-direction: row;
 }
 
 .form-container input,
@@ -340,5 +303,45 @@ input {
 
 .form-container button:hover {
   background-color: #e04e4e; /* Cor ao passar o mouse */
+}
+
+.image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.image-container {
+  position: relative;
+}
+
+.preview-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.remove-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-image::before {
+  content: "x";
+  font-size: 1rem;
 }
 </style>

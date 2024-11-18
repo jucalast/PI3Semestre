@@ -48,7 +48,7 @@
 import SpecialCoffeeForm from "./SpecialCoffeeForm.vue";
 import PreparationMethodForm from "./PreparationMethodForm.vue";
 import { useToast } from "vue-toastification";
-import axiosInstance from "../utils/axiosInstance"; // Certifique-se de importar a instância do axios
+import axiosInstance from "../utils/axiosInstance";
 
 export default {
   name: "CreateProductModal",
@@ -84,6 +84,7 @@ export default {
         if (response.status === 200) {
           console.log("Produto criado:", response.data);
           toast.success("Produto criado com sucesso!");
+          this.$emit("product-created", response.data); // Emite o evento com o novo produto
           this.$emit("close");
         } else {
           throw new Error("Erro ao criar o produto");
@@ -95,9 +96,14 @@ export default {
         this.isSubmitting = false;
       }
     },
+    handleImageUpload(newImages) {
+      this.product.imagens = [...this.product.imagens, ...newImages];
+    },
   },
 };
 </script>
+
+
 
 <style scoped>
 .loading-overlay {

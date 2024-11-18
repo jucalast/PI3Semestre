@@ -94,7 +94,7 @@
                   class="product-card"
                 >
                   <div class="product-image">
-                    <img :src="product.imagem" alt="Imagem do Produto" />
+                    <img :src="product.imagens[0]" alt="Imagem do Produto" />
                   </div>
                   <div class="product-details">
                     <div class="nameandprice">

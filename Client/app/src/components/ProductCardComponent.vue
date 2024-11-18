@@ -15,7 +15,7 @@
           <div class="backcard">
             <div class="imgcardcont">
               <img
-                :src="produto.imagem"
+                :src="produto.imagens[0]"
                 :alt="produto.nome"
                 class="product-image"
               />

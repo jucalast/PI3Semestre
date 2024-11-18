@@ -15,7 +15,7 @@
             <div class="image-bckg">
               <img
                 class="image-product"
-                :src="cartItem.imagem_produto"
+                :src="cartItem.imagens_produto[0]"
                 :alt="cartItem.nome_produto"
               />
             </div>
@@ -74,6 +74,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import axiosInstance from "@/utils/axiosInstance";

@@ -13,7 +13,7 @@
           @mouseleave="showButtons = null"
         >
           <div class="imgcardcont">
-            <img :src="produto.imagem" :alt="produto.nome" class="product-image" />
+            <img :src="produto.imagens[0]" :alt="produto.nome" class="product-image" />
           </div>
           <div class="name">
             <h3 class="product-name" @click="openModal(produto)">
@@ -37,7 +37,6 @@
         </div>
       </div>
 
-      <!-- Modal de edição -->
       <EditProductModal
         v-if="isEditModalVisible"
         :product="selectedProduct"
@@ -46,7 +45,6 @@
         @save="handleSave"
       />
 
-      <!-- Modal de produto existente -->
       <ProductModal
         v-if="selectedProduct"
         :product="selectedProduct"
@@ -54,7 +52,6 @@
         @close="isModalVisible = false"
       />
 
-      <!-- Confirmação de exclusão -->
       <div v-if="isConfirmationVisible" class="confirmation-modal">
         <p>Tem certeza que deseja excluir este produto?</p>
         <button class="deletesim" @click="deleteProduct">Sim</button>
@@ -70,9 +67,8 @@
 <script>
 import ProductModal from "@/components/ProductModal.vue";
 import EditProductModal from "@/components/EditProductModal.vue";
-import axiosInstance from "../utils/axiosInstance"; // Certifique-se de importar a instância do axios
+import axiosInstance from "../utils/axiosInstance";
 import { useToast } from "vue-toastification";
-import axios from "axios";  
 
 export default {
   props: {
@@ -100,12 +96,10 @@ export default {
     return { toast };
   },
   methods: {
-    // Formatação da descrição do produto
     formattedDescription(descricao) {
       return descricao.length > 30 ? descricao.slice(0, 30) + "..." : descricao;
     },
 
-    // Abertura do modal para visualizar detalhes do produto
     async openModal(product) {
       this.selectedProduct = { ...product };
       await this.fetchProductDetails(product.id);
@@ -117,23 +111,21 @@ export default {
       }
     },
 
-    // Lida com o clique no botão "editar"
     handleEdit(produto) {
       this.selectedProduct = { ...produto };
       this.isEditModalVisible = true;
       console.log(produto);
     },
 
-    // Busca os detalhes do produto na API
     async fetchProductDetails(productId) {
       try {
-        const cafeResponse = await axios.get(
+        const cafeResponse = await axiosInstance.get(
           `http://localhost:8080/api/cafes-especiais/produto/${productId}`
         );
         if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
           this.selectedProduct.cafeEspecial = cafeResponse.data;
         } else {
-          const metodoResponse = await axios.get(
+          const metodoResponse = await axiosInstance.get(
             `http://localhost:8080/api/metodo-preparo/produto/${productId}`
           );
           if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
@@ -152,68 +144,83 @@ export default {
     },
 
     async handleSave(updatedProduct) {
-  const toast = useToast();  // Acesso à toast para feedback
+      const productData = {
+        ...updatedProduct,
+        cafeEspecial: updatedProduct.cafeEspecial || {},
+        metodoPreparo: updatedProduct.metodoPreparo || {},
+      };
 
-  // Certifique-se de que todos os campos obrigatórios estejam presentes
-  const productData = {
-    nome: updatedProduct.nome,
-    descricao: updatedProduct.descricao,
-    preco: updatedProduct.preco,
-    avaliacao: updatedProduct.avaliacao,
-    imagem: updatedProduct.imagem,
-    quantidade_estoque: updatedProduct.quantidade_estoque,
-    cafeEspecial: updatedProduct.cafeEspecial || {}
-  };
-
-  try {
-    // Usando axiosInstance para fazer a requisição PUT
-    const response = await axiosInstance.put(
-      `/api/produtos/protected/update/${updatedProduct.id}`,
-      productData
-    );
-
-    // Verificando a resposta e atualizando a lista de produtos
-    if (response.status === 200) {
-      const index = this.produtos.findIndex(prod => prod.id === updatedProduct.id);
-      if (index !== -1) {
-        this.produtos[index] = updatedProduct;  // Atualiza o produto na lista local
-        toast.success("Produto atualizado com sucesso!");
+      // Remover cafeEspecial se estiver vazio
+      if (Object.keys(productData.cafeEspecial).length === 0) {
+        delete productData.cafeEspecial;
       }
-    } else {
-      throw new Error("Erro ao atualizar o produto.");
-    }
-  } catch (error) {
-    console.error("Erro ao atualizar o produto:", error);
-    toast.error("Erro ao atualizar o produto: " + (error.response?.data?.message || error.message));
-  } finally {
-    this.isEditModalVisible = false;  // Fecha o modal após salvar
-  }
-},
-    // Confirmação da exclusão do produto
-    confirmDeleteProduct(produtoId) {
-      this.productToDelete = produtoId;
+
+      // Remover metodoPreparo se estiver vazio
+      if (Object.keys(productData.metodoPreparo).length === 0) {
+        delete productData.metodoPreparo;
+      }
+
+      // Logar o corpo da requisição antes de enviar
+      console.log("Dados enviados para o servidor:", productData);
+
+      try {
+        const response = await axiosInstance.put(
+          `http://localhost:8080/api/produtos/protected/update/${updatedProduct.id}`,
+          productData
+        );
+
+        if (response.status === 200) {
+          // Atualiza a lista de produtos no pai
+          const index = this.produtos.findIndex(
+            (prod) => prod.id === updatedProduct.id
+          );
+          if (index !== -1) {
+            this.produtos.splice(index, 1, updatedProduct);
+          }
+
+          this.toast.success("Produto atualizado com sucesso.");
+          this.isEditModalVisible = false;
+        } else {
+          this.toast.error("Erro ao atualizar produto.");
+        }
+      } catch (error) {
+        this.toast.error("Erro ao atualizar produto.");
+        console.error("Erro ao salvar produto:", error.message);
+      }
+    },
+
+    async confirmDeleteProduct(id) {
+      this.productToDelete = id;
       this.isConfirmationVisible = true;
     },
 
-    // Exclusão do produto
     async deleteProduct() {
+      if (!this.productToDelete) return;
+
       try {
-        await axios.delete(`http://localhost:8080/api/produtos/${this.productToDelete}`);
-        const index = this.produtos.findIndex((prod) => prod.id === this.productToDelete);
-        if (index !== -1) {
-          this.produtos.splice(index, 1);
-          this.toast.success("Produto excluído com sucesso!");
+        const response = await axiosInstance.delete(
+          `http://localhost:8080/api/produtos/${this.productToDelete}`
+        );
+
+        if (response.status === 200) {
+          this.produtos = this.produtos.filter(
+            (produto) => produto.id !== this.productToDelete
+          );
+          this.isConfirmationVisible = false;
+          this.toast.success("Produto excluído com sucesso.");
+        } else {
+          this.toast.error("Erro ao excluir produto.");
         }
       } catch (error) {
-        console.error("Erro ao excluir o produto:", error);
-        this.toast.error("Erro ao excluir o produto.");
-      } finally {
-        this.isConfirmationVisible = false; // Esconde a confirmação após a ação
+        console.error("Erro ao excluir produto:", error.message);
+        this.toast.error("Erro ao excluir produto.");
       }
     },
   },
 };
 </script>
+
+
 
 
 <style scoped>
@@ -351,7 +358,6 @@ body {
   font-weight: bold;
   color: #333;
   background: transparent !important;
-  margin-left: -1rem;
 }
 
 p {

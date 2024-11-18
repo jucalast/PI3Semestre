@@ -3,13 +3,21 @@
     <div class="modal-content">
       <!-- Carrossel de Comentários -->
       <div class="comments-carousel" v-if="comments.length > 0">
-        <p>{{ comments[currentCommentIndex].userName }}: {{ comments[currentCommentIndex].descricao }}</p>
+        <p>
+          {{ comments[currentCommentIndex].userName }}:
+          {{ comments[currentCommentIndex].descricao }}
+        </p>
       </div>
 
       <div class="infoprod">
         <div class="product-rating">
           <div class="rating-stars">
-            <span class="fa fa-star" v-for="star in 5" :key="'rating-' + star" :class="getStarClass(star)"></span>
+            <span
+              class="fa fa-star"
+              v-for="star in 5"
+              :key="'rating-' + star"
+              :class="getStarClass(star)"
+            ></span>
           </div>
         </div>
 
@@ -26,10 +34,16 @@
               Sacola
             </button>
             <!-- No modal, dentro do template -->
-            <button class="favorite-button" @click.stop="handleFavoriteClick(product)">
+            <button
+              class="favorite-button"
+              @click.stop="handleFavoriteClick(product)"
+            >
               <font-awesome-icon
-                  icon="star"
-                  :class="{'favoritocard': true, 'is-favorite': favoriteProductIds.includes(product.id)}"
+                icon="star"
+                :class="{
+                  favoritocard: true,
+                  'is-favorite': favoriteProductIds.includes(product.id),
+                }"
               />
             </button>
           </div>
@@ -42,11 +56,7 @@
         </p>
       </div>
       <div class="imagemproduto">
-        <img
-            :src="product.imagem"
-            :alt="product.nome"
-            class="product-image modalimage"
-        />
+        <ImageCarousel :images="product.imagens" />
       </div>
 
       <!-- Acordions para informações do produto -->
@@ -64,8 +74,8 @@
         <!-- Accordion para Características (apenas se for café especial) -->
         <div v-if="product.cafeEspecial" class="accordion-item">
           <div
-              class="accordion-header"
-              @click="toggleAccordion('caracteristicas')"
+            class="accordion-header"
+            @click="toggleAccordion('caracteristicas')"
           >
             <h4>Características</h4>
             <span>{{ isOpen.caracteristicas ? "-" : "+" }}</span>
@@ -87,7 +97,7 @@
             <p>
               <strong>Torra:</strong>
               {{
-                product.cafeEspecial[0]?.torra || "Informação não disponível"
+                product.cafeEspecial[0]?.torra || "Informação n��o disponível"
               }}
             </p>
             <p>
@@ -110,8 +120,8 @@
         <!-- Accordion para Método de Preparo (apenas se houver método de preparo) -->
         <div v-if="product.metodoPreparo" class="accordion-item">
           <div
-              class="accordion-header"
-              @click="toggleAccordion('metodoPreparo')"
+            class="accordion-header"
+            @click="toggleAccordion('metodoPreparo')"
           >
             <h4>Caracteristicas</h4>
             <span>{{ isOpen.metodoPreparo ? "-" : "+" }}</span>
@@ -152,8 +162,8 @@
         <!-- Accordion para Outros Detalhes -->
         <div class="accordion-item">
           <div
-              class="accordion-header"
-              @click="toggleAccordion('outrosDetalhes')"
+            class="accordion-header"
+            @click="toggleAccordion('outrosDetalhes')"
           >
             <h4>Outros Detalhes</h4>
             <span>{{ isOpen.outrosDetalhes ? "-" : "+" }}</span>
@@ -172,8 +182,9 @@
 
 <script>
 import axiosInstance from "@/utils/axiosInstance";
-import {globalState} from "@/state";
-import {computed, ref, onMounted, watch} from "vue";
+import { globalState } from "@/state";
+import { computed, ref, onMounted, watch } from "vue";
+import ImageCarousel from "@/components/ImageCarousel.vue";
 
 export default {
   props: {
@@ -206,6 +217,9 @@ export default {
       favoriteProductIds,
     };
   },
+  components: {
+    ImageCarousel,
+  },
   watch: {
     isVisible(newValue) {
       console.log("Visibility changed:", newValue);
@@ -222,7 +236,9 @@ export default {
   methods: {
     async fetchAverageRating() {
       try {
-        const response = await axiosInstance.get(`http://localhost:8080/avaliacoes/media/${this.product.id}`);
+        const response = await axiosInstance.get(
+          `http://localhost:8080/avaliacoes/media/${this.product.id}`
+        );
         this.averageRating = response.data;
         console.log("Fetched average rating:", this.averageRating);
       } catch (error) {
@@ -235,22 +251,28 @@ export default {
       const remainder = this.averageRating - floorRating;
 
       if (star <= floorRating) {
-        return 'checked'; // estrela completamente preenchida
+        return "checked"; // estrela completamente preenchida
       } else if (star === floorRating + 1 && remainder >= 0.5) {
-        return 'half'; // meia estrela para 0.5 ou mais
+        return "half"; // meia estrela para 0.5 ou mais
       }
-      return ''; // estrela não preenchida
+      return ""; // estrela não preenchida
     },
     async fetchComments() {
       try {
-        const response = await axiosInstance.get(`http://localhost:8080/avaliacoes/produto/${this.product.id}`);
+        const response = await axiosInstance.get(
+          `http://localhost:8080/avaliacoes/produto/${this.product.id}`
+        );
         this.comments = response.data;
         console.log("Comments fetched:", this.comments);
         if (this.comments.length > 0) {
           this.currentCommentIndex = 0; // Reset to first comment
           this.commentInterval = setInterval(() => {
-            this.currentCommentIndex = (this.currentCommentIndex + 1) % this.comments.length;
-            console.log("Updating current comment index:", this.currentCommentIndex);
+            this.currentCommentIndex =
+              (this.currentCommentIndex + 1) % this.comments.length;
+            console.log(
+              "Updating current comment index:",
+              this.currentCommentIndex
+            );
           }, 4000); // Change comment every 3 seconds
         }
       } catch (error) {
@@ -278,10 +300,12 @@ export default {
       try {
         const params = new URLSearchParams();
         params.append("productId", produto.id);
-        const response = await axiosInstance.post(`/api/favorites/add?${params.toString()}`);
+        const response = await axiosInstance.post(
+          `/api/favorites/add?${params.toString()}`
+        );
         console.log("Favorite toggle response:", response);
         if (response.status === 200) {
-          await this.fetchFavorites();  // Isto re-fetch os favoritos atualizados do servidor
+          await this.fetchFavorites(); // Isto re-fetch os favoritos atualizados do servidor
         } else {
           console.error("Falha ao alterar o estado do favorito");
         }
@@ -294,13 +318,15 @@ export default {
         const response = await axiosInstance.get(`/api/favorites/list`);
         console.log("Fetched favorites:", response.data);
         if (Array.isArray(response.data)) {
-          globalState.favoriteProductIds = response.data.map((fav) => fav.productId);
+          globalState.favoriteProductIds = response.data.map(
+            (fav) => fav.productId
+          );
         } else {
-          globalState.favoriteProductIds = [];  // Limpa a lista se a resposta não for um array
+          globalState.favoriteProductIds = []; // Limpa a lista se a resposta não for um array
         }
       } catch (error) {
         console.error("Erro ao buscar favoritos:", error.message);
-        globalState.favoriteProductIds = [];  // Limpa a lista em caso de erro na requisição
+        globalState.favoriteProductIds = []; // Limpa a lista em caso de erro na requisição
       }
     },
     disableScroll() {
@@ -315,7 +341,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
@@ -329,9 +354,12 @@ export default {
   border-radius: 5px;
   width: 30%;
   height: 80%;
-  max-height: 80%; /* Define a altura máxima */
-  overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo ultrapassar a altura máxima */
-  overflow-x: hidden; /* Adiciona rolagem vertical se o conteúdo ultrapassar a altura máxima */
+  max-height: 80%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .accordion p font {
@@ -410,7 +438,7 @@ export default {
 
 .imagemproduto {
   width: 25%;
-  height: 25%;
+  height: 100%; /* Alterado para ocupar 100% da altura */
 }
 
 .modal-content {
@@ -424,8 +452,9 @@ export default {
   flex-wrap: wrap;
   align-content: center;
   justify-content: space-evenly;
-  align-items: flex-start;
+  align-items: center;
   font-family: "Poppins", sans-serif;
+  font-size: 16px; /* Definir padrão de font-size */
 }
 
 .modalimage {
@@ -548,7 +577,9 @@ span {
 }
 
 .favoritocard.is-favorite {
-  color: var(--favoritocard-hover-color); /* Altera a cor para a cor de favorito ativo */
+  color: var(
+    --favoritocard-hover-color
+  ); /* Altera a cor para a cor de favorito ativo */
 }
 
 .favorite-button {
@@ -576,9 +607,6 @@ span {
   font-size: 1rem;
 }
 
-
-
-
 .fa-star {
   color: #ddd; /* Cor das estrelas não preenchidas */
   display: inline-block; /* Garante alinhamento correto */
@@ -595,9 +623,8 @@ span {
 }
 
 .half::before {
-  content: '\f005'; /* Código Unicode para a estrela completa (FontAwesome) */
+  content: "\f005"; /* Código Unicode para a estrela completa (FontAwesome) */
   display: block;
   mask-image: linear-gradient(to right, black 50%, transparent 50%);
 }
 </style>
-

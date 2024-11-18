@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -54,9 +56,14 @@ public class Produto {
     private BigDecimal preco;
 
     /**
-     * URL da imagem do produto
+     * imagem do produto
      */
-    private String imagem;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "produto_imagens", joinColumns = @JoinColumn(name = "produto_id"))
+    @Column(name = "imagem_base64")
+    @Lob
+    @OrderColumn(name = "imagem_order")
+    private List<String> imagens = new ArrayList<>();
 
     /**
      * Quantidade em estoque do produto
@@ -118,12 +125,12 @@ public class Produto {
         this.preco = preco;
     }
 
-    public String getImagem() {
-        return imagem;
+    public List<String> getImagens() {
+        return imagens;
     }
 
-    public void setImagem(String imagem) {
-        this.imagem = imagem;
+    public void setImagens(List<String> imagens) {
+        this.imagens = imagens != null ? new ArrayList<>(imagens) : new ArrayList<>();
     }
 
     public int getQuantidadeEstoque() {
@@ -147,6 +154,9 @@ public class Produto {
     }
 
     public void setCafeEspecial(CafeEspecial cafeEspecial) {
+        if (cafeEspecial != null) {
+            cafeEspecial.setProduto(this);
+        }
         this.cafeEspecial = cafeEspecial;
     }
 
@@ -155,6 +165,9 @@ public class Produto {
     }
 
     public void setMetodoPreparo(MetodoPreparo metodoPreparo) {
+        if (metodoPreparo != null) {
+            metodoPreparo.setProduto(this);
+        }
         this.metodoPreparo = metodoPreparo;
     }
 }

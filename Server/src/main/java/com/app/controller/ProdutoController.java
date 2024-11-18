@@ -9,7 +9,6 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
  * As rotas incluem operações de criação, leitura, atualização e exclusão (CRUD)
  * de produtos.
  *
- * @author JoãO
  * @version 1.0
  * @since 2024-10-05
  */
@@ -94,6 +92,24 @@ public class ProdutoController {
     }
 
     /**
+     * Rota que obtém um produto pelo seu ID com especializações carregadas.
+     *
+     * @param id O ID do produto a ser buscado.
+     * @return O produto correspondente ao ID, ou uma resposta 404 caso o
+     * produto não seja encontrado.
+     */
+    @GetMapping("/com-especializacoes/{id}")
+    public ResponseEntity<Produto> getProdutoComEspecializacoesById(@PathVariable Long id) {
+        Optional<Produto> produto = Optional.ofNullable(produtoService.getProdutoById(id));
+        if (produto.isPresent()) {
+            Hibernate.initialize(produto.get().getCafeEspecial());
+            Hibernate.initialize(produto.get().getMetodoPreparo());
+            return ResponseEntity.ok(produto.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
      * Rota para criar um novo produto.
      *
      * Caso o produto seja uma especialização, as associações são configuradas
@@ -105,6 +121,7 @@ public class ProdutoController {
     @PostMapping("/protected/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
+        
         if (produto.getCafeEspecial() != null) {
             produto.getCafeEspecial().setProduto(produto);
         } else if (produto.getMetodoPreparo() != null) {
@@ -129,7 +146,8 @@ public class ProdutoController {
         Optional<Produto> existingProduto = Optional.ofNullable(produtoService.getProdutoById(id));
         if (existingProduto.isPresent()) {
             produto.setId(id);
-            return ResponseEntity.ok(produtoService.updateProduto(id, produto));
+            Produto updatedProduto = produtoService.updateProduto(id, produto);
+            return ResponseEntity.ok(updatedProduto);
         }
         return ResponseEntity.notFound().build();
     }

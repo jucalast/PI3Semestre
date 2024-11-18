@@ -119,30 +119,70 @@ public class ProdutoService {
     @Transactional
     public Produto updateProduto(Long id, Produto produto) {
         logger.info("Atualizando produto com ID: {}", id);
-    
+
         ValidationUtil.validarObjeto(produto);
-    
+
         Produto existingProduto = getProdutoById(id);
-    
+
+        // Log dos valores recebidos
+        logger.info("Valores recebidos para atualização: Nome: {}, Descrição: {}, Preço: {}, Quantidade Estoque: {}, Avaliação: {}",
+                produto.getNome(), produto.getDescricao(), produto.getPreco(), produto.getQuantidadeEstoque(), produto.getAvaliacao());
+
+        if (produto.getCafeEspecial() != null) {
+            CafeEspecial cafeEspecial = produto.getCafeEspecial();
+            logger.info("Valores de CafeEspecial recebidos: Notas Sensoriais: {}, Origem: {}, Variedade: {}, Torrefação: {}, Torra: {}, Beneficiamento: {}, Data Torra: {}, Data Validade: {}, Recomendações Preparo: {}",
+                    cafeEspecial.getNotasSensoriais(), cafeEspecial.getOrigem(), cafeEspecial.getVariedade(), cafeEspecial.getTorrefacao(), cafeEspecial.getTorra(), cafeEspecial.getBeneficiamento(), cafeEspecial.getDataTorra(), cafeEspecial.getDataValidade(), cafeEspecial.getRecomendacoesPreparo());
+        }
+
         // Atualiza os dados do produto
         existingProduto.setNome(produto.getNome());
         existingProduto.setDescricao(produto.getDescricao());
         existingProduto.setPreco(produto.getPreco());
-        existingProduto.setImagem(produto.getImagem());
         existingProduto.setQuantidadeEstoque(produto.getQuantidadeEstoque());
         existingProduto.setAvaliacao(produto.getAvaliacao());
-    
+
+        // Atualiza as imagens do produto, permitindo remoção e adição
+        if (produto.getImagens() != null) {
+            existingProduto.setImagens(produto.getImagens());
+        }
+
         // Atualiza a especialização CafeEspecial se existir
         if (produto.getCafeEspecial() != null) {
             if (existingProduto.getCafeEspecial() == null) {
                 existingProduto.setCafeEspecial(produto.getCafeEspecial());
                 produto.getCafeEspecial().setProduto(existingProduto);
             } else {
-                existingProduto.getCafeEspecial().setNotasSensoriais(produto.getCafeEspecial().getNotasSensoriais());
-                // Atualizar outros campos conforme necessário...
+                CafeEspecial cafeEspecial = produto.getCafeEspecial();
+                if (cafeEspecial.getNotasSensoriais() != null) {
+                    existingProduto.getCafeEspecial().setNotasSensoriais(cafeEspecial.getNotasSensoriais());
+                }
+                if (cafeEspecial.getOrigem() != null) {
+                    existingProduto.getCafeEspecial().setOrigem(cafeEspecial.getOrigem());
+                }
+                if (cafeEspecial.getVariedade() != null) {
+                    existingProduto.getCafeEspecial().setVariedade(cafeEspecial.getVariedade());
+                }
+                if (cafeEspecial.getTorrefacao() != null) {
+                    existingProduto.getCafeEspecial().setTorrefacao(cafeEspecial.getTorrefacao());
+                }
+                if (cafeEspecial.getTorra() != null) {
+                    existingProduto.getCafeEspecial().setTorra(cafeEspecial.getTorra());
+                }
+                if (cafeEspecial.getBeneficiamento() != null) {
+                    existingProduto.getCafeEspecial().setBeneficiamento(cafeEspecial.getBeneficiamento());
+                }
+                if (cafeEspecial.getDataTorra() != null) {
+                    existingProduto.getCafeEspecial().setDataTorra(cafeEspecial.getDataTorra());
+                }
+                if (cafeEspecial.getDataValidade() != null) {
+                    existingProduto.getCafeEspecial().setDataValidade(cafeEspecial.getDataValidade());
+                }
+                if (cafeEspecial.getRecomendacoesPreparo() != null) {
+                    existingProduto.getCafeEspecial().setRecomendacoesPreparo(cafeEspecial.getRecomendacoesPreparo());
+                }
             }
         }
-    
+
         // Atualiza a especialização MetodoPreparo se existir
         if (produto.getMetodoPreparo() != null) {
             if (existingProduto.getMetodoPreparo() == null) {
@@ -153,12 +193,11 @@ public class ProdutoService {
                 // Atualizar outros campos conforme necessário...
             }
         }
-    
+
         Produto updatedProduto = produtoRepository.save(existingProduto);
         logger.info("Produto {} atualizado com sucesso", updatedProduto.getNome());
         return updatedProduto;
     }
-    
 
     /**
      * Deleta um produto pelo ID.
