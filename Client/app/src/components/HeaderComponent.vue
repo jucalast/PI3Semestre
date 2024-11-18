@@ -1,6 +1,7 @@
 <template>
   <header class="header">
     <div class="topheader">
+
       <!-- Parte da esquerda -->
       <nav class="nav">
         <router-link
@@ -55,6 +56,7 @@
         </div>
       </form>
 
+      <!-- Logo -->
       <div class="logo-container" @click="goToHome">
         <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
@@ -136,7 +138,7 @@
             <span v-if="isAuthenticated" class="user-name">
               {{ username }}
             </span>
-            <img :src="photoUrl || getDicebearAvatar()" alt="User" />
+            <img :src="getUserAvatar()" alt="User" />
           </button>
           <div class="dropdown-content" v-if="dropdownVisible">
             <div v-if="isAuthenticated" class="useroptions">
@@ -273,9 +275,15 @@ export default {
         console.error('Erro ao excluir o produto', error);
       }
     },
-    getDicebearAvatar() {
-      const randomString = Math.random().toString(36).substring(7); 
-      return `https://api.dicebear.com/6.x/shapes/png?seed=${randomString}`;
+    getUserAvatar() {
+      if (this.isAuthenticated) {
+        if (this.photoUrl) {
+          return this.photoUrl;
+        }
+        return this.getDicebearAvatar(this.username);
+      } else {
+        return '/src/assets/user.png';
+      }
     },
     redirectToLogin() {
       window.location.href = `${this.baseURL}/login`;
@@ -384,7 +392,6 @@ a:hover {
   display: flex;
   justify-content: flex-end;
   position: relative;
-  /* Adicionando posição relativa para o container */
 }
 
 .search-button {
@@ -461,7 +468,6 @@ header .action-buttons {
   filter: invert(1);
 }
 
-/* Estilização da parte do perfil */
 .user-dropdown {
   position: relative;
 }
@@ -518,14 +524,12 @@ header .action-buttons {
   overflow-y: auto;
   overflow-x: hidden;
   flex-grow: 1;
-  /* Allows this container to grow and fill the space, pushing the button to the bottom */
 }
 
 .all-favorites-button {
   width: 100%;
   padding: 10px;
   background-color: transparent;
-  /* Customize according to your color scheme */
   color: #3a5bff;
   border: none;
   cursor: pointer;
@@ -591,9 +595,9 @@ header .action-buttons {
 }
 
 .user-button img {
-  width: 60px; 
-  height: 60px; 
-  border-radius: 50%; 
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   object-fit: cover;
 }
 </style>

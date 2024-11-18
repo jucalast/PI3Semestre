@@ -218,28 +218,30 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
         if (authentication != null && authentication.isAuthenticated()) {
+            
             response.put("authenticated", true);
             response.put("email", authentication.getName());
 
             if (authentication.getPrincipal() instanceof OAuth2User) {
+
                 OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
                 String photoUrl = oauthUser.getAttribute("picture");
                 response.put("photoUrl", photoUrl);
-
                 String firstName = oauthUser.getAttribute("given_name");
                 response.put("username", firstName);
-
                 List<String> oauthRoles = Collections.singletonList("ROLE_USER");
                 response.put("roles", oauthRoles);
+
             } else if (authentication.getPrincipal() instanceof UserDetails) {
+
                 response.put("username", userService.getUserFromAuthentication(authentication).getUserName());
                 response.put("photoUrl", null);
-
                 List<String> formLoginRoles = authentication.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList());
                 response.put("roles", formLoginRoles);
+
             }
 
             return ResponseEntity.ok(response);
