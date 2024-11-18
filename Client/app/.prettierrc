@@ -15,7 +15,7 @@
   "proseWrap": "always",
   "importOrder": ["^[./]", "^react", "^@/.*"],
   "importOrderSeparation": true,
-  "jsxBracketSameLine": false,
+  "jsxBracketSameLine": true,
   "embeddedLanguageFormatting": "auto",
   "singleAttributePerLine": false,
   "overrides": [

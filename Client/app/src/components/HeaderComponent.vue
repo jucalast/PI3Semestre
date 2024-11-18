@@ -1,7 +1,6 @@
 <template>
   <header class="header">
     <div class="topheader">
-
       <!-- Parte da esquerda -->
       <nav class="nav">
         <router-link
@@ -63,6 +62,7 @@
 
       <!-- Parte da direita -->
       <div class="action-buttons">
+        
         <!-- Favoritos -->
         <div
           class="favorites-container"
@@ -280,7 +280,7 @@ export default {
         if (this.photoUrl) {
           return this.photoUrl;
         }
-        return this.getDicebearAvatar(this.username);
+        return `https://avatars.dicebear.com/api/shapes/${this.username}.svg`;
       } else {
         return '/src/assets/user.png';
       }
@@ -333,12 +333,12 @@ export default {
 
 .logo {
   height: 5rem;
-  margin-left: 5rem;
+  margin-left: 1rem;
   filter: invert(1);
 }
 
 .logo-container {
-  width: 15%;
+
 }
 
 .exitbtn {
@@ -359,8 +359,8 @@ a {
   text-decoration: none;
   color: var(--text-color);
   padding: 0.5rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  /* padding-left: 1.5rem;
+  padding-right: 1.5rem; */
   border-radius: 2rem;
   transition: transform 0.3s ease, color 0.3s ease;
   font-size: 2rem !important;
@@ -368,9 +368,8 @@ a {
 
 .nav {
   display: flex;
-  margin: 0 15px;
   flex-direction: row;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 a img {
@@ -445,7 +444,7 @@ header .action-buttons {
   justify-content: space-around;
   border-radius: 2rem;
   height: 3rem;
-  width: 13%;
+  width: 17%;
   padding-left: 0.5rem !important;
   padding-right: 0.5rem !important;
 }
@@ -458,7 +457,7 @@ header .action-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0.1rem;
+  margin: 0.1rem 0.1rem; 
   border-radius: 50%;
 }
 
@@ -472,11 +471,30 @@ header .action-buttons {
   position: relative;
 }
 
+.user-dropdown .user-button {
+  display: flex;
+  align-items: center;
+}
+
+.user-dropdown .user-name {
+  margin-left: 10%;
+  margin-right: 10%;
+  font-weight: bold;
+  color: #333;
+  font-size: 1rem;
+}
+
+.user-button img {  
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .dropdown-content {
   display: block;
   right: -2rem;
   top: 5rem;
-
   position: absolute;
   background-color: #ededed;
   min-width: 160px;
@@ -493,11 +511,15 @@ header .action-buttons {
   padding: 12px 16px;
   text-decoration: none;
   display: flex;
-  border-bottom: solid 1px #9d9d9d;
-  border-radius: 0;
-  width: 100%;
   justify-content: center;
   font-size: 1.5rem !important;
+  width: 100%;
+  border-radius: 0;
+}
+
+.dropdown-content a:not(:last-child),
+.dropdown-content button:not(:last-child) {
+  border-bottom: 1px solid #9d9d9d;
 }
 
 .favorite-icon:hover {
@@ -582,22 +604,5 @@ header .action-buttons {
   width: 100%;
 }
 
-.user-dropdown .user-button {
-  display: flex;
-  align-items: center;
-}
 
-.user-dropdown .user-name {
-  margin-left: 8px;
-  font-weight: bold;
-  color: #333;
-  font-size: 1rem;
-}
-
-.user-button img {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-}
 </style>
