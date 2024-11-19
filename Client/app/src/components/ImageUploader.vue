@@ -104,7 +104,7 @@ export default {
 
 .dropbox {
   display: flex;
-  border: 2px dashed #5f75e4;
+  border: 4px dashed #5f75e4;
   border-radius: 2rem;
   padding: 20px;
   text-align: center;
@@ -115,6 +115,10 @@ export default {
   font-size: 2rem;
   align-items: center;
   justify-content: center;
+}
+
+.dropbox:hover {
+  background-color: #5f75e425;
 }
 
 .dropbox.dragging {

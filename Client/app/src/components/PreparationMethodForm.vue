@@ -1,5 +1,5 @@
 <template>
-  <div class="form-container">
+  <div :class="['form-container', { 'edit-mode': isEditMode }]">
     <form @submit.prevent="submitForm">
       <div class="dados-imagem">
         <div class="dados">
@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <button class="enviar" type="submit">{{ isEditMode ? 'Atualizar método de preparo' : 'Criar método de preparo' }}</button>
+      <button :class="['enviar', { 'disabled': !isFormValid || !isFormChanged }]" type="submit" :disabled="!isFormValid || !isFormChanged">{{ isEditMode ? 'Atualizar método de preparo' : 'Criar método de preparo' }}</button>
     </form>
   </div>
 </template>
@@ -107,6 +107,8 @@ export default {
   data() {
     return {
       localProduct: { ...this.product },
+      isFormValid: false,
+      isFormChanged: false,
     };
   },
   watch: {
@@ -114,6 +116,15 @@ export default {
       immediate: true,
       handler(newVal) {
         this.localProduct = { ...newVal };
+        this.validateForm();
+        this.checkFormChanges();
+      },
+    },
+    localProduct: {
+      deep: true,
+      handler() {
+        this.validateForm();
+        this.checkFormChanges();
       },
     },
   },
@@ -128,7 +139,18 @@ export default {
       const formattedProduct = {
         ...this.localProduct,
         preco: parseFloat(this.localProduct.preco.replace(/\./g, '').replace(',', '.')), // Converte para BigDecimal
+        metodoPreparo: Object.entries(this.localProduct.metodoPreparo).reduce(
+          (acc, [key, value]) => {
+            if (value) acc[key] = value;
+            return acc;
+          },
+          {}
+        ),
       };
+
+      if (!Object.keys(formattedProduct.metodoPreparo).length) {
+        delete formattedProduct.metodoPreparo;
+      }
 
       console.log("Produto enviado:", formattedProduct); // Exibe os dados no console para teste
       this.$emit("submit-product", formattedProduct); // Emite o evento para o pai com os dados do produto
@@ -139,6 +161,14 @@ export default {
       value = value.replace(/(\d)(\d{2})$/, "$1,$2"); // Coloca a vírgula antes dos últimos 2 dígitos
       value = value.replace(/(?=(\d{3})+(\D))\B/g, "."); // Coloca o ponto a cada 3 dígitos
       this.localProduct.preco = value;
+    },
+    validateForm() {
+      const { nome, descricao, preco, quantidade_estoque, metodoPreparo, imagens } = this.localProduct;
+      this.isFormValid = nome && descricao && preco && quantidade_estoque && imagens.length > 0 &&
+        Object.values(metodoPreparo).every(value => value);
+    },
+    checkFormChanges() {
+      this.isFormChanged = JSON.stringify(this.localProduct) !== JSON.stringify(this.product);
     },
   },
 };
@@ -174,7 +204,6 @@ export default {
 .imagenanddrop {
   display: flex;
   flex-direction: column;
-  background: #e3e3e3;
   width: 40%;
   border-radius: 2rem;
 }
@@ -183,6 +212,13 @@ export default {
   position: absolute;
   top: 13%;
   right: 13%;
+}
+
+.enviar.disabled {
+  background-color: transparent;
+  border: 2px solid #818181;
+  color: #818181;
+  cursor: not-allowed;
 }
 
 .dados {
@@ -197,7 +233,7 @@ export default {
 .form-group {
   display: flex;
   flex-direction: column;
-  width: 100%;
+
 }
 
 label {
@@ -231,6 +267,14 @@ label {
   align-items: center;
   overflow-y: auto;
   max-height: 80% !important;
+  
+}
+
+.form-container.edit-mode {
+  min-width: 100% !important;
+  max-height: 83% !important;
+  margin-top: 7rem;
+
 }
 
 .form-container form {
@@ -245,7 +289,7 @@ label {
 select,
 .form-container input,
 .form-container textarea {
-  color: #ff4d4d;
+  color: #3a5bff;
   border: solid 1px #aeaeaeb6;
   background: #ededed;
   border-radius: 2rem;
@@ -275,8 +319,8 @@ input {
 .form-container input:focus,
 .form-container textarea:focus {
   outline: none;
-  border: 1px solid #ff4d4d;
-  box-shadow: 1px 0px 20px 1px #ff4d4d54;
+  border: 1px solid #3a5bff;
+  box-shadow: 1px 0px 20px 1px #3a5bff38;
 }
 
 .form-container button {
@@ -291,10 +335,6 @@ input {
   position: absolute;
   top: 13%;
   right: 13%;
-}
-
-.form-container button:hover {
-  background-color: #e04e4e; /* Cor ao passar o mouse */
 }
 
 .image-preview {
@@ -319,12 +359,11 @@ input {
   position: absolute;
   top: 0;
   right: 0;
-  background: red;
   color: white;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
-  padding: 0.5rem;
+
   width: 20px;
   height: 20px;
   display: flex;

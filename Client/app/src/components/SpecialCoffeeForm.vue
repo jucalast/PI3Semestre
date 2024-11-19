@@ -1,5 +1,5 @@
 <template>
-  <div class="form-container">
+  <div :class="['form-container', { 'edit-mode': isEditMode }]">
     <form @submit.prevent="submitForm">
       <div class="dados-imagem">
         <div class="dados">
@@ -83,7 +83,7 @@
         </div>
       </div>
 
-      <button class="enviar" type="submit">{{ isEditMode ? 'Atualizar café especial' : 'Criar café especial' }}</button>
+      <button :class="['enviar', { 'disabled': !isFormValid || !isFormChanged }]" type="submit" :disabled="!isFormValid || !isFormChanged">{{ isEditMode ? 'Atualizar café especial' : 'Criar café especial' }}</button>
     </form>
   </div>
 </template>
@@ -125,6 +125,8 @@ export default {
   data() {
     return {
       localProduct: { ...this.product },
+      isFormValid: false,
+      isFormChanged: false,
     };
   },
   watch: {
@@ -132,6 +134,15 @@ export default {
       immediate: true,
       handler(newVal) {
         this.localProduct = { ...newVal };
+        this.validateForm();
+        this.checkFormChanges();
+      },
+    },
+    localProduct: {
+      deep: true,
+      handler() {
+        this.validateForm();
+        this.checkFormChanges();
       },
     },
   },
@@ -143,9 +154,10 @@ export default {
       this.localProduct.imagens.splice(index, 1);
     },
     submitForm() {
+      const precoString = typeof this.localProduct.preco === 'string' ? this.localProduct.preco : this.localProduct.preco.toString();
       const filteredProduct = {
         ...this.localProduct,
-        preco: parseFloat(this.localProduct.preco.replace(/\./g, '').replace(',', '.')), // Converte para BigDecimal
+        preco: parseFloat(precoString.replace(/\./g, '').replace(',', '.')), // Converte para BigDecimal
         cafeEspecial: Object.entries(this.localProduct.cafeEspecial).reduce(
           (acc, [key, value]) => {
             if (value) acc[key] = value;
@@ -169,6 +181,14 @@ export default {
       value = value.replace(/(?=(\d{3})+(\D))\B/g, "."); // Coloca o ponto a cada 3 dígitos
       this.localProduct.preco = value;
     },
+    validateForm() {
+      const { nome, descricao, preco, quantidade_estoque, cafeEspecial, imagens } = this.localProduct;
+      this.isFormValid = nome && descricao && preco && quantidade_estoque && imagens.length > 0 &&
+        Object.values(cafeEspecial).every(value => value);
+    },
+    checkFormChanges() {
+      this.isFormChanged = JSON.stringify(this.localProduct) !== JSON.stringify(this.product);
+    },
   },
 };
 </script>
@@ -185,7 +205,6 @@ export default {
 .imagenanddrop {
   display: flex;
   flex-direction: column;
-  background: #e3e3e3;
   width: 40%;
   border-radius: 2rem;
 
@@ -209,7 +228,6 @@ export default {
 .form-group {
   display: flex;
   flex-direction: column;
-  width: 100%;
 }
 
 label {
@@ -244,6 +262,13 @@ label {
   max-height: 80% !important;
 }
 
+.form-container.edit-mode {
+  min-width: 100% !important;
+  max-height: 83% !important;
+  margin-top: 7rem;
+
+}
+
 .form-container form {
   display: flex;
   gap: 20px;
@@ -256,11 +281,10 @@ label {
 
 .form-container input,
 .form-container textarea {
-  color: #ff4d4d;
+  color: #3a5bff;
   border: solid 1px #aeaeaeb6;
   background: #ededed;
   border-radius: 2rem;
-
   height: 5rem; /* Para inputs */
   padding-left: 2rem !important;
   font-size: 1.5rem !important;
@@ -286,8 +310,8 @@ input {
 .form-container input:focus,
 .form-container textarea:focus {
   outline: none;
-  border: 1px solid #ff4d4d;
-  box-shadow: 1px 0px 20px 1px #ff4d4d54;
+  border: 1px solid #3a5bff;
+  box-shadow: 1px 0px 20px 1px #3a5bff3b;
 }
 
 .form-container button {
@@ -301,8 +325,13 @@ input {
   transition: background-color 0.3s; /* Efeito de transição para cor do fundo */
 }
 
-.form-container button:hover {
-  background-color: #e04e4e; /* Cor ao passar o mouse */
+
+
+.enviar.disabled {
+  background-color: transparent;
+  border: 2px solid #818181;
+  color: #818181;
+  cursor: not-allowed;
 }
 
 .image-preview {

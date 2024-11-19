@@ -78,7 +78,9 @@ export default {
         const response = await axiosInstance.post(
           "/api/produtos/protected/create",
           product,
-          {}
+          {
+            timeout: 60000 // Aumenta o tempo limite para 60 segundos
+          }
         );
 
         if (response.status === 200) {

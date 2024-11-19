@@ -5,15 +5,20 @@
       <p>Explore e gerencie todos seu negócio com facilidade e rapidez.</p>
     </section>
     <section class="principal-section">
-      <CreateProductComponent @product-created="handleProductCreated" />
-      <div class="product-list">
-        <div class="header">
-          <h3>Edite ou exclua produtos</h3>
-          <button @click="fetchProdutos" class="refresh-button">
-            <i class="fas fa-sync-alt"></i> Atualizar
-          </button>
+      <div class="left-column">
+        <CreateProductComponent @product-created="handleProductCreated" />
+        <FavoriteCountComponent />
+      </div>
+      <div class="right-column">
+        <div class="product-list">
+          <div class="header">
+            <h3>Edite ou exclua produtos</h3>
+            <button @click="fetchProdutos" class="refresh-button">
+              <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+          </div>
+          <CardGeneric :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
         </div>
-        <CardGeneric :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
       </div>
     </section>
   </AdminLayout>
@@ -24,6 +29,7 @@
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import CreateProductComponent from '@/components/CreateProductComponent.vue';
 import CardGeneric from '@/components/CardGeneric.vue';
+import FavoriteCountComponent from '@/components/FavoriteCountComponent.vue';
 import axios from 'axios';
 
 export default {
@@ -32,12 +38,14 @@ export default {
     AdminLayout,
     CreateProductComponent,
     CardGeneric, // Certifique-se de que o nome está correto
+    FavoriteCountComponent,
   },
   data() {
     return {
       produtos: [],
       isLoading: true,
       searchQuery: "",
+      favoriteCounts: {},
     };
   },
   computed: {
@@ -66,10 +74,19 @@ export default {
     },
     updateSearchQuery(query) {
       this.searchQuery = query;
-    }
+    },
+    async fetchFavoriteCounts() {
+      try {
+        const response = await axios.get("http://localhost:8080/api/favorites/count-by-product");
+        this.favoriteCounts = response.data;
+      } catch (error) {
+        console.error("Erro ao buscar contagem de favoritos:", error);
+      }
+    },
   },
   mounted() {
     this.fetchProdutos(); // Chama a função uma vez ao montar o componente
+    this.fetchFavoriteCounts();
   },
 };
 </script>
@@ -96,6 +113,14 @@ export default {
   display: flex;
   gap: 2rem;
   justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.left-column, .right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 h1 {
@@ -110,13 +135,11 @@ strong {
 }
 
 .product-list {
-    width: 45%;
     background: #ffffff;
     border: solid 1px #d2d2d2;
     border-radius: 1.5rem;
     padding: 2rem;
-    max-height: 50vh;
-    overflow-y: auto;
+
 }
 
 img {
@@ -165,5 +188,12 @@ h3 {
 
 .refresh-button i {
   margin-right: 0.5rem;
+}
+
+.favorites-section {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 1rem;
 }
 </style>

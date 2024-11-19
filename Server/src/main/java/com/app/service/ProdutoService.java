@@ -33,6 +33,12 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Autowired
+    private CafeEspecialRepository cafeEspecialRepository;
+
+    @Autowired
+    private MetodoPreparoRepository metodoPreparoRepository;
+
     /**
      * Cria um novo produto no sistema após validação.
      *
@@ -230,12 +236,6 @@ public class ProdutoService {
         logger.info("Produto com ID {} deletado com sucesso", id);
     }
     
-
-    @Autowired
-    private CafeEspecialRepository cafeEspecialRepository;
-
-    @Autowired
-    private MetodoPreparoRepository metodoPreparoRepository;
 
     /**
      * Lista atributos dos produtos, incluindo especializações de CafeEspecial e

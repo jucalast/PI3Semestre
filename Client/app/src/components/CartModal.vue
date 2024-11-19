@@ -112,7 +112,12 @@ export default {
         console.log(this.cartItems);
         this.somasCarrinho(responseCart.data);
       } catch (error) {
-        console.error("Erro ao buscar produtos do carrinho: ", error);
+        if (error.response && error.response.status === 401) {
+          console.error("Usuário não autorizado. Redirecionando para login.");
+          window.location.href = `${this.baseURL}/login`;
+        } else {
+          console.error("Erro ao buscar produtos do carrinho: ", error);
+        }
       } finally {
         this.isLoading = false;
       }

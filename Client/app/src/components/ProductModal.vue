@@ -244,6 +244,7 @@ export default {
       } catch (error) {
         console.error("Erro ao buscar a média de avaliações:", error);
         this.averageRating = 0;
+        alert("Erro ao buscar a média de avaliações. Por favor, tente novamente mais tarde.");
       }
     },
     getStarClass(star) {
@@ -278,6 +279,7 @@ export default {
       } catch (error) {
         console.error("Erro ao buscar comentários:", error);
         this.comments = [];
+        alert("Erro ao buscar comentários. Por favor, tente novamente mais tarde.");
       }
     },
     close() {

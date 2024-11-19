@@ -98,11 +98,9 @@ export default {
   },
   setup() {
     const favoriteProductIds = computed(() => globalState.favoriteProductIds);
-    return {
-      favoriteProductIds,
-    };
     const itemsOnCart = computed(() => globalState.itemsOnCart);
     return {
+      favoriteProductIds,
       itemsOnCart,
     };
   },

@@ -16,3 +16,28 @@ body {
 html {
   display: flex;
 }
+
+/* Estilizando o scrollbar para navegadores Webkit (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 12px; /* Largura do scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Cor do fundo do track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Cor do thumb */
+  border-radius: 10px; /* Bordas arredondadas */
+  border: 3px solid #f1f1f1; /* Espaço ao redor do thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Cor do thumb ao passar o mouse */
+}
+
+/* Estilizando o scrollbar para navegadores Firefox */
+* {
+  scrollbar-width: thin; /* Largura do scrollbar */
+  scrollbar-color: #888 #f1f1f1; /* Cor do thumb e do track */
+}

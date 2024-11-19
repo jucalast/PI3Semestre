@@ -89,7 +89,16 @@ export default {
       isEditModalVisible: false,
       selectedProduct: null,
       showButtons: null,
+      localProdutos: [...this.produtos], // Cria uma cópia local da prop produtos
     };
+  },
+  watch: {
+    produtos: {
+      handler(newVal) {
+        this.localProdutos = [...newVal]; // Atualiza a cópia local quando a prop mudar
+      },
+      deep: true,
+    },
   },
   setup() {
     const toast = useToast();
@@ -166,16 +175,17 @@ export default {
       try {
         const response = await axiosInstance.put(
           `http://localhost:8080/api/produtos/protected/update/${updatedProduct.id}`,
-          productData
+          productData,
+          { timeout: 30000 } // Aumenta o tempo limite para 30 segundos
         );
 
         if (response.status === 200) {
           // Atualiza a lista de produtos no pai
-          const index = this.produtos.findIndex(
+          const index = this.localProdutos.findIndex(
             (prod) => prod.id === updatedProduct.id
           );
           if (index !== -1) {
-            this.produtos.splice(index, 1, updatedProduct);
+            this.localProdutos.splice(index, 1, updatedProduct);
           }
 
           this.toast.success("Produto atualizado com sucesso.");
@@ -198,14 +208,19 @@ export default {
       if (!this.productToDelete) return;
 
       try {
+        console.log("Tentando excluir o produto com ID:", this.productToDelete);
         const response = await axiosInstance.delete(
           `http://localhost:8080/api/produtos/${this.productToDelete}`
         );
 
-        if (response.status === 200) {
-          this.produtos = this.produtos.filter(
+        console.log("Resposta do servidor:", response);
+
+        if (response.status === 200 || response.status === 204) {
+          const updatedProdutos = this.localProdutos.filter(
             (produto) => produto.id !== this.productToDelete
           );
+          this.localProdutos = updatedProdutos;
+          this.$emit('update:produtos', updatedProdutos); // Atualiza a prop produtos no pai
           this.isConfirmationVisible = false;
           this.toast.success("Produto excluído com sucesso.");
         } else {
@@ -213,7 +228,22 @@ export default {
         }
       } catch (error) {
         console.error("Erro ao excluir produto:", error.message);
-        this.toast.error("Erro ao excluir produto.");
+        if (error.response) {
+          console.log("Erro resposta do servidor:", error.response);
+          if (error.response.status === 200 || error.response.status === 204) {
+            const updatedProdutos = this.localProdutos.filter(
+              (produto) => produto.id !== this.productToDelete
+            );
+            this.localProdutos = updatedProdutos;
+            this.$emit('update:produtos', updatedProdutos); // Atualiza a prop produtos no pai
+            this.isConfirmationVisible = false;
+            this.toast.success("Produto excluído com sucesso.");
+          } else {
+            this.toast.error("Erro ao excluir produto.");
+          }
+        } else {
+          this.toast.error("Erro ao excluir produto.");
+        }
       }
     },
   },
