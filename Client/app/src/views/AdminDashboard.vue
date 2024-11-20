@@ -1,7 +1,10 @@
 <template>
   <AdminLayout>
     <section class="centered-section">
-      <h1>Tudo na palma das <strong>suas mãos</strong> </h1>
+      <h1>
+        Tudo na palma das
+        <strong>suas mãos</strong>
+      </h1>
       <p>Explore e gerencie todos seu negócio com facilidade e rapidez.</p>
     </section>
     <section class="principal-section">
@@ -92,17 +95,33 @@ export default {
 </script>
 
 <style scoped>
+  .centered-section {
+    margin-top: 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+  }
 
+  .principal-section {
+    background: white;
+    height: fit-content;
+    margin: 5rem;
+    padding: 5rem;
+    border-radius: 2rem;
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+  }
 
-.centered-section {
-  margin-top: 6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  text-align: center;
-  padding: 2rem;
-}
+  h1 {
+    font-size: 10rem;
+    line-height: 0.8;
+    color: #cdd5ff;
+    letter-spacing: -0.05em; /* Ajuste este valor conforme necessário */
+  }
 
 .principal-section {
   background: white;
@@ -142,20 +161,20 @@ strong {
 
 }
 
-img {
-  position: absolute;
-  width: 100%;
-  z-index: -1;
-}
+  img {
+    position: absolute;
+    width: 100%;
+    z-index: -1;
+  }
 
-p {
-  font-size: 2.5rem;
-  margin-top: 1rem;
-  background: transparent;
-  width: 80%;
-  backdrop-filter: blur(0);
-  color: #16225e;
-}
+  p {
+    font-size: 2.5rem;
+    margin-top: 1rem;
+    background: transparent;
+    width: 80%;
+    backdrop-filter: blur(0);
+    color: #16225e;
+  }
 
 h3 {
   width: 80%;

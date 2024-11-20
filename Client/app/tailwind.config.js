@@ -1,8 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-  ],
+  content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -21,10 +19,10 @@ module.exports = {
         priceBackground: '#49494933',
         headerBackground: '#e4bf5f',
         headerText: '#fff2d2',
-        favoriteCard: '#d1d1d1', 
+        favoriteCard: '#d1d1d1',
         favoriteCardHover: '#e4bf5f',
       },
     },
   },
   plugins: [],
-}
+};

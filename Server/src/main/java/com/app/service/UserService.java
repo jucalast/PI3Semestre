@@ -78,15 +78,16 @@ public class UserService implements UserDetailsService {
      * @param name O nome do usuário.
      * @param email O e-mail do usuário.
      */
-    public void saveUserIfNotExists(String name, String email) {
+    public UserModel saveUserIfNotExists(String name, String email) {
         UserModel user = userRepository.findByEmailId(email);
         if (user == null) {
             user = new UserModel();
             user.setUserName(name);
             user.setEmailId(email);
             user.setRoles("ROLE_USER");
-            userRepository.save(user);
+            user = userRepository.save(user);  
         }
+        return user;  
     }
 
     /**

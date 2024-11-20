@@ -245,9 +245,9 @@ label {
   max-width: 95%;
 }
 
-.imagem {
-  width: 180%;
-}
+  .imagem {
+    width: 180%;
+  }
 
 .form-container {
   gap: 1rem !important;
@@ -293,19 +293,19 @@ label {
   font-family: "Poppins", sans-serif; /* Aplicando Poppins aos inputs */
 }
 
-input {
-  width: fit-content !important;
-}
+  input {
+    width: fit-content !important;
+  }
 
-.form-container textarea {
-  height: auto; /* Permite que a altura do textarea seja dinâmica */
-  min-height: 100px; /* Define uma altura mínima para o textarea */
-}
+  .form-container textarea {
+    height: auto; /* Permite que a altura do textarea seja dinâmica */
+    min-height: 100px; /* Define uma altura mínima para o textarea */
+  }
 
-.form-container input::placeholder,
-.form-container textarea::placeholder {
-  color: #6d6d6d;
-}
+  .form-container input::placeholder,
+  .form-container textarea::placeholder {
+    color: #6d6d6d;
+  }
 
 .form-container input:focus,
 .form-container textarea:focus {
@@ -314,16 +314,16 @@ input {
   box-shadow: 1px 0px 20px 1px #3a5bff3b;
 }
 
-.form-container button {
-  background-color: #ff4d4d; /* Cor do botão */
-  color: white; /* Cor do texto no botão */
-  border: none; /* Remove borda */
-  border-radius: 2rem; /* Bordas arredondadas */
-  padding: 1rem 2rem; /* Espaçamento interno */
-  font-size: 2rem; /* Tamanho do texto */
-  cursor: pointer; /* Cursor de mão ao passar o mouse */
-  transition: background-color 0.3s; /* Efeito de transição para cor do fundo */
-}
+  .form-container button {
+    background-color: #ff4d4d; /* Cor do botão */
+    color: white; /* Cor do texto no botão */
+    border: none; /* Remove borda */
+    border-radius: 2rem; /* Bordas arredondadas */
+    padding: 1rem 2rem; /* Espaçamento interno */
+    font-size: 2rem; /* Tamanho do texto */
+    cursor: pointer; /* Cursor de mão ao passar o mouse */
+    transition: background-color 0.3s; /* Efeito de transição para cor do fundo */
+  }
 
 
 

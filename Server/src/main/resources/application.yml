@@ -25,7 +25,7 @@ spring:
 
   output:
     ansi:
-      enabled: ALWAYS  # Habilita a saída ANSI para cores
+      enabled: ALWAYS
   logging:
     level:
       root: INFO 

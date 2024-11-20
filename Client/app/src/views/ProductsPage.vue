@@ -22,80 +22,74 @@
 </template>
 
 <script>
-import DefaultLayout from "@/layouts/DefaultLayout.vue";
-import ProductCard from "@/components/ProductCardComponent.vue";
-import AtributosProduto from "@/components/AtributosProduto.vue";
-import axios from "axios";
+  import DefaultLayout from '@/layouts/DefaultLayout.vue';
+  import ProductCard from '@/components/ProductCardComponent.vue';
+  import AtributosProduto from '@/components/AtributosProduto.vue';
+  import axios from 'axios';
 
-export default {
-  components: {
-    DefaultLayout,
-    ProductCard,
-    AtributosProduto,
-    
-  },
-  data() {
-    return {
-      produtos: [],         // Lista de produtos
-      isLoading: true,      // Indica se a lista de produtos está carregando
-      searchQuery: "",      // Termo de busca
-    };
-  },
-  methods: {
-    async fetchProdutos() {
-      try {
-        const response = await axios.get("http://localhost:8080/api/produtos");
-        this.produtos = response.data;
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
-      } finally {
-        this.isLoading = false;
-      }
+  export default {
+    components: {
+      DefaultLayout,
+      ProductCard,
+      AtributosProduto,
     },
-    
-    updateSearchQuery(query) {
-      this.searchQuery = query;
+    data() {
+      return {
+        produtos: [], // Lista de produtos
+        isLoading: true, // Indica se a lista de produtos está carregando
+        searchQuery: '', // Termo de busca
+      };
     },
-    
-    updateFilteredProducts(produtos) {
-      this.produtos = produtos; // Atualiza a lista de produtos filtrados
+    methods: {
+      async fetchProdutos() {
+        try {
+          const response = await axios.get(
+            'http://localhost:8080/api/produtos'
+          );
+          this.produtos = response.data;
+        } catch (error) {
+          console.error('Erro ao buscar produtos:', error);
+        } finally {
+          this.isLoading = false;
+        }
+      },
+
+      updateSearchQuery(query) {
+        this.searchQuery = query;
+      },
+
+      updateFilteredProducts(produtos) {
+        this.produtos = produtos; // Atualiza a lista de produtos filtrados
+      },
     },
-  },
-  mounted() {
-    this.fetchProdutos();
-  },
-};
+    mounted() {
+      this.fetchProdutos();
+    },
+  };
 </script>
 
-
 <style scoped>
-.product-list {
-  display: flex;
-  flex-wrap: wrap;
- 
-justify-content: flex-start;
-  padding-top: 2rem;
-  width: 80%;
-}
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
 
+    justify-content: flex-start;
+    padding-top: 2rem;
+    width: 80%;
+  }
 
+  .no-margin {
+    margin: 0;
+    padding: 0;
+  }
 
-.no-margin {
-  margin: 0;
-  padding: 0;
-}
+  .sessiontwo {
+    padding: 2rem; /* Adiciona espaço ao redor do conteúdo */
+    display: flex !important;
+    height: fit-content;
+  }
 
-
-.sessiontwo {
-  padding: 2rem; /* Adiciona espaço ao redor do conteúdo */
-  display: flex !important;
-  height: fit-content;
-
-}
-
-.accordion {
-  margin-bottom: 2rem; /* Espaço inferior entre o accordion e a lista de produtos */
-}
-
-
+  .accordion {
+    margin-bottom: 2rem; /* Espaço inferior entre o accordion e a lista de produtos */
+  }
 </style>

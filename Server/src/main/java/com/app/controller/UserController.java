@@ -2,7 +2,9 @@ package com.app.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -12,8 +14,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,8 +106,7 @@ public class UserController {
      * ou retorno à página de login em caso de falha.
      */
     @PostMapping("/login/form-process")
-    public String loginUser(@RequestParam String email, @RequestParam String password, Model model, HttpServletRequest request) {
-
+    public ResponseEntity<?> loginUser(@RequestParam String email, @RequestParam String password, HttpServletRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
@@ -118,10 +123,10 @@ public class UserController {
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("userId", user.getId());
 
-            return "redirect:" + frontendUrl;
+            return ResponseEntity.ok().body(Map.of("message", "Login bem-sucedido", "userId", user.getId()));
+
         } catch (AuthenticationException e) {
-            model.addAttribute("error", "Credenciais inválidas");
-            return "customLogin";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Credenciais inválidas"));
         }
     }
 
@@ -144,9 +149,10 @@ public class UserController {
         String name = token.getPrincipal().getAttribute("name");
         String email = token.getPrincipal().getAttribute("email");
 
-        userService.saveUserIfNotExists(name, email);
+        UserModel user = userService.saveUserIfNotExists(name, email);
 
         UserModel authenticatedUser = new UserModel();
+        authenticatedUser.setId(user.getId());
         authenticatedUser.setUserName(name);
         authenticatedUser.setEmailId(email);
         authenticatedUser.setRoles("ROLE_USER");
@@ -183,9 +189,9 @@ public class UserController {
      * @return Um redirecionamento para a URL da home page.
      */
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute UserModel user) {
+    public ResponseEntity<String> registerUser(@ModelAttribute UserModel user) {
         userService.registerUser(user);
-        return "customLogin";
+        return ResponseEntity.ok("Usuário registrado com sucesso!");
     }
 
     /**
@@ -212,8 +218,32 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
         if (authentication != null && authentication.isAuthenticated()) {
+            
             response.put("authenticated", true);
-            response.put("username", authentication.getName());
+            response.put("email", authentication.getName());
+
+            if (authentication.getPrincipal() instanceof OAuth2User) {
+
+                OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+
+                String photoUrl = oauthUser.getAttribute("picture");
+                response.put("photoUrl", photoUrl);
+                String firstName = oauthUser.getAttribute("given_name");
+                response.put("username", firstName);
+                List<String> oauthRoles = Collections.singletonList("ROLE_USER");
+                response.put("roles", oauthRoles);
+
+            } else if (authentication.getPrincipal() instanceof UserDetails) {
+
+                response.put("username", userService.getUserFromAuthentication(authentication).getUserName());
+                response.put("photoUrl", null);
+                List<String> formLoginRoles = authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
+                response.put("roles", formLoginRoles);
+
+            }
+
             return ResponseEntity.ok(response);
         }
 

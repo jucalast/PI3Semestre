@@ -90,8 +90,8 @@ export default {
         this.isSubmitting = false;
       }
     },
-  },
-};
+  }
+}
 </script>
 
 <style scoped>

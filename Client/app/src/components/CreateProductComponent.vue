@@ -12,7 +12,7 @@
   
   <script>
   import CreateProductModal from '@/components/CreateProductModal.vue';
-  
+
   export default {
     name: 'CreateProductComponent',
     components: {
@@ -47,14 +47,13 @@
     background: #d6d6d6 !important;
   }
 
-  p{
+  p {
     padding: 1rem;
     background: transparent;
     font-size: 2rem;
   }
 
   H3 {
-font-size: 3rem;
+    font-size: 3rem;
   }
-  </style>
-  
+</style>

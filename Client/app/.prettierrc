@@ -1,0 +1,30 @@
+{
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "useTabs": false,
+  "printWidth": 80,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "jsxSingleQuote": true,
+  "htmlWhitespaceSensitivity": "ignore",
+  "vueIndentScriptAndStyle": true,
+  "quoteProps": "as-needed",
+  "proseWrap": "always",
+  "importOrder": ["^[./]", "^react", "^@/.*"],
+  "importOrderSeparation": true,
+  "jsxBracketSameLine": true,
+  "embeddedLanguageFormatting": "auto",
+  "singleAttributePerLine": false,
+  "overrides": [
+    {
+      "files": "*.vue",
+      "options": {
+        "htmlWhitespaceSensitivity": "ignore",
+        "vueIndentScriptAndStyle": true
+      }
+    }
+  ]
+}

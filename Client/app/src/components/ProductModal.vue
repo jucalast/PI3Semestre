@@ -22,10 +22,11 @@
         </div>
 
         <p class="nome">
-          <strong> {{ product.nome }} </strong>
+          <strong>{{ product.nome }}</strong>
         </p>
         <p class="preco">
-          <strong></strong> R$ {{ product.preco?.toFixed(2) }}
+          <strong></strong>
+          R$ {{ product.preco?.toFixed(2) }}
         </p>
         <!-- Adicionar os três botões abaixo da quantidade em estoque -->
         <div class="action-buttons">
@@ -52,7 +53,8 @@
           </button>
         </div>
         <p class="qtdestoque">
-          <strong></strong>{{ product.quantidade_estoque }} disponíveis
+          <strong></strong>
+          {{ product.quantidade_estoque }} disponíveis
         </p>
       </div>
       <div class="imagemproduto">
@@ -64,10 +66,10 @@
         <div class="accordion-item">
           <div class="accordion-header" @click="toggleAccordion('descricao')">
             <h4>Descrição</h4>
-            <span>{{ isOpen.descricao ? "-" : "+" }}</span>
+            <span>{{ isOpen.descricao ? '-' : '+' }}</span>
           </div>
           <div v-if="isOpen.descricao" class="accordion-content">
-            <p>{{ product.descricao || "Descrição não disponível" }}</p>
+            <p>{{ product.descricao || 'Descrição não disponível' }}</p>
           </div>
         </div>
 
@@ -78,20 +80,20 @@
             @click="toggleAccordion('caracteristicas')"
           >
             <h4>Características</h4>
-            <span>{{ isOpen.caracteristicas ? "-" : "+" }}</span>
+            <span>{{ isOpen.caracteristicas ? '-' : '+' }}</span>
           </div>
           <div v-if="isOpen.caracteristicas" class="accordion-content">
             <p>
               <strong>Origem:</strong>
               {{
-                product.cafeEspecial[0]?.origem || "Informação não disponível"
+                product.cafeEspecial[0]?.origem || 'Informação não disponível'
               }}
             </p>
             <p>
               <strong>Variedade:</strong>
               {{
                 product.cafeEspecial[0]?.variedade ||
-                "Informação não disponível"
+                'Informação não disponível'
               }}
             </p>
             <p>
@@ -104,14 +106,14 @@
               <strong>Notas Sensoriais:</strong>
               {{
                 product.cafeEspecial[0]?.notasSensoriais ||
-                "Informação não disponível"
+                'Informação não disponível'
               }}
             </p>
             <p>
               <strong>Data de Validade:</strong>
               {{
                 product.cafeEspecial[0]?.dataValidade ||
-                "Informação não disponível"
+                'Informação não disponível'
               }}
             </p>
           </div>
@@ -124,37 +126,37 @@
             @click="toggleAccordion('metodoPreparo')"
           >
             <h4>Caracteristicas</h4>
-            <span>{{ isOpen.metodoPreparo ? "-" : "+" }}</span>
+            <span>{{ isOpen.metodoPreparo ? '-' : '+' }}</span>
           </div>
           <div v-if="isOpen.metodoPreparo" class="accordion-content">
             <p>
               <strong>Tipo de Preparo:</strong>
               {{
-                product.metodoPreparo.tipoPreparo || "Informação não disponível"
+                product.metodoPreparo.tipoPreparo || 'Informação não disponível'
               }}
             </p>
             <p>
               <strong>Material:</strong>
               {{
-                product.metodoPreparo.material || "Informação não disponível"
+                product.metodoPreparo.material || 'Informação não disponível'
               }}
             </p>
             <p>
               <strong>Acessórios:</strong>
               {{
-                product.metodoPreparo.acessorios || "Informação não disponível"
+                product.metodoPreparo.acessorios || 'Informação não disponível'
               }}
             </p>
             <p>
               <strong>Complexidade:</strong>
               {{
                 product.metodoPreparo.complexidade ||
-                "Informação não disponível"
+                'Informação não disponível'
               }}
             </p>
             <p>
               <strong>Marca:</strong>
-              {{ product.metodoPreparo.marca || "Informação não disponível" }}
+              {{ product.metodoPreparo.marca || 'Informação não disponível' }}
             </p>
           </div>
         </div>
@@ -166,7 +168,7 @@
             @click="toggleAccordion('outrosDetalhes')"
           >
             <h4>Outros Detalhes</h4>
-            <span>{{ isOpen.outrosDetalhes ? "-" : "+" }}</span>
+            <span>{{ isOpen.outrosDetalhes ? '-' : '+' }}</span>
           </div>
           <div v-if="isOpen.outrosDetalhes" class="accordion-content">
             <p v-if="product.cafeEspecial[0]?.recomendacoesPreparo">
@@ -186,30 +188,29 @@ import { globalState } from "@/state";
 import { computed, ref, onMounted, watch } from "vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
 
-export default {
-  props: {
-    product: {
-      type: Object,
-      required: true,
-    },
-    isVisible: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      comments: [],
-      currentCommentIndex: 0,
-      commentInterval: null,
-      isOpen: {
-        descricao: false,
-        caracteristicas: false,
-        metodoPreparo: false,
-        outrosDetalhes: false,
+  export default {
+    props: {
+      product: {
+        type: Object,
+        required: true,
       },
-      averageRating: 0,
-    };
+      isVisible: {
+        type: Boolean,
+        required: true,
+      },    },
+    data() {
+      return {
+        comments: [],
+        currentCommentIndex: 0,
+        commentInterval: null,
+        isOpen: {
+          descricao: false,
+          caracteristicas: false,
+          metodoPreparo: false,
+          outrosDetalhes: false,
+        },
+        averageRating: 0,
+      };
   },
   setup() {
     const favoriteProductIds = computed(() => globalState.favoriteProductIds);
@@ -247,9 +248,41 @@ export default {
         alert("Erro ao buscar a média de avaliações. Por favor, tente novamente mais tarde.");
       }
     },
-    getStarClass(star) {
-      const floorRating = Math.floor(this.averageRating);
-      const remainder = this.averageRating - floorRating;
+    setup() {
+      const favoriteProductIds = computed(() => globalState.favoriteProductIds);
+      return {
+        favoriteProductIds,
+      };
+    },
+    watch: {
+      isVisible(newValue) {
+        console.log('Visibility changed:', newValue);
+        if (newValue) {
+          this.fetchComments();
+          this.fetchAverageRating();
+          this.disableScroll();
+        } else {
+          clearInterval(this.commentInterval);
+          this.enableScroll();
+        }
+      },
+    },
+    methods: {
+      async fetchAverageRating() {
+        try {
+          const response = await axiosInstance.get(
+            `http://localhost:8080/avaliacoes/media/${this.product.id}`
+          );
+          this.averageRating = response.data;
+          console.log('Fetched average rating:', this.averageRating);
+        } catch (error) {
+          console.error('Erro ao buscar a média de avaliações:', error);
+          this.averageRating = 0;
+        }
+      },
+      getStarClass(star) {
+        const floorRating = Math.floor(this.averageRating);
+        const remainder = this.averageRating - floorRating;
 
       if (star <= floorRating) {
         return "checked"; // estrela completamente preenchida
@@ -331,20 +364,13 @@ export default {
         globalState.favoriteProductIds = []; // Limpa a lista em caso de erro na requisição
       }
     },
-    disableScroll() {
-      console.log("Scrolling disabled.");
-      document.body.classList.add("no-scroll");
-    },
-    enableScroll() {
-      console.log("Scrolling enabled.");
-      document.body.classList.remove("no-scroll");
-    },
-  },
-};
+  }
+}
+  }
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 .product-page .cards {
   margin-top: 5rem;
@@ -364,79 +390,79 @@ export default {
   flex-direction: column;
 }
 
-.accordion p font {
-  font-size: 1.5rem !important;
-  color: var(--text-color) !important;
-}
+  .accordion p font {
+    font-size: 1.5rem !important;
+    color: var(--text-color) !important;
+  }
 
-.accordion-item {
-  border-bottom: 1px solid #ccc;
-  width: 100%;
-}
+  .accordion-item {
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+  }
 
-.accordion-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  cursor: pointer;
+  .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    cursor: pointer;
 
-  flex-direction: row;
-  align-content: flex-start;
-  align-items: center;
-}
+    flex-direction: row;
+    align-content: flex-start;
+    align-items: center;
+  }
 
-.accordion-content {
-  display: flex;
-  padding: 1rem;
-  background-color: #fff;
-  width: 100%;
-  flex-direction: column;
-}
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 300;
-  backdrop-filter: blur(5px);
-}
+  .accordion-content {
+    display: flex;
+    padding: 1rem;
+    background-color: #fff;
+    width: 100%;
+    flex-direction: column;
+  }
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+    backdrop-filter: blur(5px);
+  }
 
-.sacolaandfav {
-  display: flex;
-}
+  .sacolaandfav {
+    display: flex;
+  }
 
-.no-scroll {
-  overflow: hidden; /* Impede o scroll */
-}
+  .no-scroll {
+    overflow: hidden; /* Impede o scroll */
+  }
 
-.nome {
-  font-size: 3rem;
-  line-height: 1; /* Diminui o espaçamento entre as linhas */
-  text-transform: uppercase;
-}
+  .nome {
+    font-size: 3rem;
+    line-height: 1; /* Diminui o espaçamento entre as linhas */
+    text-transform: uppercase;
+  }
 
-.preco {
-  font-size: 2rem;
-  font-weight: bold;
-  padding-top: 0;
-}
+  .preco {
+    font-size: 2rem;
+    font-weight: bold;
+    padding-top: 0;
+  }
 
-.infoprod {
-  display: flex;
-  width: 30%;
-  flex-direction: column;
-  align-content: flex-start;
-  align-items: flex-start;
-}
+  .infoprod {
+    display: flex;
+    width: 30%;
+    flex-direction: column;
+    align-content: flex-start;
+    align-items: flex-start;
+  }
 
-.infoprod p {
-  backdrop-filter: blur(0);
-}
+  .infoprod p {
+    backdrop-filter: blur(0);
+  }
 
 .imagemproduto {
   width: 25%;
@@ -459,124 +485,126 @@ export default {
   font-size: 16px; /* Definir padrão de font-size */
 }
 
-.modalimage {
-  width: 100% !important;
-  position: relative;
-}
+  .modalimage {
+    width: 100% !important;
+    position: relative;
+  }
 
-.modal-content p {
-  background: transparent !important;
-  width: fit-content;
+  .modal-content p {
+    background: transparent !important;
+    width: fit-content;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
 
-h4 {
-  font-size: 2rem;
-  font-weight: lighter;
-}
+  h4 {
+    font-size: 2rem;
+    font-weight: lighter;
+  }
 
-span {
-  font-size: 2rem;
-}
+  span {
+    font-size: 2rem;
+  }
 
-.modal-content .action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-  flex-direction: column;
-}
+  .modal-content .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-direction: column;
+  }
 
-.add-to-cart {
-  background-color: #313131;
-  color: #fff;
-  border: none;
-  padding: 0.8rem 1.2rem;
-  border-radius: 1.5rem;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  height: 4rem;
-}
-.add-to-cart:hover {
-  background-color: #1e1e1e;
-}
+  .add-to-cart {
+    background-color: #313131;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 1.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    height: 4rem;
+  }
+  .add-to-cart:hover {
+    background-color: #1e1e1e;
+  }
 
-.buy-now {
-  background-color: #5f75e4;
-  color: #fff;
-  border: none;
-  padding: 0.8rem 1.2rem;
-  border-radius: 1.5rem;
-  font-size: 1.5rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  height: 4rem;
-}
-.buy-now:hover {
-  background-color: #4b5fb4;
-}
+  .buy-now {
+    background-color: #5f75e4;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    height: 4rem;
+  }
+  .buy-now:hover {
+    background-color: #4b5fb4;
+  }
 
-.accordion .action-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  border-radius: 2rem;
-  height: 3rem;
-  width: 13%;
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
-  flex-direction: row;
-}
+  .accordion .action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 2rem;
+    height: 3rem;
+    width: 13%;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    flex-direction: row;
+  }
 
-.action-button {
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0.1rem;
-  border-radius: 50%;
-}
+  .action-button {
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.1rem;
+    border-radius: 50%;
+  }
 
-.action-button img {
-  width: 1.5rem;
-  height: 1.5rem;
-  filter: invert(1);
-}
+  .action-button img {
+    width: 1.5rem;
+    height: 1.5rem;
+    filter: invert(1);
+  }
 
-.favorite-button {
-  justify-content: center;
-  background-color: rgba(94, 94, 94, 0.281);
-  backdrop-filter: blur(5px);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0.1rem;
-  border-radius: 50%;
-  padding: 0.5rem;
-  width: 4rem;
-}
+  .favorite-button {
+    justify-content: center;
+    background-color: rgba(94, 94, 94, 0.281);
+    backdrop-filter: blur(5px);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.1rem;
+    border-radius: 50%;
+    padding: 0.5rem;
+    width: 4rem;
+  }
 
-.favoritocard {
-  color: var(--favoritocard-color);
-  font-size: 1.5rem; /* Tamanho do ícone */
-  transition: transform 0.3s ease, color 0.3s ease;
-  width: 2rem !important;
-  height: 2rem !important;
-}
-.favoritocard:hover {
-  color: var(--favoritocard-hover-color);
-  transform: scale(1.2); /* Aumenta o ícone em 20% */
-}
+  .favoritocard {
+    color: var(--favoritocard-color);
+    font-size: 1.5rem; /* Tamanho do ícone */
+    transition:
+      transform 0.3s ease,
+      color 0.3s ease;
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+  .favoritocard:hover {
+    color: var(--favoritocard-hover-color);
+    transform: scale(1.2); /* Aumenta o ícone em 20% */
+  }
 
 .favoritocard.is-favorite {
   color: var(
@@ -584,30 +612,30 @@ span {
   ); /* Altera a cor para a cor de favorito ativo */
 }
 
-.favorite-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
+  .favorite-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
 
-.is-favorite {
-  color: var(--favoritocard-hover-color);
-  transform: scale(1.2); /* Aumenta o ícone em 20% */
-}
+  .is-favorite {
+    color: var(--favoritocard-hover-color);
+    transform: scale(1.2); /* Aumenta o ícone em 20% */
+  }
 
-.comments-carousel {
-  position: absolute;
-  top: 15%; /* Posição ajustada */
-  left: 60%; /* Centralizar horizontalmente */
-  transform: translateX(-50%); /* Ajuste fino para centralização perfeita */
-  width: auto;
-  background-color: lightgray;
-  padding: 10px;
-  border-radius: 25px;
-  z-index: 10; /* Garantir que apareça acima da imagem */
-  text-align: center;
-  font-size: 1rem;
-}
+  .comments-carousel {
+    position: absolute;
+    top: 15%; /* Posição ajustada */
+    left: 60%; /* Centralizar horizontalmente */
+    transform: translateX(-50%); /* Ajuste fino para centralização perfeita */
+    width: auto;
+    background-color: lightgray;
+    padding: 10px;
+    border-radius: 25px;
+    z-index: 10; /* Garantir que apareça acima da imagem */
+    text-align: center;
+    font-size: 1rem;
+  }
 
 .fa-star {
   color: #ddd; /* Cor das estrelas não preenchidas */
