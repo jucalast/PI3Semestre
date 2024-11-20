@@ -20,20 +20,25 @@
       accept="image/*" 
       style="display: none" 
     />
-   
+    <div class="image-preview">
+      <div v-for="(image, index) in imagePreviews" :key="index" class="preview">
+        <img :src="image" alt="Preview" />
+        <button class="remove-btn" @click="removeImage(index)">X</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    onImageUpload: {
-      type: Function,
-      required: true,
-    },
     initialImages: {
       type: Array,
       default: () => [],
+    },
+    onImageUpload: {
+      type: Function,
+      required: true,
     },
   },
   data() {
@@ -44,52 +49,52 @@ export default {
     };
   },
   methods: {
-  onFileChange(event) {
-    const files = Array.from(event.target.files);
-    console.log("Arquivos selecionados pelo usuário:", files);
-    this.processFiles(files);
-  },
-  handleDrop(event) {
-    this.isDragging = false;
-    const files = Array.from(event.dataTransfer.files);
-    console.log("Arquivos arrastados e soltos:", files);
-    this.processFiles(files);
-  },
-  processFiles(files) {
-    const newBase64Images = [];
+    onFileChange(event) {
+      const files = Array.from(event.target.files);
+      console.log("Arquivos selecionados pelo usuário:", files);
+      this.processFiles(files);
+    },
+    handleDrop(event) {
+      this.isDragging = false;
+      const files = Array.from(event.dataTransfer.files);
+      console.log("Arquivos arrastados e soltos:", files);
+      this.processFiles(files);
+    },
+    processFiles(files) {
+      const newBase64Images = [];
 
-    files.forEach((file) => {
-      if (file.type.startsWith("image/")) {
-        console.log("Processando arquivo de imagem:", file);
-        const reader = new FileReader();
+      files.forEach((file) => {
+        if (file.type.startsWith("image/")) {
+          console.log("Processando arquivo de imagem:", file);
+          const reader = new FileReader();
 
-        reader.onload = (e) => {
-          newBase64Images.push(e.target.result); // Adiciona a imagem ao novo array base64
+          reader.onload = (e) => {
+            newBase64Images.push(e.target.result); // Adiciona a imagem ao novo array base64
 
-          // Atualiza o estado após processar todas as imagens
-          if (newBase64Images.length === files.length) {
-            console.log("Imagens base64 geradas:", newBase64Images);
-            this.imagePreviews = [...this.imagePreviews, ...newBase64Images];
-            console.log("Pré-visualizações atuais:", this.imagePreviews);
-            this.onImageUpload([...this.imagePreviews]); // Envia todas as imagens ao pai
-          }
-        };
+            // Atualiza o estado após processar todas as imagens
+            if (newBase64Images.length === files.length) {
+              console.log("Imagens base64 geradas:", newBase64Images);
+              this.imagePreviews = [...this.imagePreviews, ...newBase64Images];
+              console.log("Pré-visualizações atuais:", this.imagePreviews);
+              this.onImageUpload([...this.imagePreviews]); // Envia todas as imagens ao pai
+            }
+          };
 
-        reader.readAsDataURL(file);
-      } else {
-        console.log("Arquivo não é uma imagem, ignorando:", file);
-      }
-    });
+          reader.readAsDataURL(file);
+        } else {
+          console.log("Arquivo não é uma imagem, ignorando:", file);
+        }
+      });
+    },
+    triggerFileInput() {
+      console.log("Abrindo o seletor de arquivos...");
+      this.$refs.fileInput.click();
+    },
+    removeImage(index) {
+      this.imagePreviews.splice(index, 1);
+      this.onImageUpload([...this.imagePreviews]); // Atualiza o pai com a nova lista de imagens
+    },
   },
-  triggerFileInput() {
-    console.log("Abrindo o seletor de arquivos...");
-    this.$refs.fileInput.click();
-  },
-  removeImage(index) {
-    this.imagePreviews.splice(index, 1);
-    this.onImageUpload([...this.imagePreviews]); // Atualiza o pai com a nova lista de imagens
-  },
-},
 };
 </script>
 
@@ -98,8 +103,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px;
   height: 40%;
+
 }
 
 .dropbox {
@@ -110,6 +115,7 @@ export default {
   text-align: center;
   cursor: pointer;
   transition: background-color 0.3s;
+  width: 100%;
   height: 100%;
   color: #5e5e5e;
   font-size: 2rem;
@@ -160,23 +166,28 @@ export default {
 }
 
 .remove-btn {
-  position: absolute;
-  top: 0px;
-  right: -10px;
-  background: transparent;
-  color: #ff4d4d;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  padding: 2px 5px;
-  font-size: 12px;
-  transition: background-color 0.3s;
-  width: 20px;
-  height: 20px;
-  display: flex;
+    position: absolute;
+    top: 0px;
+    right: -10px;
+    background: #ff4d4d2f;
+    color: #ff4d4d;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 2px 5px;
+    font-size: 2rem;
+    transition: background-color 0.3s;
+    width: 3.2rem;
+    height: -moz-fit-content;
+    height: fit-content;
+    display: flex
+;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 .remove-btn:hover {
-  background-color: #ff4d4d2f;
+  background-color: #ff4d4d69;
 }
 </style>

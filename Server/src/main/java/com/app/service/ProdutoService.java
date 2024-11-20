@@ -205,6 +205,15 @@ public class ProdutoService {
         return updatedProduto;
     }
 
+    @Transactional
+    public void bulkUpdateProdutos(List<Produto> produtos) {
+        for (Produto produto : produtos) {
+            Produto existingProduto = getProdutoById(produto.getId());
+            existingProduto.setPreco(produto.getPreco());
+            produtoRepository.save(existingProduto);
+        }
+    }
+
     /**
      * Deleta um produto pelo ID.
      *

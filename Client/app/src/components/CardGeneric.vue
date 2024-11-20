@@ -23,7 +23,7 @@
               {{ formattedDescription(produto.descricao) }}
             </p>
             <div class="priceandfav">
-              <p class="product-price">{{ produto.preco.toFixed(2) }}</p>
+              <p class="product-price">{{ typeof produto.preco === 'number' ? produto.preco.toFixed(2) : produto.preco }}</p>
             </div>
           </div>
           <div class="action-buttons">
@@ -69,10 +69,9 @@
 
 <script>
 import ProductModal from "@/components/ProductModal.vue";
-import EditProductModal from "@/components/EditProductModal.vue";
 import axiosInstance from "../utils/axiosInstance";
 import { useToast } from "vue-toastification";
-
+import EditProductModal from "@/components/EditProductModal.vue";
 export default {
   props: {
     produtos: Array,

@@ -185,7 +185,7 @@
 .cart-modal-bckg {
   position: fixed;
   background-color: rgba(0, 0, 0, 0.7);
-  margin-top: 4.5rem;
+  margin-top: 5.6rem;
   left: 0;
   width: 100%;
   height: 100%;

@@ -223,4 +223,11 @@ public class ProdutoController {
         List<Produto> produtos = produtoService.buscarProdutosPorAtributos(atributos);
         return ResponseEntity.ok(produtos);
     }
+
+    @PutMapping("/protected/bulk-update")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> bulkUpdateProdutos(@RequestBody List<Produto> produtos) {
+        produtoService.bulkUpdateProdutos(produtos);
+        return ResponseEntity.ok().build();
+    }
 }

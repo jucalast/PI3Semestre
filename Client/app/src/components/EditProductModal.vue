@@ -108,7 +108,7 @@ export default {
 }
 
 .loading-gif {
-  width: 2rem; /* Ajuste o tamanho do GIF conforme necessário */
+  width: 10rem; /* Ajuste o tamanho do GIF conforme necessário */
 }
 .modal-overlay {
   position: fixed;

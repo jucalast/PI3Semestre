@@ -1,5 +1,6 @@
 <template>
   <AdminLayout>
+    <FloatingHeader @open-image-upload="showImageUploadModal = true" />
     <section class="centered-section">
       <h1>
         Tudo na palma das
@@ -19,10 +20,25 @@
             <button @click="fetchProdutos" class="refresh-button">
               <i class="fas fa-sync-alt"></i> Atualizar
             </button>
+            <div class="dropdown">
+              <button @click="toggleBulkEditDropdown" class="bulk-edit-button">
+                <i class="fas fa-edit"></i> Edição em Massa
+              </button>
+              <div v-if="isBulkEditDropdownVisible" class="dropdown-content">
+                <BulkEditDropdown
+                  :produtos="filteredProducts"
+                  @bulk-edit="handleBulkEdit"
+                />
+              </div>
+            </div>
           </div>
-          <CardGeneric :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
+          <div v-if="isLoading" class="loading-gif">
+            <img :src="loadingGif" alt="Carregando..." />
+          </div>
+          <CardGeneric v-else :produtos="filteredProducts" :searchQuery="searchQuery" :isLoading="isLoading" />
         </div>
       </div>
+      <ImageUploadModal v-if="showImageUploadModal" @close="showImageUploadModal = false" @images-uploaded="handleImagesUploaded" />
     </section>
   </AdminLayout>
 </template>
@@ -30,18 +46,27 @@
 
 <script>
 import AdminLayout from '@/layouts/AdminLayout.vue';
+import FloatingHeader from '@/components/FloatingHeader.vue';
 import CreateProductComponent from '@/components/CreateProductComponent.vue';
 import CardGeneric from '@/components/CardGeneric.vue';
 import FavoriteCountComponent from '@/components/FavoriteCountComponent.vue';
-import axios from 'axios';
+import BulkEditDropdown from '@/components/BulkEditDropdown.vue';
+import ImageUploadModal from '@/components/ImageUploadModal.vue';
+import axiosInstance from '../utils/axiosInstance';
+import { useToast } from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
+import loadingGif from '@/assets/Logo Maven.gif';
 
 export default {
   name: 'AdminDashboard',
   components: {
     AdminLayout,
+    FloatingHeader,
     CreateProductComponent,
     CardGeneric, // Certifique-se de que o nome está correto
     FavoriteCountComponent,
+    BulkEditDropdown,
+    ImageUploadModal,
   },
   data() {
     return {
@@ -49,6 +74,9 @@ export default {
       isLoading: true,
       searchQuery: "",
       favoriteCounts: {},
+      isBulkEditDropdownVisible: false,
+      loadingGif,
+      showImageUploadModal: false,
     };
   },
   computed: {
@@ -64,7 +92,7 @@ export default {
   methods: {
     async fetchProdutos() {
       try {
-        const response = await axios.get("http://localhost:8080/api/produtos");
+        const response = await axiosInstance.get("http://localhost:8080/api/produtos");
         this.produtos = response.data;
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
@@ -80,11 +108,50 @@ export default {
     },
     async fetchFavoriteCounts() {
       try {
-        const response = await axios.get("http://localhost:8080/api/favorites/count-by-product");
+        const response = await axiosInstance.get("http://localhost:8080/api/favorites/count-by-product");
         this.favoriteCounts = response.data;
       } catch (error) {
         console.error("Erro ao buscar contagem de favoritos:", error);
       }
+    },
+    toggleBulkEditDropdown() {
+      this.isBulkEditDropdownVisible = !this.isBulkEditDropdownVisible;
+    },
+    async handleBulkEdit(updatedProducts) {
+      const toast = useToast();
+      try {
+        const response = await axiosInstance.put("http://localhost:8080/api/produtos/protected/bulk-update", updatedProducts);
+        if (response.status === 200) {
+          this.fetchProdutos();
+          this.isBulkEditDropdownVisible = false;
+          toast.success("Produtos atualizados com sucesso!");
+        } else {
+          throw new Error("Erro ao atualizar produtos");
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar produtos:", error);
+        toast.error("Erro ao atualizar produtos");
+      }
+    },
+    async handleImagesUploaded(images) {
+      try {
+        const response = await axiosInstance.put(`http://localhost:8080/api/banners/${this.selectedBannerId}/image`, images[0]);
+        this.fetchProdutos();
+        this.showImageUploadModal = false;
+      } catch (error) {
+        console.error("Erro ao fazer upload da imagem:", error);
+      }
+    },
+    async deleteBannerImage(bannerId) {
+      try {
+        await axiosInstance.delete(`http://localhost:8080/api/banners/${bannerId}/image`);
+        this.fetchProdutos();
+      } catch (error) {
+        console.error("Erro ao deletar a imagem:", error);
+      }
+    },
+    handleImagesUploaded(images) {
+      console.log('Imagens carregadas:', images);
     },
   },
   mounted() {
@@ -214,5 +281,68 @@ h3 {
   padding: 2rem;
   background: #f9f9f9;
   border-radius: 1rem;
+}
+
+.bulk-edit-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  border: solid 2px #dfdfdf !important;
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-left: 1rem;
+}
+.bulk-edit-button:hover {
+  background: #ebebeb;
+}
+.bulk-edit-button i {
+  margin-right: 0.5rem;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: block;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.loading-gif {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.image-upload-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border: 2px dashed #ccc;
+  border-radius: 1rem;
+  padding: 2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.image-upload-card:hover {
+  background-color: #e0e0e0;
+}
+
+.image-upload-card p {
+  font-size: 1.5rem;
+  color: #333;
 }
 </style>
