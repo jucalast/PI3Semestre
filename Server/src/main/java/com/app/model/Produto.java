@@ -81,6 +81,12 @@ public class Produto {
     private Integer avaliacao;
 
     /**
+     * Indica se o produto está ativo.
+     */
+    @Column(nullable = false)
+    private boolean ativo = true;
+
+    /**
      * Relacionamento com o Café Especial
      */
     @OneToOne(mappedBy = "produto", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -151,6 +157,14 @@ public class Produto {
         this.avaliacao = avaliacao;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public CafeEspecial getCafeEspecial() {
         return cafeEspecial;
     }
@@ -171,5 +185,21 @@ public class Produto {
             metodoPreparo.setProduto(this);
         }
         this.metodoPreparo = metodoPreparo;
+    }
+
+    @Override
+    public String toString() {
+        return "Produto{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", preco=" + preco +
+                ", quantidadeEstoque=" + quantidadeEstoque +
+                ", avaliacao=" + avaliacao +
+                ", ativo=" + ativo +
+                // Evitar chamada recursiva
+                ", cafeEspecial=" + (cafeEspecial != null ? cafeEspecial.getId() : null) +
+                ", metodoPreparo=" + (metodoPreparo != null ? metodoPreparo.getId() : null) +
+                '}';
     }
 }

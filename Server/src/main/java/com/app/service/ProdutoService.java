@@ -215,27 +215,66 @@ public class ProdutoService {
     @Transactional
     public void deleteProduto(Long id) {
         logger.info("Deletando produto com ID: {}", id);
-    
+
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
-    
+
         // Verifica e deleta a especialização CafeEspecial se existir
         if (produto.getCafeEspecial() != null) {
             cafeEspecialRepository.delete(produto.getCafeEspecial());
             logger.info("Especialização CafeEspecial deletada para o produto ID: {}", id);
         }
-    
+
         // Verifica e deleta a especialização MetodoPreparo se existir
         if (produto.getMetodoPreparo() != null) {
             metodoPreparoRepository.delete(produto.getMetodoPreparo());
             logger.info("Especialização MetodoPreparo deletada para o produto ID: {}", id);
         }
-    
+
         // Após deletar as especializações, deleta o próprio produto
         produtoRepository.delete(produto);
         logger.info("Produto com ID {} deletado com sucesso", id);
     }
-    
+
+    /**
+     * Desativa um produto pelo ID.
+     *
+     * @param id ID do produto a ser desativado.
+     * @return Produto desativado.
+     * @throws RuntimeException se o produto com o ID especificado não for
+     * encontrado.
+     */
+    @Transactional
+    public Produto deactivateProduto(Long id) {
+        logger.info("Desativando produto com ID: {}", id);
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+        logger.info("Produto encontrado: {}", produto);
+        produto.setAtivo(false);
+        Produto updatedProduto = produtoRepository.save(produto);
+        logger.info("Produto com ID {} desativado com sucesso", id);
+        return updatedProduto;
+    }
+
+    /**
+     * Ativa um produto pelo ID.
+     *
+     * @param id ID do produto a ser ativado.
+     * @return Produto ativado.
+     * @throws RuntimeException se o produto com o ID especificado não for
+     * encontrado.
+     */
+    @Transactional
+    public Produto activateProduto(Long id) {
+        logger.info("Ativando produto com ID: {}", id);
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+        logger.info("Produto encontrado: {}", produto);
+        produto.setAtivo(true);
+        Produto updatedProduto = produtoRepository.save(produto);
+        logger.info("Produto com ID {} ativado com sucesso", id);
+        return updatedProduto;
+    }
 
     /**
      * Lista atributos dos produtos, incluindo especializações de CafeEspecial e

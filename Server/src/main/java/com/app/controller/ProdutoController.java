@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,6 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/produtos")
 public class ProdutoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProdutoController.class);
 
     @Autowired
     private ProdutoService produtoService;
@@ -149,6 +153,46 @@ public class ProdutoController {
             Produto updatedProduto = produtoService.updateProduto(id, produto);
             return ResponseEntity.ok(updatedProduto);
         }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Rota para desativar um produto pelo seu ID.
+     *
+     * @param id O ID do produto a ser desativado.
+     * @return O produto desativado ou uma resposta 404 se o produto não for encontrado.
+     */
+    @PutMapping("/protected/deactivate/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Produto> deactivateProduto(@PathVariable Long id) {
+        logger.info("Recebida solicitação para desativar produto com ID: {}", id);
+        Optional<Produto> existingProduto = Optional.ofNullable(produtoService.getProdutoById(id));
+        if (existingProduto.isPresent()) {
+            Produto updatedProduto = produtoService.deactivateProduto(id);
+            logger.info("Produto desativado com sucesso: {}", updatedProduto);
+            return ResponseEntity.ok(updatedProduto);
+        }
+        logger.warn("Produto com ID {} não encontrado", id);
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Rota para ativar um produto pelo seu ID.
+     *
+     * @param id O ID do produto a ser ativado.
+     * @return O produto ativado ou uma resposta 404 se o produto não for encontrado.
+     */
+    @PutMapping("/protected/activate/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Produto> activateProduto(@PathVariable Long id) {
+        logger.info("Recebida solicitação para ativar produto com ID: {}", id);
+        Optional<Produto> existingProduto = Optional.ofNullable(produtoService.getProdutoById(id));
+        if (existingProduto.isPresent()) {
+            Produto updatedProduto = produtoService.activateProduto(id);
+            logger.info("Produto ativado com sucesso: {}", updatedProduto);
+            return ResponseEntity.ok(updatedProduto);
+        }
+        logger.warn("Produto com ID {} não encontrado", id);
         return ResponseEntity.notFound().build();
     }
 

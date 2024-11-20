@@ -117,13 +117,14 @@
         const searchFiltered = this.produtos.filter((produto) =>
           produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
+        const activeFiltered = searchFiltered.filter(produto => produto.ativo);
         if (
           !this.selectedValues ||
           Object.keys(this.selectedValues).length === 0
         ) {
-          return searchFiltered;
+          return activeFiltered;
         }
-        return this.filterBySelectedAttributes(searchFiltered);
+        return this.filterBySelectedAttributes(activeFiltered);
       },
     },
     async mounted() {

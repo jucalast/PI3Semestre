@@ -37,10 +37,12 @@
     computed: {
       filteredProducts() {
         if (!this.searchQuery) {
-          return this.produtos;
+          return this.produtos.filter(produto => produto.ativo);
         }
-        return this.produtos.filter((produto) =>
-          produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+        return this.produtos.filter(
+          (produto) =>
+            produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+            produto.ativo
         );
       },
     },

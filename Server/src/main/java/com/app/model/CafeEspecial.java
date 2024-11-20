@@ -120,4 +120,22 @@ public class CafeEspecial {
     public void setProduto(Produto produto) {
         this.produto = produto;
     }
+
+    @Override
+    public String toString() {
+        return "CafeEspecial{" +
+                "id=" + id +
+                ", notasSensoriais='" + notasSensoriais + '\'' +
+                ", origem='" + origem + '\'' +
+                ", variedade='" + variedade + '\'' +
+                ", torrefacao='" + torrefacao + '\'' +
+                ", torra='" + torra + '\'' +
+                ", beneficiamento='" + beneficiamento + '\'' +
+                ", dataTorra=" + dataTorra +
+                ", dataValidade=" + dataValidade +
+                ", recomendacoesPreparo='" + recomendacoesPreparo + '\'' +
+                // Evitar chamada recursiva
+                ", produto=" + (produto != null ? produto.getId() : null) +
+                '}';
+    }
 }

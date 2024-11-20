@@ -66,11 +66,8 @@ export default {
     handleOverlayClick() {
       this.$emit("close");
     },
-    data() {
-      return {
-        selectedForm: null,
-        isSubmitting: false,
-      };
+    selectForm(formType) {
+      this.selectedForm = formType;
     },
     async submitProduct(product) {
       const toast = useToast();
@@ -108,39 +105,41 @@ export default {
 };
 </script>
 
+
+
 <style scoped>
-  .loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
 
-  .loading-gif {
-    width: 2rem; /* Ajuste o tamanho do GIF conforme necessário */
-  }
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 400;
-    backdrop-filter: blur(10px);
-  }
+.loading-gif {
+  width: 2rem; /* Ajuste o tamanho do GIF conforme necessário */
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 400;
+  backdrop-filter: blur(10px);
+}
 
-  img {
-    width: 3rem;
-  }
+img {
+  width: 3rem;
+}
 
 .botoes {
   display: flex;
@@ -148,14 +147,14 @@ export default {
   gap: 2rem;
 }
 
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    height: 80%;
-  }
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  height: 80%;
+}
 
 button {
   display: flex;
