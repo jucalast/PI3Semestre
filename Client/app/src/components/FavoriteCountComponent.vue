@@ -69,7 +69,7 @@ export default {
 .favorites-section {
   margin-top: 0 !important;
   padding: 2rem;
-  background: #d1d9ff !important;
+  background: #00000017!important;
   border-radius: 2rem !important;
 }
 
@@ -78,14 +78,15 @@ h3 {
   font-size: 3rem;
   line-height: 1 !important;
   padding-bottom: 2rem;
-  color:#3a5bff;
+  color:#ffffff;
 }
 
 .product-image {
-  width: 50px;
-  height: 80px;
+  width: 8em;
+  height: 8rem;
   object-fit: cover;
   margin-right: 1rem;
+  border-radius:1rem;
 }
 
 li {
@@ -96,10 +97,11 @@ li {
     justify-content: flex-start;
     font-size: 1.5rem;
     padding: 1.5rem;
-    background:#a2b2ff;
-    border-radius:2rem;
-    color:#001eb4;
+border-top:#ffffff51 solid 1px;
+border-bottom:#ffffff51 solid 1px;
+    color:#ffffff;
     margin-bottom:1rem;
+    padding-left:0%
 }
 
 .favorite-info {

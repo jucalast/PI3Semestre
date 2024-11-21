@@ -386,7 +386,7 @@ body {
   text-align: center;
   padding: 1rem;
   cursor: pointer;
-  transition: none !important;
+  transition: none !important; /* Remover a transição */
   align-items: center;
   margin: 0;
   position: relative;
@@ -396,7 +396,7 @@ body {
 
 .product-card:hover {
   width: 84%;
-  transform: translateY(0px);
+
 }
 
 .imgcardcont {
@@ -452,7 +452,6 @@ p {
   display: flex;
   flex-direction: column;
   opacity: 0;
-  transition: opacity 0.2s ease-in-out;
   border-radius: 1.5rem;
 }
 

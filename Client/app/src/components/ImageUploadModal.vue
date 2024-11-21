@@ -125,7 +125,7 @@ export default {
 .modal-content {
   background: white;
   padding: 2rem;
-  border-radius: 1rem;
+  border-radius: 0 0 2rem 2rem;
   position: relative;
   width: 80%;
 }
@@ -156,14 +156,15 @@ input::placeholder {
 .modal-header h2 {
   margin: 0;
   position: absolute;
-  background: #84ffab;
-  font-size: 1.5rem;
-  color: #046120;
+  background: #00000000;
+  font-size: 2rem;
+  color: #ffffff;
   width: 100%;
   right: 0;
-  top: 0;
-  padding: 1rem;
-  border-radius: 1rem 1rem 0 0;
+  top: -30%;
+  padding: 2rem;
+  border-radius: 2rem 2rem 0 0;
+  backdrop-filter: blur(20px);
 }
 
 .close-button {

@@ -40,11 +40,11 @@
     cursor: pointer;
     border-radius: 2rem;
     transition: background-color 0.3s;
-    background: #dfdfdf !important;
+    background: #ffffff !important;
   }
 
   .card:hover {
-    background: #d6d6d6 !important;
+    background: #ececec !important;
   }
 
   p {
