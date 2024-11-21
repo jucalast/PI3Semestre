@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @RestController
-@RequestMapping("/avaliacoes")
+@RequestMapping("/api/avaliacoes")
 public class AvaliacaoController {
 
     /**
@@ -103,7 +103,7 @@ public class AvaliacaoController {
         List<Map<String, Object>> avaliacoesResponse = new ArrayList<>();
         for (ProdutoPedidoModel produtoPedido : produtoPedidos) {
             // Use a instância avaliacaoRepository para chamar o método
-            List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(produtoPedido.getId());
+            List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(Math.toIntExact(produtoPedido.getId()));
             for (AvaliacaoModel avaliacao : avaliacoes) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("avaliacaoId", avaliacao.getId());
@@ -133,7 +133,7 @@ public class AvaliacaoController {
         double totalNotas = 0;
         int countAvaliacoes = 0;
         for (ProdutoPedidoModel produtoPedido : produtoPedidos) {
-            List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(produtoPedido.getId());
+            List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(Math.toIntExact(produtoPedido.getId()));
             for (AvaliacaoModel avaliacao : avaliacoes) {
                 totalNotas += avaliacao.getNota();
                 countAvaliacoes++;

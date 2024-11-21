@@ -12,7 +12,7 @@ import SignInPage from '@/views/SignInPage.vue';
 const routes = [
   { path: '/', component: HomePage },
   { path: '/products', component: ProductsPage, name: 'products' },
-  { path: '/checkout', component: CheckoutPage, name: 'checkout' },
+  { path: '/checkout', name: 'Checkout', component: CheckoutPage},
   { path: '/Address', component: AddressPage, name: 'address' },
   { path: '/favorites', component: FavoritePage, name: 'FavoritePage' },
   { path: '/admin', component: AdminDashboard, name: 'AdminDashboard' },

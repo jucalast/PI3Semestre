@@ -312,8 +312,11 @@
         alert(`Produto ${product.nome} adicionado ao carrinho.`);
       },
       buyNow(product) {
-        console.log(`Buying now: ${product.nome}`);
-        alert(`Comprando agora o produto ${product.nome}.`);
+        if (!product.id) {
+          console.error('ID do produto não fornecido');
+          return;
+        }
+        this.$router.push({ name: 'Checkout', query: { ids: product.id.toString() } });
       },
       async handleFavoriteClick(produto) {
         try {
