@@ -352,9 +352,6 @@ export default {
   filter: invert(1);
 }
 
-.logo-container {
-
-}
 
 .exitbtn {
   display: flex !important;

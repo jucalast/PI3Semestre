@@ -4,7 +4,8 @@
       <!-- Carrossel de Comentários -->
       <div class="comments-carousel" v-if="comments.length > 0">
         <p>
-          {{ comments[currentCommentIndex].userName }}:
+          <img :src="comments[currentCommentIndex].userAvatar" alt="User Avatar" class="user-avatar" />
+          <span class="user-name">{{ comments[currentCommentIndex].userName + ":" }}</span>
           {{ comments[currentCommentIndex].descricao }}
         </p>
       </div>
@@ -601,12 +602,19 @@ span {
   left: 60%; /* Centralizar horizontalmente */
   transform: translateX(-50%); /* Ajuste fino para centralização perfeita */
   width: auto;
-  background-color: lightgray;
-  padding: 10px;
+  background-color: rgb(32, 32, 32);
+  padding: 1rem;
   border-radius: 25px;
   z-index: 10; /* Garantir que apareça acima da imagem */
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.5rem;
+  color:#ffffff;
+}
+p {
+  display:flex !important;
+  flex-direction:row !important;
+  align-items: center !important;
+  gap:1rem;
 }
 
 .fa-star {
@@ -628,5 +636,18 @@ span {
   content: "\f005"; /* Código Unicode para a estrela completa (FontAwesome) */
   display: block;
   mask-image: linear-gradient(to right, black 50%, transparent 50%);
+}
+
+.user-name {
+  color: #a7a7a7; /* Cor de exemplo, ajuste conforme necessário */
+  font-size: 1.5rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
 }
 </style>

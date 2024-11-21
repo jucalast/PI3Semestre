@@ -80,7 +80,7 @@ h3 {
 }
 
 input {
-width: 4rem;
+width: 5rem;
   color: #3a5bff;
   border: solid 1px #aeaeaeb6;
   background: #ededed;

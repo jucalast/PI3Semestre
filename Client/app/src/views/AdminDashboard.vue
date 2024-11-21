@@ -221,12 +221,14 @@
     border-right: #304acd solid 1px;
   }
 
-  .other {
+  div.other {
     display: flex;
+    height: fit-content
   }
 
   .logo-container {
     margin-top: 2rem;
+    position: fixed;
   }
 
   .logo {
@@ -240,7 +242,7 @@
     align-items: center;
     text-align: center;
     padding: 2rem;
-    height: 20%;
+    height: 10%;
   }
 
   h1 {
@@ -361,7 +363,7 @@
     display: block;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 200px;
+ width: 15rem;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
     border-radius: 1rem;

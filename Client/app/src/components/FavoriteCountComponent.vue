@@ -82,8 +82,8 @@ h3 {
 }
 
 .product-image {
-  width: 8em;
-  height: 8rem;
+  width: 4em;
+  height: 10rem;
   object-fit: cover;
   margin-right: 1rem;
   border-radius:1rem;
@@ -100,7 +100,7 @@ li {
 border-top:#ffffff51 solid 1px;
 border-bottom:#ffffff51 solid 1px;
     color:#ffffff;
-    margin-bottom:1rem;
+    
     padding-left:0%
 }
 
