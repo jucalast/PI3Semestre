@@ -280,7 +280,7 @@ export default {
         if (this.photoUrl) {
           return this.photoUrl;
         }
-        return `https://avatars.dicebear.com/api/shapes/${this.username}.svg`;
+        return `https://api.dicebear.com/9.x/thumbs/svg?seed=${this.username}`;
       } else {
         return '/src/assets/user.png';
       }
