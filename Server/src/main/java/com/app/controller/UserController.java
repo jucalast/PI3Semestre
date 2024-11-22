@@ -15,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -25,6 +24,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.app.model.UserModel;
@@ -218,7 +219,7 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
         if (authentication != null && authentication.isAuthenticated()) {
-            
+
             response.put("authenticated", true);
             response.put("email", authentication.getName());
 
@@ -251,4 +252,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
+    @PutMapping("/api/profile")
+    public ResponseEntity<?> updateUserProfile(HttpServletRequest request, @RequestBody Map<String, Object> updates) {
+        UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+
+        if (authenticatedUser == null) {
+            return ResponseEntity.status(401).body("Usuário não autenticado.");
+        }
+
+        try {
+            userService.updateUserProfile(authenticatedUser.getId(), updates);
+
+            return ResponseEntity.ok("Perfil atualizado com sucesso!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao atualizar o perfil.");
+        }
+    }
 }

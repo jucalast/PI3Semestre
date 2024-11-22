@@ -4,6 +4,7 @@ import com.app.model.UserModel;
 import com.app.repository.UserRepository;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -85,9 +86,9 @@ public class UserService implements UserDetailsService {
             user.setUserName(name);
             user.setEmailId(email);
             user.setRoles("ROLE_USER");
-            user = userRepository.save(user);  
+            user = userRepository.save(user);
         }
-        return user;  
+        return user;
     }
 
     /**
@@ -130,27 +131,41 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Atualiza as informações de um usuário existente.
+     * Atualiza o perfil do usuário com base no ID e nos campos fornecidos.
      *
-     * @param userId O ID do usuário a ser atualizado.
-     * @param updatedUser O objeto UserModel com os dados atualizados do
-     * usuário.
-     * @throws RuntimeException Se o usuário com o ID fornecido não for
-     * encontrado.
+     * @param userId ID do usuário autenticado.
+     * @param updates Mapa contendo os campos a serem atualizados.
      */
-    public void updateUser(Long userId, UserModel updatedUser) {
-        UserModel existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+    public void updateUserProfile(Long userId, Map<String, Object> updates) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
-        existingUser.setUserName(updatedUser.getUserName());
-        existingUser.setEmailId(updatedUser.getEmailId());
-        existingUser.setRoles(updatedUser.getRoles());
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "userName":
+                    user.setUserName((String) value);
+                    break;
+                case "emailId":
+                    user.setEmailId((String) value);
+                    break;
+                case "mobileNumber":
+                    user.setMobileNumber((String) value);
+                    break;
+                case "currentPassword":
+                    String currentPassword = (String) value;
+                    if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                        throw new IllegalArgumentException("Senha atual incorreta.");
+                    }
+                    break;
+                case "newPassword":
+                    String newPassword = (String) value;
+                    user.setPassword(passwordEncoder.encode(newPassword)); 
+                    break;
+                default:
+                    throw new IllegalArgumentException("Campo '" + key + "' não é válido.");
+            }
+        });
 
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        }
-
-        userRepository.save(existingUser);
+        userRepository.save(user);
     }
-
 }

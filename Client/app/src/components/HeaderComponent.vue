@@ -222,7 +222,7 @@ export default {
           localStorage.clear();
           this.logout();
           this.authenticated = false;
-          window.location.reload();
+          this.$router.push('/login');
         })
         .catch((error) => {
           console.error('Erro ao tentar fazer logout', error);
@@ -488,6 +488,7 @@ header .action-buttons {
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
+  filter: none;
 }
 
 .dropdown-content {
