@@ -7,11 +7,10 @@
       <div class="main-cart">
         <section class="products">
           <section
-            v-for="(cartItem, index) in cartItems"
-            :key="index"
-            class="product-section"
+              v-for="(cartItem, index) in cartItems"
+              :key="index"
+              class="product-section"
           >
-            {{ console.log(cartItem[index]) }}
             <div class="image-bckg">
               <img
                 class="image-product"
@@ -26,12 +25,12 @@
               </button>
             </div>
             <select
-              @change="
+                @change="
                 updateQuantidadeItem(cartItem.produtoId, $event.target.value)
               "
-              name="Quantidade"
-              class="input-qntty"
-              :value="cartItem.quantidade"
+                name="Quantidade"
+                class="input-qntty"
+                :value="cartItem.quantidade"
             >
               <option value="1">1</option>
               <option value="2">2</option>
@@ -79,102 +78,79 @@
 
 
 <script>
-  import axiosInstance from '@/utils/axiosInstance';
+import axiosInstance from '@/utils/axiosInstance';
 
-  export default {
-    name: 'CartModal',
-    props: {
-      isModalVisible: {
-        type: Boolean,
-        required: true,
-      },
+export default {
+  name: 'CartModal',
+  props: {
+    isModalVisible: {
+      type: Boolean,
+      required: true,
     },
-    watch: {
-      isModalVisible(newValue) {
-        if (newValue) {
-          this.fetchCarts();
-        }
-      },
-    },
-    data() {
-      return {
-        cartItems: [],
-        somaValorItens: 0,
-        somaQuantidade: 0,
-      };
-    },
-    methods: {
-      close() {
-        this.$emit('close');
-      },
-      async fetchCarts() {
-        try {
-          const responseCart = await axiosInstance.get(`/api/carrinho/`);
-          this.cartItems = responseCart.data;
-          console.log(this.cartItems);
-          this.somasCarrinho(responseCart.data);
-        } catch (error) {
-          console.error('Erro ao buscar produtos do carrinho: ', error);
-        } finally {
-          this.isLoading = false;
-        }
-      },
-      async removeItemOnCartUser(productId) {
-        try {
-          const responseCart = await axiosInstance.delete(
-            `/api/carrinho/${productId}`
-          );
-          this.fetchCarts();
-        } catch (error) {
-          console.error('Erro ao remover produto do carrinho', error);
-        } finally {
-          this.isLoading = false;
-        }
-      },
-      somasCarrinho(itensCarrinho) {
-        this.somaValorItens = 0;
-        this.somaQuantidade = 0;
-        for (let index = 0; index < itensCarrinho.length; index++) {
-          this.somaValorItens +=
-            parseFloat(itensCarrinho[index].preco_produto) *
-            parseFloat(itensCarrinho[index].quantidade);
-          this.somaQuantidade += parseInt(itensCarrinho[index].quantidade);
-        }
-      },
-      async updateQuantidadeItem(productId, quantity) {
-        console.log(productId, quantity);
-        const responseCart = await axiosInstance.put(
-          `/api/carrinho/${productId}/${parseInt(quantity)}`
-        );
-        console.log(responseCart.data);
+  },
+  watch: {
+    isModalVisible(newValue) {
+      if (newValue) {
         this.fetchCarts();
-      },
-    },
-    async mounted() {
-      await this.fetchCarts();
-    },
-    async updateQuantidadeItem(productId, quantity) {
-      try {
-        const responseCart = await axiosInstance.put(
-          `/api/carrinho/${productId}/${quantity}`
-        );
-        console.log("Quantidade atualizada:", responseCart.data);
-        // Recarregue os itens do carrinho após a atualização
-        this.fetchCarts();
-      } catch (error) {
-        console.error("Erro ao atualizar quantidade no carrinho:", error);
       }
     },
-
-    // Método para logar o carrinho no console
-    handleContinuePurchase() {
-      console.log("Carrinho de compras:", JSON.stringify(this.cartItems, null, 2));
+  },
+  data() {
+    return {
+      cartItems: [],
+      somaValorItens: 0,
+      somaQuantidade: 0,
+    };
+  },
+  methods: {
+    close() {
+      this.$emit('close');
     },
-  
+    async fetchCarts() {
+      try {
+        const responseCart = await axiosInstance.get(`/api/carrinho/`);
+        this.cartItems = responseCart.data;
+        this.somasCarrinho(responseCart.data);
+      } catch (error) {
+        console.error('Erro ao buscar produtos do carrinho: ', error);
+        return;
+      }
+    },
+    async removeItemOnCartUser(productId) {
+      try {
+        const responseCart = await axiosInstance.delete(`/api/carrinho/${productId}`);
+        this.fetchCarts();
+      } catch (error) {
+        console.error('Erro ao remover produto do carrinho', error);
+      }
+    },
+    somasCarrinho(itensCarrinho) {
+      this.somaValorItens = 0;
+      this.somaQuantidade = 0;
+      itensCarrinho.forEach(item => {
+        this.somaValorItens += parseFloat(item.preco_produto) * parseInt(item.quantidade);
+        this.somaQuantidade += parseInt(item.quantidade);
+      });
+    },
+    async updateQuantidadeItem(productId, quantity) {
+      const responseCart = await axiosInstance.put(
+          `/api/carrinho/${productId}/${parseInt(quantity)}`
+      );
+      this.fetchCarts();
+    },
+    continueToCheckout() {
+      const productIds = this.cartItems.map(item => item.produtoId);
+      if (productIds.length > 0) {
+        this.$router.push({ name: 'Checkout', query: { ids: productIds.join(',') } });
+      } else {
+        alert('Seu carrinho está vazio.');
+      }
+    }
+  },
   async mounted() {
     await this.fetchCarts();
-  }
-  }
+  },
+};
 </script>
 
 <style scoped>

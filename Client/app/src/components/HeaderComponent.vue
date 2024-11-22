@@ -307,7 +307,6 @@ export default {
       const responseCart = await axios.get(
         'http://localhost:8080/api/check-auth'
       );
-      console.log(responseCart.status);
       responseCart.status === 200
         ? (this.isCartModalVisible = !this.isCartModalVisible)
         : (window.location.href = 'http://localhost:8080/login');
