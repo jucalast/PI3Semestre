@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout>
+  <AdminLayout>
     <div class="checkout-page flex flex-row h-full p-4">
       <!-- ESQUERDA -->
       <div class="left-section w-full md:w-2/3 flex flex-col space-y-4 h-full">
@@ -15,11 +15,19 @@
             </div>
           </div>
           <!-- ENDEREÇO -->
-          <div class="section address bg-gray-200 flex-grow p-4 rounded-lg shadow-md">
+          <div class="section address flex-grow p-4 rounded-lg">
             <GoogleMap ref="googleMap" @addressClicked="handleAddressClick" />
-            <p v-if="clickedAddress">{{ clickedAddress }}</p>
-            <button @click="addAddress" class="add-address-btn">Adicionar Endereço</button>
-            <button @click="showModal = true" class="add-address-btn">Digitar Endereço</button>
+            <div class="elements-card">
+              <h2>{{ clickedAddress || 'Nenhum endereço selecionado' }}</h2>
+              <div>
+                <button @click="addAddress" class="icon-button">
+                  <font-awesome-icon icon="fa-solid fa-plus" />
+                </button>
+                <button @click="showModal = true" class="icon-button">
+                  <font-awesome-icon icon="fa-solid fa-edit" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <!-- INFORMAÇÃO DE ENTREGA -->
@@ -30,44 +38,34 @@
         </div>
       </div>
       <!-- DIREITA (Detalhes da Compra) -->
-      <div class="right-section w-full md:w-1/3 pl-4">
-        <div class="section bg-gray-400 h-full p-4 rounded-lg shadow-md">
-          <cartaoTemplate :cardDetails="cardDetails" />
-          <button @click="showCardModal = true" class="add-card-btn">Adicionar Cartão</button>
-          <div class="price-details">
-            <p>Preço dos Produtos: R$ {{ totalProductPrice }}</p>
-            <p>Preço do Frete: R$ {{ shippingPrice.toFixed(2) }}</p>
-            <button class="total-price">Total: R$ {{ totalPrice }}</button>
-          </div>
-        </div>
-
-        <ModalCartao
-            :isVisible="showCardModal"
-            @close="showCardModal = false"
-            @submitCard="handleCardDetails"
-        />
-      </div>
+      <RightSection :cardDetails="cardDetails" @saveCardDetails="saveCardDetails" />
     </div>
     <AddressModal :isVisible="showModal" @close="showModal = false" @submit-address="handleManualAddress" />
-  </DefaultLayout>
+  </AdminLayout>
 </template>
 
 <script>
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import cartaoTemplate from '@/components/cartaoTemplate.vue';
+
+import cartaoTemplate from '@/components/CartaoTemplate.vue';
 import GoogleMap from '@/components/GoogleMap.vue';
 import AddressModal from '@/components/AddressModal.vue';
 import axiosInstance from "@/utils/axiosInstance";
-import ModalCartao from '@/components/ModalCartao.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPlus, faEdit, faCheck } from '@fortawesome/free-solid-svg-icons';
+import AdminLayout from '@/layouts/AdminLayout.vue';
+import RightSection from '@/components/RightSection.vue'; // Importar o novo componente
 
+library.add(faPlus, faEdit, faCheck);
 
 export default {
   components: {
-    DefaultLayout,
+    AdminLayout,
     cartaoTemplate,
     GoogleMap,
     AddressModal,
-    ModalCartao
+    FontAwesomeIcon,
+    RightSection
   },
   data() {
     return {
@@ -79,7 +77,7 @@ export default {
       productCount: 0,
       shippingPrice: 15.00,
       showModal: false,
-      showCardModal: false, // Controle de visibilidade do modal de cartão
+      showCardInputs: false, // Controle de visibilidade dos inputs de cartão
       cardDetails: {
         number: '',
         name: '',
@@ -99,6 +97,9 @@ export default {
     },
     totalPrice() {
       return (parseFloat(this.totalProductPrice) + this.shippingPrice).toFixed(2);
+    },
+    isCardFilled() {
+      return this.cardDetails.number && this.cardDetails.name && this.cardDetails.expiry;
     }
   },
   created() {
@@ -151,15 +152,17 @@ export default {
       }
     },
     async handleManualAddress(fullAddress) {
+      this.clickedAddress = fullAddress;
       this.savedAddress = fullAddress;
       try {
         await this.$refs.googleMap.centerMapOnAddress(fullAddress);
       } catch (err) {
         console.error('Erro ao centralizar o mapa:', err);
       }
+    },
+    saveCardDetails() {
+      this.showCardInputs = false; // Esconde os inputs após salvar
     }
-
-
   }
 };
 </script>
@@ -169,24 +172,109 @@ export default {
 .checkout-page {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 100px);
+  width: 100vw !important;
+  height: 100vh !important;
+background: #ececec;
 }
+
 
 /* Seção da esquerda */
 .left-section {
   flex-grow: 1; /* Permite que a seção da esquerda cresça para preencher o espaço */
-  flex-basis: 65%; /* Define a base inicial como 65% do espaço disponível */
+  flex-basis: 70%; /* Define a base inicial como 60% do espaço disponível */
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 /* Seção da direita */
 .right-section {
-  flex-basis: 35%; /* Define a base inicial como 35% do espaço disponível */
-  width: 35%; /* Definindo explicitamente a largura como 35% */
+  flex-basis:35%; /* Define a base inicial como 40% do espaço disponível */
+  
+}
+
+.info-card {
+  background: #ffffff;
+    width: 100%;
+    height: 80%;
+    border-radius: 2rem;
+    padding: 2rem;
+    display: flex
+;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top:
+    10rem;
+}
+
+
+.card-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+ .header-info-card
+{
+display: flex;
+width: 100%;
+
+}
+
+
+.card-inputs input {
+  color: #3a5bff;
+  border: solid 1px #aeaeaeb6;
+  background: #ededed;
+  border-radius: 2rem;
+  height: 5rem;
+  padding-left: 2rem;
+  font-size: 1.5rem;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+}
+
+.card-inputs input::placeholder {
+  color: #6d6d6d;
+}
+
+.card-inputs input:focus {
+  outline: none;
+  border: 1px solid #3a5bff;
+  box-shadow: 1px 0px 20px 1px #3a5bff3b;
+}
+.submit-btn, .total-price {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 1rem 2rem;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+ .submit-btn:hover, .total-price:hover {
+  background-color: #e04343;
+}
+
+.price-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.price-details p {
+  margin: 20px 0;
 }
 
 /* Estilo para os subcontainers de produtos e endereço dentro da seção de detalhes */
 .products, .address {
-  flex: 1;  /* Atribui a mesma proporção de crescimento para ambos */
   display: flex; /* Usa flexbox para melhor controle de layout */
   flex-direction: column; /* Organiza os conteúdos verticalmente */
   justify-content: space-between; /* Distribui o espaço igualmente entre os elementos internos */
@@ -194,6 +282,7 @@ export default {
   padding: 20px; /* Adiciona um pouco de espaço interno para não tocar as bordas */
   margin: 10px; /* Garante um pequeno espaço entre os modais */
   height: 100%; /* Faz cada seção usar todo o espaço vertical disponível */
+  flex-basis: 30%; /* Define a base inicial como 30% do espaço disponível */
 }
 
 .section {
@@ -201,11 +290,26 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border-radius: 2rem !important;
+
+}
+
+
+.section-card {
+  width: 100%;
+  display: flex
+;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    border-radius: 2rem !important;
+    background: #00000035;
 }
 
 .products{
   flex-direction: row;
   height: 440px;
+
 }
 
 /* Detalhes específicos para melhorar a visualização dos elementos dentro de cada modal */
@@ -215,6 +319,15 @@ export default {
   margin-bottom: 10px; /* Espaço antes dos elementos abaixo, se houver */
 }
 
+.card-container1 {
+  display: flex;
+    height: 40%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+}
 .product-display, .map-display {
   width: 100%; /* Ocupa toda a largura do modal */
   overflow: hidden; /* Esconde qualquer conteúdo que exceda o tamanho do modal */
@@ -236,30 +349,41 @@ export default {
   font-size: 1rem; /* Tamanho do texto */
 }
 
-.price-details{
+.elements-card {
+  background-color: #57575773;
+  backdrop-filter: blur(5px);
+  border-radius: 2.5rem;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
+  margin: 0;
+  font-size: 2rem;
+  position: relative;
+  bottom: 8rem;
+  z-index: 2;
+  padding: 1rem;
+  text-align: center;
+  width: 100%; /* Ocupa a largura total do mapa */
 }
 
-.price-details p{
-  margin: 20px 0;
-}
 
 
-.total-price{
-  padding: 10px 20px;
-  background-color: #4CAF50; /* Verde */
-  color: white;
+.icon-button {
+  background: none;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px; /* Espaço acima do botão */
-  font-size: 1rem; /* Tamanho do texto */
+  font-size: 2rem;
+  color: #ffffff;
 }
 
-.add-card-btn {
+.card-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+.submit-btn {
   padding: 10px 20px;
   background-color: #4CAF50;
   color: white;
@@ -270,6 +394,50 @@ export default {
   margin-top: 10px;
 }
 
+.add-card-btn {
+  background-color: #efefef;
+  color: #1e1e1e;
+  border-radius: 2rem;
+  padding: 1rem; /* Tamanho reduzido */
+  font-size: 1.5rem; /* Tamanho reduzido */
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start; /* Encosta o botão na esquerda */
+}
 
+.add-card-btn:hover {
+  background-color: #f4f4f4;
+ 
+}
 
+.save-card-btn {
+  background-color: #ffffff;
+    color: #1e1e1e;
+    border-radius: 2rem;
+    padding: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin-top: 10px;
+    display: flex
+;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    width: 5rem;
+
+}
+
+.save-card-btn:hover {
+  background-color: #f4f4f4;
+}
+
+.save-card-btn.filled {
+  background-color: #3a5bff;
+  color: white;
+}
 </style>

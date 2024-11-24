@@ -260,14 +260,7 @@
 </script>
 
 <style scoped>
-  .card-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: center;
-    width: 100%;
-    margin-top: 5rem;
-  }
+
 
   .not {
     margin-top: 20rem;
@@ -275,10 +268,11 @@
   .cards {
     margin-top: -7rem;
     margin-bottom: 10rem;
-    display: flex;
+    display: flex
+;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     align-content: center;
     gap: 2rem;

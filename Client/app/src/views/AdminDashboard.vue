@@ -223,7 +223,6 @@
 
   div.other {
     display: flex;
-    height: fit-content
   }
 
   .logo-container {
@@ -241,8 +240,7 @@
     justify-content: flex-start;
     align-items: center;
     text-align: center;
-    padding: 2rem;
-    height: 10%;
+    padding: 4rem;
   }
 
   h1 {

@@ -23,10 +23,10 @@
               {{ formattedDescription(produto.descricao) }}
             </p>
             <div class="priceandfav">
-              <p class="product-price">{{ typeof produto.preco === 'number' ? produto.preco.toFixed(2) : produto.preco }}</p>
+              <p class="product-price">{{ produto.preco.toFixed(2) }}</p>
             </div>
           </div>
-          <div class="action-buttons">
+          <div v-if="showButtons === produto.id" class="action-buttons">
             <button class="excluir" @click.stop="confirmDeleteProduct(produto.id)">
               <i class="fas fa-trash"></i>
             </button>
@@ -34,9 +34,6 @@
               <i class="fas fa-edit"></i>
             </button>
           </div>
-          <button class="desativar" @click.stop="confirmToggleProduct(produto.id, produto.ativo)">
-            <i :class="produto.ativo ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
-          </button>
         </div>
       </div>
 
@@ -69,9 +66,10 @@
 
 <script>
 import ProductModal from "@/components/ProductModal.vue";
+import EditProductModal from "@/components/EditProductModal.vue";
 import axiosInstance from "../utils/axiosInstance";
 import { useToast } from "vue-toastification";
-import EditProductModal from "@/components/EditProductModal.vue";
+
 export default {
   props: {
     produtos: Array,
@@ -91,19 +89,7 @@ export default {
       isEditModalVisible: false,
       selectedProduct: null,
       showButtons: null,
-      localProdutos: [...this.produtos], // Cria uma cópia local da prop produtos
-      isToggleConfirmationVisible: false,
-      productToToggle: null,
-      isActive: false,
     };
-  },
-  watch: {
-    produtos: {
-      handler(newVal) {
-        this.localProdutos = [...newVal]; // Atualiza a cópia local quando a prop mudar
-      },
-      deep: true,
-    },
   },
   setup() {
     const toast = useToast();
@@ -180,17 +166,16 @@ export default {
       try {
         const response = await axiosInstance.put(
           `http://localhost:8080/api/produtos/protected/update/${updatedProduct.id}`,
-          productData,
-          { timeout: 30000 } // Aumenta o tempo limite para 30 segundos
+          productData
         );
 
         if (response.status === 200) {
           // Atualiza a lista de produtos no pai
-          const index = this.localProdutos.findIndex(
+          const index = this.produtos.findIndex(
             (prod) => prod.id === updatedProduct.id
           );
           if (index !== -1) {
-            this.localProdutos.splice(index, 1, updatedProduct);
+            this.produtos.splice(index, 1, updatedProduct);
           }
 
           this.toast.success("Produto atualizado com sucesso.");
@@ -213,19 +198,14 @@ export default {
       if (!this.productToDelete) return;
 
       try {
-        console.log("Tentando excluir o produto com ID:", this.productToDelete);
         const response = await axiosInstance.delete(
           `http://localhost:8080/api/produtos/${this.productToDelete}`
         );
 
-        console.log("Resposta do servidor:", response);
-
-        if (response.status === 200 || response.status === 204) {
-          const updatedProdutos = this.localProdutos.filter(
+        if (response.status === 200) {
+          this.produtos = this.produtos.filter(
             (produto) => produto.id !== this.productToDelete
           );
-          this.localProdutos = updatedProdutos;
-          this.$emit('update:produtos', updatedProdutos); // Atualiza a prop produtos no pai
           this.isConfirmationVisible = false;
           this.toast.success("Produto excluído com sucesso.");
         } else {
@@ -233,59 +213,7 @@ export default {
         }
       } catch (error) {
         console.error("Erro ao excluir produto:", error.message);
-        if (error.response) {
-          console.log("Erro resposta do servidor:", error.response);
-          if (error.response.status === 200 || error.response.status === 204) {
-            const updatedProdutos = this.localProdutos.filter(
-              (produto) => produto.id !== this.productToDelete
-            );
-            this.localProdutos = updatedProdutos;
-            this.$emit('update:produtos', updatedProdutos); // Atualiza a prop produtos no pai
-            this.isConfirmationVisible = false;
-            this.toast.success("Produto excluído com sucesso.");
-          } else {
-            this.toast.error("Erro ao excluir produto.");
-          }
-        } else {
-          this.toast.error("Erro ao excluir produto.");
-        }
-      }
-    },
-
-    async confirmToggleProduct(id, isActive) {
-      console.log(`Confirmar ${isActive ? 'desativação' : 'ativação'} do produto com ID:`, id);
-      this.productToToggle = id;
-      this.isActive = isActive;
-      this.isToggleConfirmationVisible = true;
-      // Chamar diretamente o método toggleProduct para depuração
-      await this.toggleProduct();
-    },
-
-    async toggleProduct() {
-      if (!this.productToToggle) return;
-
-      try {
-        console.log(`${this.isActive ? 'Desativando' : 'Ativando'} produto com ID:`, this.productToToggle);
-        const response = await axiosInstance.put(
-          `http://localhost:8080/api/produtos/protected/${this.isActive ? 'deactivate' : 'activate'}/${this.productToToggle}`
-        );
-
-        console.log("Resposta do servidor:", response);
-
-        if (response.status === 200) {
-          const updatedProdutos = this.localProdutos.map(produto =>
-            produto.id === this.productToToggle ? { ...produto, ativo: !this.isActive } : produto
-          );
-          this.localProdutos = updatedProdutos;
-          this.$emit('update:produtos', updatedProdutos);
-          this.isToggleConfirmationVisible = false;
-          this.toast.success(`Produto ${this.isActive ? 'desativado' : 'ativado'} com sucesso.`);
-        } else {
-          this.toast.error(`Erro ao ${this.isActive ? 'desativar' : 'ativar'} produto.`);
-        }
-      } catch (error) {
-        this.toast.error(`Erro ao ${this.isActive ? 'desativar' : 'ativar'} produto.`);
-        console.error(`Erro ao ${this.isActive ? 'desativar' : 'ativar'} produto:`, error.message);
+        this.toast.error("Erro ao excluir produto.");
       }
     },
   },
@@ -386,7 +314,7 @@ body {
   text-align: center;
   padding: 1rem;
   cursor: pointer;
-  transition: none !important; /* Remover a transição */
+  transition: none !important;
   align-items: center;
   margin: 0;
   position: relative;
@@ -396,7 +324,7 @@ body {
 
 .product-card:hover {
   width: 84%;
-
+  transform: translateY(0px);
 }
 
 .imgcardcont {
@@ -452,6 +380,7 @@ p {
   display: flex;
   flex-direction: column;
   opacity: 0;
+  transition: opacity 0.2s ease-in-out;
   border-radius: 1.5rem;
 }
 
@@ -489,23 +418,5 @@ p {
 
 .excluir {
   background: #dfdfdf !important;
-}
-
-.desativar {
-  background: #dfdfdf !important;
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 1rem;
-  border-radius: 50%;
-}
-
-.desativar i {
-  font-size: 2.5rem !important;
-  color: #6b6b6b;
-}
-
-.desativar i:hover {
-  color: #ff4d4d;
 }
 </style>
