@@ -36,20 +36,7 @@ public interface ProdutoPedidoRepository extends JpaRepository<ProdutoPedidoMode
      * @return Lista de produtos associados ao pedido.
      */
     List<ProdutoPedidoModel> findByPedidoId(Integer pedidoId);
-    
-    /**
-     * Exclui todos os produtos relacionados a um pedido específico pelo seu ID.
-     * 
-     * @param pedidoId ID do pedido cujos produtos devem ser excluídos.
-     */
-    void deleteByPedidoId(Integer pedidoId);
-    
-    /**
-     * Exclui todos os produtos de um pedido com base no ID do produto.
-     * 
-     * @param produtoId ID do produto a ser excluído.
-     */
-    void deleteByProdutoId(Integer produtoId);
+
     /**
      * Busca todos os pedidos associados a um produto específico pelo seu ID.
      *

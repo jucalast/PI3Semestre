@@ -59,7 +59,7 @@ public class ProdutoPedidoModel {
      */
     @NotNull(message = "O ID do produto não pode ser nulo")
     @ManyToOne
-    @JoinColumn(name = "produtosId", nullable = false)
+    @JoinColumn(name = "produtoId", nullable = false)
     private Produto produto;
 
     /**
