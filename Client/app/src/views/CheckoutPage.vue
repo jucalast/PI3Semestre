@@ -167,7 +167,12 @@ export default {
         const response = await axiosInstance.get('/api/addresses/user');
         this.addresses = response.data;
       } catch (error) {
-        console.error('Erro ao buscar endereços:', error);
+        if (error.response && error.response.status === 401) {
+          console.error('Usuário não autenticado');
+          this.$router.push('/login');
+        } else {
+          console.error('Erro ao buscar endereços:', error);
+        }
       }
     },
     async fetchAllAddresses() {
@@ -175,7 +180,12 @@ export default {
         const response = await axiosInstance.get('/api/addresses/user');
         this.allAddresses = response.data;
       } catch (error) {
-        console.error('Erro ao buscar todos os endereços:', error);
+        if (error.response && error.response.status === 401) {
+          console.error('Usuário não autenticado');
+          this.$router.push('/login');
+        } else {
+          console.error('Erro ao buscar todos os endereços:', error);
+        }
       }
     },
     handleAddressClick(address) {

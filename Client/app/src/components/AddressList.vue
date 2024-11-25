@@ -33,7 +33,7 @@ export default {
       required: true
     },
     selectedAddressId: {
-      type: Number,
+      type: [Number, null],
       required: true
     }
   },
