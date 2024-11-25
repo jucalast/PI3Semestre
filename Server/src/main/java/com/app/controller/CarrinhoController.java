@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,7 @@ import java.util.Map;
  * Este controlador valida a autenticação da sessão do usuário e gerenciamento
  * da das rotas de manipulação do carrinho.
  *
- * @author Ricardo L. Ferreira
+ * @autor Ricardo L. Ferreira
  */
 @RestController
 @RequestMapping("api/carrinho")

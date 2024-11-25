@@ -291,13 +291,21 @@ export default {
       console.log(`Toggling accordion for section: ${section}`);
       this.isOpen[section] = !this.isOpen[section];
     },
-    addToCart(product) {
-      console.log(`Adding product to cart: ${product.nome}`);
-      alert(`Produto ${product.nome} adicionado ao carrinho.`);
+    async addToCart(product) {
+      try {
+        const response = await axiosInstance.post(`/api/carrinho/${product.id}`);
+        if (response.status === 200) {
+          alert(`Produto ${product.nome} adicionado ao carrinho.`);
+        } else {
+          alert('Erro ao adicionar produto ao carrinho.');
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar produto ao carrinho:', error);
+        alert('Erro ao adicionar produto ao carrinho.');
+      }
     },
     buyNow(product) {
-      console.log(`Buying now: ${product.nome}`);
-      alert(`Comprando agora o produto ${product.nome}.`);
+      this.$router.push({ name: 'Checkout', query: { ids: product.id } });
     },
     async handleFavoriteClick(produto) {
       try {

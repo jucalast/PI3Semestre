@@ -70,7 +70,7 @@
             adicionando mais produtos ao pedido
           </p>
         </section>
-        <button class="btn-compra" @click="handleContinuePurchase">Continuar a compra</button>
+        <button class="btn-compra" @click="continueToCheckout">Continuar a compra</button>
       </div>
     </div>
   </div>
@@ -137,6 +137,20 @@ export default {
           `/api/carrinho/${productId}/${parseInt(quantity)}`
       );
       this.fetchCarts();
+    },
+    async addToCart(product) {
+      try {
+        const response = await axiosInstance.post(`/api/carrinho/${product.id}`);
+        if (response.status === 200) {
+          this.fetchCarts();
+          alert(`Produto ${product.nome} adicionado ao carrinho.`);
+        } else {
+          alert('Erro ao adicionar produto ao carrinho.');
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar produto ao carrinho:', error);
+        alert('Erro ao adicionar produto ao carrinho.');
+      }
     },
     continueToCheckout() {
       const productIds = this.cartItems.map(item => item.produtoId);

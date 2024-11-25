@@ -5,11 +5,8 @@
     </div>
     <div class="info-card" :style="{ boxShadow: boxShadowStyle }">
       <div class="header-info-card">
-        <button @click="showCardInputs = true" class="add-card-btn">
-          <font-awesome-icon icon="fa-solid fa-plus" /> Add
-        </button>
-        <button v-if="showCardInputs" @click="saveCardDetails" :class="['save-card-btn', { 'filled': isCardFilled }]">
-          <font-awesome-icon icon="fa-solid fa-check" />
+        <button @click="toggleCardInputs" :class="['add-card-btn', { 'filled': showCardInputs && isCardFilled }]">
+          <font-awesome-icon :icon="showCardInputs ? 'fa-solid fa-check' : 'fa-solid fa-plus'" /> {{ showCardInputs ? 'OK' : 'Add' }}
         </button>
         <button class="payment-btn">
           <font-awesome-icon icon="fa-solid fa-qrcode" /> Pix
@@ -22,9 +19,18 @@
         </button>
       </div>
       <div v-if="showCardInputs" class="card-inputs">
-        <input v-mask="'#### #### #### ####'" v-model="cardDetails.number" placeholder="Número do Cartão" required />
-        <input v-model="cardDetails.name" placeholder="Nome no Cartão" required />
-        <input v-mask="'##/##'" v-model="cardDetails.expiry" placeholder="Data de Validade (MM/AA)" required />
+        <div class="card-inputs-top">
+          <input v-mask="'#### #### #### ####'" v-model="cardDetails.number" placeholder="0000 0000 0000 0000" required class="card-number" />
+          <input v-mask="'##/##'" v-model="cardDetails.expiry" placeholder="00/00" required class="card-expiry" />
+        </div>
+        <input v-model="cardDetails.name" placeholder="Nome no Titular" required class="card-name" />
+      </div>
+      <div v-if="isCardFilled && !showCardInputs" class="card-summary">
+        <label class="card-option">
+          <input class="radio-option" type="radio" name="card" />
+          <span>Final {{ cardDetails.number.slice(-4) }}</span>
+          <span class="card-type">Crédito</span>
+        </label>
       </div>
       <div class="price-details">
         <div class="price-item">
@@ -85,9 +91,12 @@ export default {
     }
   },
   methods: {
-    saveCardDetails() {
-      this.showCardInputs = false;
-      this.$emit('saveCardDetails');
+    toggleCardInputs() {
+      if (this.showCardInputs && this.isCardFilled) {
+        this.showCardInputs = false;
+      } else {
+        this.showCardInputs = true;
+      }
     },
     updateBoxShadowColor(color) {
       const primaryColor = color.match(/#([0-9a-f]{6})/i)[0]; // Extrai a primeira cor do gradiente
@@ -107,65 +116,80 @@ export default {
   justify-content: flex-end;
   flex-direction: column;
   padding: 2rem;
+  height: 100%;
 }
 
 .card-container1 {
   width: 100% !important;
   position: absolute;
-  width: 40%;
+  width: 25%;
   height: 25% !important;
-  top: 4%;
-  right: -10%;
+  top: 5%;
+  right: 3%;
 }
 
 .info-card {
   background: #ffffff;
-  background: #ffffff;
-    width: 100%;
-    height: 80%;
-    border-radius: 2rem;
-    padding: 2rem;
-    display: flex
-;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 8rem;
+  width: 100%;
+  height: 90%;
+  border-radius: 2rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 10rem;
 }
 
 .card-inputs {
-    display: flex
-;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-    width: -moz-fit-content;
-    width: fit-content;
-    background: #e8e8e8;
-    padding: 3rem 2rem;
-    border-radius: 2rem;
-    align-items: center;
-    justify-content: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem; /* Ajusta a margem superior para ficar logo abaixo do header-info-card */
+  width: -moz-fit-content;
+  width: fit-content;
+  background: #e8e8e8;
+  border-radius: 2rem;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+}
 
+.card-inputs-top {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.card-number {
+  width: 80%; /* Define a largura do input de número do cartão como 80% */
+}
+
+.card-expiry {
+  width: 20%; /* Define a largura do input de data como 20% */
+}
+
+.card-name {
+  width: 100%; /* Define a largura do input de nome do titular como 100% */
 }
 
 .header-info-card {
   display: flex;
-  width: 100%;
+  width: 90%;
   gap: 10px; /* Adiciona espaço entre os botões */
+  justify-content: center;
 }
 
 .card-inputs input {
-    color: #3a5bff;
-    border: solid 1px #aeaeaeb6;
-    background: #ededed;
-    border-radius: 2rem;
-    height: 4rem;
-    padding-left: 1rem;
-    font-size: 1.3rem;
-    outline: none;
-    font-family: "Poppins", sans-serif;
-    width: 45%;
+  color: #3a5bff;
+  border: solid 1px #aeaeaeb6;
+  background: #ffffff;
+  border-radius: 1.5rem;
+  height: 4rem;
+  padding-left: 1rem;
+  font-size: 1.3rem;
+  outline: none;
+  font-family: "Poppins", sans-serif;
 }
 
 .card-inputs input::placeholder {
@@ -176,6 +200,37 @@ export default {
   outline: none;
   border: 1px solid #3a5bff;
   box-shadow: 1px 0px 20px 1px #3a5bff3b;
+}
+
+.card-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  width: 95%;
+}
+
+.card-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 5rem;
+  padding: 1rem;
+  background: #efefef;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.radio-option {
+  margin-left: 1rem;
+  transform: scale(2); /* Aumenta o tamanho do botão de rádio */
+  accent-color: black; /* Altera a cor do botão de rádio para preto */
+}
+
+.card-type {
+  font-weight: bold;
 }
 
 .submit-btn, .total-price {
@@ -220,10 +275,9 @@ export default {
   background-color: #efefef;
   color: #1e1e1e;
   border-radius: 1.5rem;
-  padding: 1.5rem 1.6rem; /* Tamanho reduzido */
+  padding: 1rem 1rem; /* Tamanho reduzido */
   font-size: 1.3rem; /* Tamanho reduzido */
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
   margin-top: 10px;
   display: flex;
   align-items: center;
@@ -232,7 +286,18 @@ export default {
 }
 
 .add-card-btn:hover, .payment-btn:hover {
-  background-color: #f4f4f4;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.add-card-btn.filled {
+  background-color: #3a5bff; /* Azul padrão */
+  color: white;
+}
+
+.add-card-btn:not(.filled):hover {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 .save-card-btn {
@@ -259,4 +324,4 @@ export default {
   background-color: #3a5bff;
   color: white;
 }
-</style>
+</style> 

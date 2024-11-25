@@ -128,27 +128,13 @@ export default {
 
 <style scoped>
 .map-container {
-  height: 300px;
+  height: 10rem;;
   width: 100% !important;
-  border-radius: 2rem;
+margin-left: 0 !important;
+  border-radius: 2rem 2rem 0 0 ;
 }
 .map  {
-  width: 150%; /* Aumenta a largura do elemento pai */
-}
-.elements-card {
-  background-color: #e0e0e0;
-  backdrop-filter: blur(5px);
-  border-radius: 2.5rem;
-  display: flex;
-  justify-content: space-around;
-  margin: 0;
-  font-size: 2rem;
-  position: relative;
-  bottom: 6rem;
-  z-index: 2;
-  padding: 1rem;
-  text-align: center;
-  width: 100%; /* Ocupa a largura total do mapa */
+  width: 100%; /* Ajusta a largura do elemento pai para 100% */
 }
 
 .icon-button {
