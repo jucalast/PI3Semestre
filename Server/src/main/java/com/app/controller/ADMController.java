@@ -26,14 +26,14 @@ public class ADMController {
      * usuário.
      * @return Uma resposta indicando o sucesso da atualização.
      */
-    @PutMapping("/user/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> updateUser(@PathVariable("id") Long userId, @RequestBody UserModel updatedUser) {
-        try {
-            userService.updateUser(userId, updatedUser);
-            return ResponseEntity.ok("Usuário atualizado com sucesso.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao atualizar o usuário: " + e.getMessage());
-        }
-    }
+    // @PutMapping("/user/{id}")
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public ResponseEntity<String> updateUser(@PathVariable("id") Long userId, @RequestBody UserModel updatedUser) {
+    //     try {
+    //         userService.updateUser(userId, updatedUser);
+    //         return ResponseEntity.ok("Usuário atualizado com sucesso.");
+    //     } catch (Exception e) {
+    //         return ResponseEntity.badRequest().body("Erro ao atualizar o usuário: " + e.getMessage());
+    //     }
+    // }
 }
