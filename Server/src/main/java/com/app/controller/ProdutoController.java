@@ -1,10 +1,13 @@
 package com.app.controller;
 
+import com.app.model.Produto;
+import com.app.service.ProdutoService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,9 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.model.Produto;
-import com.app.service.ProdutoService;
-
 /**
  * Controlador responsável pela gestão das rotas relacionadas ao produto.
  *
@@ -31,13 +31,14 @@ import com.app.service.ProdutoService;
  * As rotas incluem operações de criação, leitura, atualização e exclusão (CRUD)
  * de produtos.
  *
- * @author JoãO
  * @version 1.0
  * @since 2024-10-05
  */
 @RestController
 @RequestMapping("/api/produtos")
 public class ProdutoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProdutoController.class);
 
     @Autowired
     private ProdutoService produtoService;
@@ -95,6 +96,24 @@ public class ProdutoController {
     }
 
     /**
+     * Rota que obtém um produto pelo seu ID com especializações carregadas.
+     *
+     * @param id O ID do produto a ser buscado.
+     * @return O produto correspondente ao ID, ou uma resposta 404 caso o
+     * produto não seja encontrado.
+     */
+    @GetMapping("/com-especializacoes/{id}")
+    public ResponseEntity<Produto> getProdutoComEspecializacoesById(@PathVariable Long id) {
+        Optional<Produto> produto = Optional.ofNullable(produtoService.getProdutoById(id));
+        if (produto.isPresent()) {
+            Hibernate.initialize(produto.get().getCafeEspecial());
+            Hibernate.initialize(produto.get().getMetodoPreparo());
+            return ResponseEntity.ok(produto.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
      * Rota para criar um novo produto.
      *
      * Caso o produto seja uma especialização, as associações são configuradas
@@ -106,6 +125,7 @@ public class ProdutoController {
     @PostMapping("/protected/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
+        
         if (produto.getCafeEspecial() != null) {
             produto.getCafeEspecial().setProduto(produto);
         } else if (produto.getMetodoPreparo() != null) {
@@ -124,13 +144,55 @@ public class ProdutoController {
      * @return O produto atualizado ou uma resposta 404 se o produto não for
      * encontrado.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/protected/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Produto> updateProduto(@PathVariable Long id, @RequestBody Produto produto) {
         Optional<Produto> existingProduto = Optional.ofNullable(produtoService.getProdutoById(id));
         if (existingProduto.isPresent()) {
             produto.setId(id);
-            return ResponseEntity.ok(produtoService.updateProduto(id, produto));
+            Produto updatedProduto = produtoService.updateProduto(id, produto);
+            return ResponseEntity.ok(updatedProduto);
         }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Rota para desativar um produto pelo seu ID.
+     *
+     * @param id O ID do produto a ser desativado.
+     * @return O produto desativado ou uma resposta 404 se o produto não for encontrado.
+     */
+    @PutMapping("/protected/deactivate/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Produto> deactivateProduto(@PathVariable Long id) {
+        logger.info("Recebida solicitação para desativar produto com ID: {}", id);
+        Optional<Produto> existingProduto = Optional.ofNullable(produtoService.getProdutoById(id));
+        if (existingProduto.isPresent()) {
+            Produto updatedProduto = produtoService.deactivateProduto(id);
+            logger.info("Produto desativado com sucesso: {}", updatedProduto);
+            return ResponseEntity.ok(updatedProduto);
+        }
+        logger.warn("Produto com ID {} não encontrado", id);
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Rota para ativar um produto pelo seu ID.
+     *
+     * @param id O ID do produto a ser ativado.
+     * @return O produto ativado ou uma resposta 404 se o produto não for encontrado.
+     */
+    @PutMapping("/protected/activate/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Produto> activateProduto(@PathVariable Long id) {
+        logger.info("Recebida solicitação para ativar produto com ID: {}", id);
+        Optional<Produto> existingProduto = Optional.ofNullable(produtoService.getProdutoById(id));
+        if (existingProduto.isPresent()) {
+            Produto updatedProduto = produtoService.activateProduto(id);
+            logger.info("Produto ativado com sucesso: {}", updatedProduto);
+            return ResponseEntity.ok(updatedProduto);
+        }
+        logger.warn("Produto com ID {} não encontrado", id);
         return ResponseEntity.notFound().build();
     }
 
@@ -160,5 +222,12 @@ public class ProdutoController {
     public ResponseEntity<List<Produto>> buscarProdutosPorAtributos(@RequestParam Map<String, String> atributos) {
         List<Produto> produtos = produtoService.buscarProdutosPorAtributos(atributos);
         return ResponseEntity.ok(produtos);
+    }
+
+    @PutMapping("/protected/bulk-update")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> bulkUpdateProdutos(@RequestBody List<Produto> produtos) {
+        produtoService.bulkUpdateProdutos(produtos);
+        return ResponseEntity.ok().build();
     }
 }

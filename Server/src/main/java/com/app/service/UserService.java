@@ -1,10 +1,14 @@
 package com.app.service;
 
+import com.app.model.AddressModel;
 import com.app.model.UserModel;
+import com.app.model.UserAddress;
+import com.app.repository.AddressRepository;
 import com.app.repository.UserRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -26,6 +30,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AddressRepository addressRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     /**
@@ -33,10 +38,12 @@ public class UserService implements UserDetailsService {
      *
      * @param userRepository O repositório de usuários.
      * @param passwordEncoder O encoder de senha.
+     * @param addressRepository O repositório de endereços.
      */
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AddressRepository addressRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.addressRepository = addressRepository;
     }
 
     /**
@@ -168,4 +175,5 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
     }
+
 }

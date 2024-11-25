@@ -1,5 +1,5 @@
 <template>
-  <div class="card-container" :style="{ backgroundColor: cardColor }">
+  <div class="card-container" :style="{ background: cardColor }">
     <!-- Número do Cartão -->
     <div class="card-number">{{ formattedCardNumber }}</div>
 
@@ -24,6 +24,12 @@ export default {
       })
     }
   },
+  data() {
+    return {
+      currentColor: 'linear-gradient(135deg, rgba(128, 128, 128, 0.5), rgba(128, 128, 128, 0.5))', // Cor padrão inicial
+      finalColor: null // Cor final após 16 dígitos
+    };
+  },
   computed: {
     // Formata o número do cartão com espaços a cada 4 dígitos
     formattedCardNumber() {
@@ -31,25 +37,18 @@ export default {
           ? this.cardDetails.number.replace(/\s+/g, '').replace(/(\d{4})/g, '$1 ').trim()
           : '**** **** **** ****'; // Exibe asteriscos se o número estiver vazio
     },
-    // Determina a cor do cartão com base no número
+    // Gera uma cor aleatória em gradiente a cada 4 números até 16 dígitos
     cardColor() {
-      const bin = this.cardDetails.number.slice(0, 6); // Pega os primeiros 6 dígitos
-      switch (bin) {
-        case '516292':
-        case '531353':
-        case '548935':
-          return 'deepskyblue'; // Nubank
-        case '549167':
-        case '544731':
-        case '536773':
-          return 'orange'; // Itaú
-        case '527571':
-        case '506699':
-        case '540033':
-          return 'green'; // Bradesco
-        default:
-          return 'gray'; // Cor padrão
+      if (this.cardDetails.number && this.cardDetails.number.length % 4 === 0 && this.cardDetails.number.length <= 16) {
+        const randomColor1 = Math.floor(Math.random() * 16777215).toString(16);
+        const randomColor2 = Math.floor(Math.random() * 16777215).toString(16);
+        this.currentColor = `linear-gradient(135deg, #${randomColor1}, #${randomColor2})`;
+        this.$emit('updateColor', `#${randomColor1}`); // Emitir a cor principal do gradiente
+        if (this.cardDetails.number.length === 16) {
+          this.finalColor = this.currentColor;
+        }
       }
+      return this.finalColor || this.currentColor;
     }
   }
 };
@@ -57,16 +56,17 @@ export default {
 
 <style scoped>
 .card-container {
-  width: 300px;
-  height: 180px;
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  border-radius: 2rem;
   padding: 20px;
   color: white;
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
   justify-content: flex-end; /* Alinha os dados na parte inferior do cartão */
-  position: relative;
+  backdrop-filter: blur(20px); /* Adiciona o efeito de desfoque */
+
 }
 .card-number {
   font-size: 20px;

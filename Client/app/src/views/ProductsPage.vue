@@ -46,7 +46,7 @@
           const response = await axios.get(
             'http://localhost:8080/api/produtos'
           );
-          this.produtos = response.data;
+          this.produtos = response.data.filter(produto => produto.ativo);
         } catch (error) {
           console.error('Erro ao buscar produtos:', error);
         } finally {

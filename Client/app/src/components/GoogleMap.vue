@@ -1,16 +1,43 @@
 <template>
-  <div ref="mapContainer" class="map-container"></div>
+  <div class="map">
+    <div ref="mapContainer" class="map-container"></div>
+  </div>
 </template>
 
 <script>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPlus, faEdit } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faPlus, faEdit);
+
 export default {
   name: 'GoogleMap',
+  components: {
+    FontAwesomeIcon
+  },
+  data() {
+    return {
+      marker: null // Armazena o marcador
+    };
+  },
   methods: {
     async initMap() {
       const mapOptions = {
         zoom: 8,
         center: { lat: -23.561732, lng: -46.655981 }, // Exemplo: Centro de São Paulo
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        disableDefaultUI: true, // Desativa todos os controles padrão
+        zoomControl: false, // Desativa o controle de zoom
+        streetViewControl: false, // Desativa o controle de Street View
+        mapTypeControl: false, // Desativa o controle de tipo de mapa
+        styles: [
+          {
+            featureType: 'all',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ]
       };
 
       this.map = new google.maps.Map(this.$refs.mapContainer, mapOptions);
@@ -19,6 +46,19 @@ export default {
         const latLng = event.latLng;
         const address = await this.reverseGeocode(latLng);
         this.$emit('addressClicked', address);
+
+        // Adiciona ou move o marcador para a nova localização
+        if (this.marker) {
+          this.marker.setPosition(latLng);
+        } else {
+          this.marker = new google.maps.Marker({
+            position: latLng,
+            map: this.map,
+            icon: {
+              url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' // Ícone vermelho
+            }
+          });
+        }
       });
     },
     async reverseGeocode(latLng) {
@@ -71,6 +111,12 @@ export default {
           }
         });
       });
+    },
+    addAddress() {
+      // Lógica para adicionar endereço
+    },
+    editAddress() {
+      // Lógica para editar endereço
     }
   },
   mounted() {
@@ -81,7 +127,19 @@ export default {
 
 <style scoped>
 .map-container {
-  height: 300px;
-  width: 100%;
+  height: 12rem;
+  width: 100% !important;
+  margin-left: 0 !important;
+  border-radius: 2rem 2rem 0 0;
+}
+.map {
+  width: 100%; /* Ajusta a largura do elemento pai para 100% */
+}
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+  color: var(--icon-color);
 }
 </style>

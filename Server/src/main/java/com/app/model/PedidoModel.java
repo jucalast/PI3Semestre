@@ -1,38 +1,13 @@
 package com.app.model;
 
-/* 
- * Importa a classe BigDecimal para manipulação de valores decimais
- * import java.math.BigDecimal;
- * 
- * Importa as anotações para mapeamento objeto-relacional
- * import jakarta.persistence.*;
- * 
- * Importa a anotação @Data do Lombok para geração automática de métodos
- * import lombok.Data;
- */
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity; 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.math.BigDecimal;
+import com.app.model.pagamento.PagamentoModel;
+import jakarta.persistence.*;
 import lombok.Data;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
- * Entidade que representa a tabela 'pedidos' no banco de dados.
- * Esta classe armazena as informações relacionadas a um pedido,
- * como o usuário que fez o pedido, a data do pedido, status, endereço
- * de entrega e o total do pedido.
- * 
- * A anotação @Data da biblioteca Lombok é usada para gerar
- * automaticamente getters, setters e outros métodos comuns.
- * 
- * @author Kairo Chácara
- * @version 1.0
- * @since 2024-10-19
+ * Representa um pedido feito por um usuário, armazenando detalhes do pedido e seu estado.
  */
 @Data
 @Entity
@@ -40,149 +15,88 @@ import lombok.Data;
 public class PedidoModel {
 
     /**
-     * ID do pedido. Este campo é a chave primária da tabela 'pedidos',
-     * com geração automática de valor incremental.
+     * Identificador único do pedido.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
-     * ID do usuário que fez o pedido. Este campo referencia a tabela 'usuarios',
-     * e é obrigatório.
+     * O usuário que realizou o pedido.
      */
     @ManyToOne
-    @JoinColumn(name = "usuarioId", nullable = false)
-    private UserModel usuarioId;
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private UserModel usuario;
 
     /**
-     * Data e hora em que o pedido foi realizado. Este campo é obrigatório.
+     * Data e hora em que o pedido foi realizado.
      */
-    @Column(name = "dataPedido", nullable = false)
-    private String dataPedido;
+    @Column(name = "data_pedido", nullable = false)
+    private LocalDateTime dataPedido;
 
     /**
-     * Status do pedido. Este campo é obrigatório e armazena um valor inteiro
-     * que representa o estado atual do pedido, utilizando um enum (1 a 5).
-     * Os valores possíveis são:
-     * 1 - Novo
-     * 2 - Processando
-     * 3 - Enviado
-     * 4 - Entregue
-     * 5 - Cancelado
+     * Status atual do pedido (e.g., 'Pendente', 'Concluído').
      */
-    @Column(name = "statusPedido", nullable = false)
-    private Integer statusPedido;
+    @Column(name = "status_pedido", nullable = false, length = 50)
+    private String statusPedido;
 
     /**
-     * Valor total do pedido, armazenado com precisão de 10 dígitos e 2 casas decimais.
-     * Este campo é obrigatório.
+     * Valor total do pedido.
      */
     @Column(name = "total", nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
     /**
-     * Observações sobre o pedido, podendo incluir informações adicionais ou especiais
-     * fornecidas pelo cliente. Este campo é opcional e tem um limite de 255 caracteres.
-     */
-    @Column(name = "observacoes", length = 255)
-    private String observacoes;
-
-    /**
-     * Estado (UF) do endereço de entrega. Este campo é obrigatório e contém
-     * dois caracteres que representam a sigla do estado (por exemplo, SP, RJ).
+     * Estado para entrega do pedido.
      */
     @Column(name = "estado", nullable = false, length = 2)
     private String estado;
 
     /**
-     * CEP (Código de Endereçamento Postal) do endereço de entrega.
-     * Este campo é obrigatório e contém até 8 caracteres.
+     * CEP para entrega do pedido.
      */
-    @Column(name = "cep", nullable = false, length = 8)
+    @Column(name = "cep", nullable = false, length = 9)
     private String cep;
 
     /**
-     * Cidade do endereço de entrega. Este campo é obrigatório e contém até 100 caracteres.
+     * Cidade para entrega do pedido.
      */
     @Column(name = "cidade", nullable = false, length = 100)
     private String cidade;
 
     /**
-     * Bairro do endereço de entrega. Este campo é obrigatório e contém até 100 caracteres.
+     * Bairro para entrega do pedido.
      */
     @Column(name = "bairro", nullable = false, length = 100)
     private String bairro;
 
     /**
-     * Complemento do endereço de entrega. Este campo é opcional e contém até 100 caracteres.
-     */
-    @Column(name = "complemento", length = 100)
-    private String complemento;
-
-    /**
-     * Número do endereço de entrega. Este campo é obrigatório.
+     * Número da residência para entrega do pedido.
      */
     @Column(name = "numero", nullable = false)
     private Integer numero;
 
     /**
-     * Rua do endereço de entrega. Este campo é obrigatório e contém até 100 caracteres.
+     * Rua para entrega do pedido.
      */
     @Column(name = "rua", nullable = false, length = 100)
     private String rua;
 
     /**
-     * Enum que representa o status do pedido.
-     * Os valores possíveis são:
-     * - NOVO (1)
-     * - PROCESSANDO (2)
-     * - ENVIADO (3)
-     * - ENTREGUE (4)
-     * - CANCELADO (5)
+     * Complemento para a entrega do pedido, se aplicável.
      */
-    public enum StatusPedido {
-        NOVO(1),
-        PROCESSANDO(2),
-        ENVIADO(3),
-        ENTREGUE(4),
-        CANCELADO(5);
+    @Column(name = "complemento", length = 100)
+    private String complemento;
 
-        private final int code;
+    /**
+     * Observações adicionais sobre o pedido.
+     */
+    @Column(name = "observacoes", length = 255)
+    private String observacoes;
 
-        /**
-         * Construtor do enum StatusPedido que associa um código numérico
-         * a cada status.
-         * 
-         * @param code Código numérico que representa o status.
-         */
-        StatusPedido(int code) {
-            this.code = code;
-        }
-
-        /**
-         * Retorna o código numérico correspondente ao status.
-         * 
-         * @return Código do status.
-         */
-        public int getCode() {
-            return code;
-        }
-
-        /**
-         * Converte um código numérico em um enum StatusPedido.
-         * 
-         * @param code Código do status a ser convertido.
-         * @return Enum correspondente ao código.
-         * @throws IllegalArgumentException Se o código não corresponder a nenhum status válido.
-         */
-        public static StatusPedido fromCode(int code) {
-            for (StatusPedido status : StatusPedido.values()) {
-                if (status.getCode() == code) {
-                    return status;
-                }
-            }
-            throw new IllegalArgumentException("Status inválido: " + code);
-        }
-    }
+    /**
+     * Informações de pagamento associadas ao pedido.
+     */
+    @OneToOne(mappedBy = "pedido", cascade = CascadeType.ALL)
+    private PagamentoModel pagamento;
 }
