@@ -5,9 +5,12 @@ import com.app.model.UserModel;
 import com.app.service.AddressService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador responsável pela gestão das rotas relacionadas aos endereços.
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0
  * @since 2024-10-20
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/addresses")
 public class AddressController {
@@ -41,11 +45,12 @@ public class AddressController {
      * usuário.
      * @param address O objeto AddressModel que representa o endereço a ser
      * adicionado.
+     * @param addressType O tipo de endereço a ser adicionado.
      * @return Um ResponseEntity com o endereço adicionado ou um erro 401 se o
      * usuário não estiver autenticado.
      */
     @PostMapping
-    public ResponseEntity<AddressModel> addAddress(HttpServletRequest request, @RequestBody AddressModel address) {
+    public ResponseEntity<AddressModel> addAddress(HttpServletRequest request, @RequestBody AddressModel address, @RequestParam String addressType) {
 
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
 
@@ -53,7 +58,7 @@ public class AddressController {
             return ResponseEntity.status(401).build();
         }
 
-        AddressModel newAddress = addressService.addAddressToUser(authenticatedUser.getId(), address);
+        AddressModel newAddress = addressService.addAddressToUser(authenticatedUser.getId(), address, addressType);
         return ResponseEntity.ok(newAddress);
     }
 
@@ -81,20 +86,20 @@ public class AddressController {
     }
 
     /**
-     * Busca todos os endereços do usuário autenticado.
+     * Busca todos os endereços do usuário autenticado, incluindo o tipo de endereço.
      *
      * @param request O objeto HttpServletRequest para acessar a sessão do usuário.
      * @return Um ResponseEntity com a lista de endereços do usuário ou um erro 401 se o usuário não estiver autenticado.
      */
     @GetMapping("/user")
-    public ResponseEntity<List<AddressModel>> getAddressesByAuthenticatedUser(HttpServletRequest request) {
+    public ResponseEntity<List<Map<String, Object>>> getAddressesByAuthenticatedUser(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
 
         if (authenticatedUser == null) {
             return ResponseEntity.status(401).build();
         }
 
-        List<AddressModel> addresses = addressService.getAddressesByAuthenticatedUser(authenticatedUser.getId());
+        List<Map<String, Object>> addresses = addressService.getAddressesByUserId(authenticatedUser.getId());
         return ResponseEntity.ok(addresses);
     }
 
@@ -112,11 +117,35 @@ public class AddressController {
         return ResponseEntity.ok(addresses);
     }
 
+    /**
+     * Rota que cria um novo endereço e o associa ao usuário autenticado.
+     *
+     * @param addressData Os dados do endereço fornecidos pelo usuário.
+     * @param request O objeto HttpServletRequest para acessar a sessão e obter o ID do usuário autenticado.
+     * @return Uma resposta indicando o sucesso ou falha da operação.
+     */
     @PostMapping("/create")
-    public ResponseEntity<AddressModel> createAddress(@RequestBody AddressModel address) {
-        System.out.println("Received address: " + address);
-        AddressModel newAddress = addressService.createAddress(address);
-        System.out.println("Created address: " + newAddress);
-        return ResponseEntity.ok(newAddress);
+    public ResponseEntity<?> createAddress(@RequestBody Map<String, String> addressData, HttpServletRequest request) {
+        log.info("Recebendo dados do endereço: {}", addressData);
+
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+        }
+
+        AddressModel address = new AddressModel();
+        address.setStreet(addressData.get("street"));
+        address.setNumber(addressData.get("number"));
+        address.setNeighborhood(addressData.get("neighborhood"));
+        address.setCity(addressData.get("city"));
+        address.setState(addressData.get("state"));
+        address.setZipCode(addressData.get("zipCode"));
+        String addressType = addressData.get("addressType");
+
+        addressService.addAddressToUser(userId, address, addressType);
+
+        return ResponseEntity.ok("Endereço adicionado com sucesso");
     }
+
+    // ...existing code...
 }

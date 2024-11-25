@@ -142,5 +142,27 @@ public class CarrinhoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: Algo de errado aconteceu. " + e.getMessage());
         }
     }
+
+    @GetMapping("/user-id")
+    public ResponseEntity<?> getUserId(HttpServletRequest request) {
+        UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+        if (authenticatedUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
+        }
+        return ResponseEntity.ok(authenticatedUser.getId());
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> listProductsOnUserCartById(@PathVariable Long userId) {
+        try {
+            List<Map<String, Object>> carrinhoItems = carrinhoService.getProductsOnUserCart(userId);
+            if (carrinhoItems.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+            return ResponseEntity.ok(carrinhoItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: Algo de errado aconteceu. " + e.getMessage());
+        }
+    }
 }
 

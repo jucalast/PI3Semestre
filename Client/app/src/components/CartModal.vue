@@ -14,12 +14,12 @@
             <div class="image-bckg">
               <img
                 class="image-product"
-                :src="cartItem.imagens_produto[0]"
-                :alt="cartItem.nome_produto"
+                :src="cartItem.imagens ? cartItem.imagens[0] : ''"
+                :alt="cartItem.nome"
               />
             </div>
             <div class="nameandbutton">
-              <h2>{{ cartItem.nome_produto }}</h2>
+              <h2>{{ cartItem.nome }}</h2>
               <button class="excluir" @click="removeItemOnCartUser(cartItem.produtoId)">
                 Excluir
               </button>
@@ -41,7 +41,7 @@
               <option value="7">7</option>
               <option value="8">8</option>
             </select>
-            <span>R${{ cartItem.preco_produto * cartItem.quantidade }}</span>
+            <span>R${{ cartItem.preco * cartItem.quantidade }}</span>
           </section>
         </section>
       </div>
@@ -109,8 +109,14 @@ export default {
     async fetchCarts() {
       try {
         const responseCart = await axiosInstance.get(`/api/carrinho/`);
-        this.cartItems = responseCart.data;
-        this.somasCarrinho(responseCart.data);
+        this.cartItems = responseCart.data.map(item => ({
+          produtoId: item.produtoId,
+          imagens: item.imagens,
+          nome: item.nome,
+          preco: item.preco,
+          quantidade: item.quantidade
+        }));
+        this.somasCarrinho(this.cartItems);
       } catch (error) {
         console.error('Erro ao buscar produtos do carrinho: ', error);
         return;
@@ -152,12 +158,14 @@ export default {
         alert('Erro ao adicionar produto ao carrinho.');
       }
     },
-    continueToCheckout() {
-      const productIds = this.cartItems.map(item => item.produtoId);
-      if (productIds.length > 0) {
-        this.$router.push({ name: 'Checkout', query: { ids: productIds.join(',') } });
-      } else {
-        alert('Seu carrinho está vazio.');
+    async continueToCheckout() {
+      try {
+        const response = await axiosInstance.get('/api/carrinho/user-id');
+        const userId = response.data;
+        this.$router.push({ name: 'Checkout', query: { userId } });
+      } catch (error) {
+        console.error('Erro ao obter o ID do usuário:', error);
+        alert('Erro ao continuar para o checkout.');
       }
     }
   },

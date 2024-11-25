@@ -1,7 +1,6 @@
 <template>
   <div class="map">
     <div ref="mapContainer" class="map-container"></div>
-  
   </div>
 </template>
 
@@ -128,15 +127,14 @@ export default {
 
 <style scoped>
 .map-container {
-  height: 10rem;;
+  height: 12rem;
   width: 100% !important;
-margin-left: 0 !important;
-  border-radius: 2rem 2rem 0 0 ;
+  margin-left: 0 !important;
+  border-radius: 2rem 2rem 0 0;
 }
-.map  {
+.map {
   width: 100%; /* Ajusta a largura do elemento pai para 100% */
 }
-
 .icon-button {
   background: none;
   border: none;

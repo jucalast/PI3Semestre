@@ -27,4 +27,14 @@ public class CartaoService {
     public List<CartaoModel> findCartoesByUserId(Long userId) {
         return cartaoRepository.findByUserId(userId);
     }
+
+    /**
+     * Salva um novo cartão no repositório.
+     *
+     * @param cartaoModel O modelo do cartão a ser salvo.
+     * @return O modelo do cartão salvo.
+     */
+    public CartaoModel saveCartao(CartaoModel cartaoModel) {
+        return cartaoRepository.save(cartaoModel);
+    }
 }

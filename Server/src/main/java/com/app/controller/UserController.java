@@ -26,9 +26,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.app.model.UserModel;
+import com.app.model.AddressModel;
 import com.app.service.UserService;
+import com.app.service.AddressService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -69,15 +72,23 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
 
     /**
-     * Construtor que injeta o serviço de usuário e o AuthenticationManager via
-     * injeção de dependência do Spring.
+     * Serviço de endereço utilizado para lógica de negócios relacionada a
+     * endereços.
+     */
+    private final AddressService addressService;
+
+    /**
+     * Construtor que injeta o serviço de usuário, o AuthenticationManager e o
+     * AddressService via injeção de dependência do Spring.
      *
      * @param userService O serviço de usuário a ser injetado.
      * @param authenticationManager O AuthenticationManager a ser injetado.
+     * @param addressService O AddressService a ser injetado.
      */
-    public UserController(UserService userService, AuthenticationManager authenticationManager) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, AddressService addressService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.addressService = addressService;
     }
 
     /**

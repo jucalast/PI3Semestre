@@ -9,6 +9,5 @@ import com.app.model.PagamentoModel;
  * <p>Estende {@link JpaRepository} para fornecer métodos básicos de CRUD.</p>
  */
 @Repository
-public interface PagamentoRepository extends JpaRepository<PagamentoModel, Integer> {
-
+public interface PagamentoRepository extends JpaRepository<PagamentoModel, String> {
 }

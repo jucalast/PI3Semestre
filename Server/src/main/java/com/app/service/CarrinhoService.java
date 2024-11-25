@@ -90,9 +90,9 @@ public class CarrinhoService {
                     map.put("carrinhoId", carrinho.getId());
                     map.put("userId", carrinho.getUserModel().getId());
                     map.put("produtoId", carrinho.getProduto().getId());
-                    map.put("imagens_produto", carrinho.getProduto().getImagens());
-                    map.put("nome_produto", carrinho.getProduto().getNome());
-                    map.put("preco_produto", carrinho.getProduto().getPreco());
+                    map.put("imagens", carrinho.getProduto().getImagens());
+                    map.put("nome", carrinho.getProduto().getNome());
+                    map.put("preco", carrinho.getProduto().getPreco());
                     map.put("quantidade", carrinho.getQuantidade());
                     return map;
                 })

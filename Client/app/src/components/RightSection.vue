@@ -1,11 +1,11 @@
 <template>
   <div class="right-section w-full md:w-2/5">
     <div class="card-container1">
-      <cartaoTemplate :cardDetails="cardDetails" @updateColor="updateBoxShadowColor" />
+      <cartaoTemplate :cardDetails="localCardDetails" @updateColor="updateBoxShadowColor" />
     </div>
     <div class="info-card" :style="{ boxShadow: boxShadowStyle }">
       <div class="header-info-card">
-        <button @click="toggleCardInputs" :class="['add-card-btn', { 'filled': showCardInputs && isCardFilled }]">
+        <button @click="showCardInputs && isCardFilled ? saveCard() : toggleCardInputs()" :class="['add-card-btn', { 'filled': showCardInputs && isCardFilled }]">
           <font-awesome-icon :icon="showCardInputs ? 'fa-solid fa-check' : 'fa-solid fa-plus'" /> {{ showCardInputs ? 'OK' : 'Add' }}
         </button>
         <button class="payment-btn">
@@ -20,19 +20,26 @@
       </div>
       <div v-if="showCardInputs" class="card-inputs">
         <div class="card-inputs-top">
-          <input v-mask="'#### #### #### ####'" v-model="cardDetails.number" placeholder="0000 0000 0000 0000" required class="card-number" />
-          <input v-mask="'##/##'" v-model="cardDetails.expiry" placeholder="00/00" required class="card-expiry" />
+          <input v-mask="'#### #### #### ####'" v-model="localCardDetails.number" placeholder="0000 0000 0000 0000" required class="card-number" />
+          <input v-mask="'##/##'" v-model="localCardDetails.expiry" placeholder="00/00" required class="card-expiry" />
         </div>
-        <input v-model="cardDetails.name" placeholder="Nome no Titular" required class="card-name" />
+        <input v-model="localCardDetails.name" placeholder="Nome no Titular" required class="card-name" />
+        <div class="card-inputs-bottom">
+          <input v-model="localCardDetails.cpf" placeholder="CPF do Titular" required class="card-cpf" />
+          <input v-model="localCardDetails.bandeira" placeholder="Bandeira" required class="card-bandeira" />
+        </div>
+        <label class="save-card-checkbox">
+          <input type="checkbox" v-model="saveForNextPurchase" /> Salvar para a próxima compra
+        </label>
       </div>
       <div v-if="isCardFilled && !showCardInputs" class="card-summary">
         <label class="card-option">
           <input class="radio-option" type="radio" name="card" />
-          <span>Final {{ cardDetails.number.slice(-4) }}</span>
+          <span>Final {{ localCardDetails.number.slice(-4) }}</span>
           <span class="card-type">Crédito</span>
         </label>
       </div>
-      <div class="price-details">
+      <div v-if="!showCardInputs" class="price-details">
         <div class="price-item">
           <span>Preço dos Produtos:</span>
           <span>R$ {{ totalProductPrice }}</span>
@@ -52,6 +59,7 @@ import cartaoTemplate from '@/components/CartaoTemplate.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import axiosInstance from '../utils/axiosInstance'; // Importe o axiosInstance
 
 library.add(faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard);
 
@@ -70,12 +78,14 @@ export default {
     return {
       showCardInputs: false,
       boxShadowColor: 'rgba(128, 128, 128, 0.5)', // Cor padrão inicial
-      selectedAddressId: null // ID do endereço selecionado
+      selectedAddressId: null, // ID do endereço selecionado
+      localCardDetails: { ...this.cardDetails }, // Copia os detalhes do cartão para evitar conflito
+      saveForNextPurchase: true // Valor padrão true
     };
   },
   computed: {
     isCardFilled() {
-      return this.cardDetails.number && this.cardDetails.name && this.cardDetails.expiry;
+      return this.localCardDetails.number && this.localCardDetails.name && this.localCardDetails.expiry;
     },
     totalProductPrice() {
       // Calcula a soma dos preços dos produtos
@@ -100,8 +110,25 @@ export default {
       }
     },
     updateBoxShadowColor(color) {
-      const primaryColor = color.match(/#([0-9a-f]{6})/i)[0]; // Extrai a primeira cor do gradiente
-      this.boxShadowColor = primaryColor;
+      if (color) {
+        const primaryColor = color.match(/#([0-9a-f]{6})/i)[0]; // Extrai a primeira cor do gradiente
+        this.boxShadowColor = primaryColor;
+      }
+    },
+    finalizePurchase() {
+      this.$emit('finalizePurchase');
+    },
+    async saveCard() {
+      try {
+        const cardDetails = { ...this.localCardDetails, number: this.localCardDetails.number.replace(/\s+/g, '') };
+        const response = await axiosInstance.post('/api/cartoes/salvar-cartao', cardDetails, {
+          withCredentials: true // Certifique-se de enviar cookies de autenticação
+        });
+        alert('Cartão salvo com sucesso!');
+      } catch (error) {
+        alert('Erro ao salvar o cartão.');
+      }
+      this.finalizePurchase();
     }
   }
 };
@@ -112,21 +139,30 @@ export default {
   display: flex;
   background: #ffffff;
   border-radius: 2rem;
-  flex-basis: 40%;
   width: 35%;
   justify-content: flex-end;
   flex-direction: column;
   padding: 2rem;
   height: 100%;
+  position: relative; /* Adiciona posição relativa */
+}
+
+@media (max-width: 768px) {
+  .right-section {
+    flex-basis: 100%;
+    width: 100%;
+    padding: 1rem;
+  }
 }
 
 .card-container1 {
-  width: 100% !important;
-  position: absolute;
-  width: 25%;
-  height: 25% !important;
-  top: 5%;
-  right: 3%;
+position:absolute;
+  height:30%;
+  width: 80%;
+  top:19%;
+  left:10%;
+  transform: translateY(-50%); /* Centraliza verticalmente */
+  z-index: 2; /* Garante que o cartão fique na frente */
 }
 
 .info-card {
@@ -139,7 +175,15 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 10rem;
+  padding-top: 12rem;
+  position: relative; /* Adiciona posição relativa */
+  z-index: 1; /* Garante que o info-card fique atrás do cartão */
+}
+
+@media (max-width: 768px) {
+  .info-card {
+    padding-top: 5rem;
+  }
 }
 
 .card-inputs {
@@ -162,6 +206,12 @@ export default {
   width: 100%;
 }
 
+.card-inputs-bottom {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
 .card-number {
   width: 80%; /* Define a largura do input de número do cartão como 80% */
 }
@@ -172,6 +222,14 @@ export default {
 
 .card-name {
   width: 100%; /* Define a largura do input de nome do titular como 100% */
+}
+
+.card-cpf {
+  width: 70%; /* Define a largura do input de CPF como 70% */
+}
+
+.card-bandeira {
+  width: 30%; /* Define a largura do input de bandeira como 30% */
 }
 
 .header-info-card {
@@ -256,6 +314,8 @@ export default {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  position: absolute; /* Adiciona posição absoluta */
+  bottom: 2rem; /* Posiciona na parte inferior */
 }
 
 .price-details .price-item {
@@ -301,28 +361,15 @@ export default {
   color: #ffffff;
 }
 
-.save-card-btn {
-  background-color: #ffffff;
-  color: #1e1e1e;
-  border-radius: 2rem;
-  padding: 1rem;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  margin-top: 10px;
+.save-card-checkbox {
   display: flex;
   align-items: center;
-  gap: 10px;
-  justify-content: center;
-  width: 5rem;
+  margin-top: 10px;
+  font-size: 1.3rem;
 }
 
-.save-card-btn:hover {
-  background-color: #f4f4f4;
-}
-
-.save-card-btn.filled {
-  background-color: #3a5bff;
-  color: white;
+.save-card-checkbox input {
+  margin-right: 10px;
+  box-shadow: none; /* Remove o box shadow */
 }
 </style>

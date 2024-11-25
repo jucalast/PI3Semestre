@@ -19,19 +19,22 @@ public class CartaoModel {
      * Deve ser tratado com alta confidencialidade.
      */
     @Id
-    @Column(name = "numero_cartao", nullable = false, length = 16)
+    @Column(name = "numero_cartao", nullable = false, length = 19) // Aumentar o comprimento para 19
+    @JsonProperty("number")
     private String numeroCartao;
 
     /**
      * Nome do titular do cartão como registrado no banco emissor.
      */
     @Column(name = "nome_titular", nullable = false, length = 100)
+    @JsonProperty("name")
     private String nomeTitular;
 
     /**
      * Data de validade do cartão no formato MM/YYYY.
      */
     @Column(name = "validade", nullable = false, length = 7)
+    @JsonProperty("expiry")
     private String validade;
 
     /**
@@ -44,6 +47,7 @@ public class CartaoModel {
      * CPF do titular do cartão.
      */
     @Column(name = "cpf_titular", nullable = false, length = 11)
+    @JsonProperty("cpf")
     private String cpfTitular;
 
     /**

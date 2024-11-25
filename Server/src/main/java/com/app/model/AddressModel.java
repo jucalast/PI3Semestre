@@ -3,6 +3,7 @@ package com.app.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -75,7 +76,7 @@ public class AddressModel {
     /**
      * Relação N:N com UserModel.
      */
+    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
     @JsonIgnore
-    @ManyToMany(mappedBy = "addresses") 
-    private List<UserModel> users; 
+    private List<UserAddress> userAddresses;
 }

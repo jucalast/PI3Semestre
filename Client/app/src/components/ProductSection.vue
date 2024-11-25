@@ -4,8 +4,8 @@
       <h3>{{ productCount }} Produtos na Sacola</h3>
       <div class="product-images">
         <div v-for="(product, index) in productDetails" :key="index" class="product-display" :style="{ right: `${index * 2}rem` }">
-          <div class="color-circle" :style="{ backgroundColor: getColorFromImage(product.imagens[0]) }"></div>
-          <img :src="product.imagens[0]" :alt="product.nome" class="product-checkout-image" />
+          <div class="color-circle" :style="{ backgroundColor: getColorFromImage(product.imagens ? product.imagens[0] : '') }"></div>
+          <img :src="product.imagens ? product.imagens[0] : ''" :alt="product.nome" class="product-checkout-image" />
         </div>
       </div>
     </div>
@@ -45,22 +45,19 @@ export default {
 </script>
 
 <style scoped>
-.space-x-4 {
-  margin-left:0 !important;
-}
 .section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   border-radius: 2rem !important;
   position: relative;
+  justify-content: flex-end;
 }
 
 .products {
-    background: #ffffff;
+  background: #ffffff;
   flex-direction: column;
-  height: 30% !important;
+  height: 100% !important;
 }
 
 .product-images {
@@ -84,17 +81,20 @@ export default {
 }
 h3 {
   width: 80%;
-    font-size: 2.5rem;
-    line-height: 1 !important;
-    padding-bottom: 2rem;
-    height: 100%;
-    display: flex;
+  font-size: 2.5rem;
+  line-height: 1 !important;
+  padding-bottom: 2rem;
+  height: 100%;
+  display: flex;
 }
 
 .product-info {
   width: 100%;
   text-align: center;
   margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .color-circle {
@@ -107,6 +107,5 @@ h3 {
   transform: translate(-50%, -50%);
   z-index: -1; /* Mantém o círculo atrás da imagem */
 }
-
 
 </style>

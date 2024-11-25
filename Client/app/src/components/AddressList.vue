@@ -5,11 +5,11 @@
       <font-awesome-icon :icon="accordionOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" />
     </div>
     <div v-if="accordionOpen" class="accordion-content">
-      <div v-for="address in addresses" :key="address.id" :class="['address-option', { selected: address.id === selectedAddressId }]">
+      <div v-for="address in addresses" :key="address.address.id" :class="['address-option', { selected: address.address.id === selectedAddressId }]">
         <label class="address-label">
-          <input type="radio" :value="address.id" :checked="address.id === selectedAddressId" @change="$emit('update:selectedAddressId', address.id)" />
-          <span>{{ address.street }}</span>
-          <span class="zip-code">{{ address.zipCode }}</span>
+          <input type="radio" :value="address.address.id" :checked="address.address.id === selectedAddressId" @change="$emit('update:selectedAddressId', address.address.id)" />
+          <span>{{ address.address.street }}</span>
+          <span class="zip-code">{{ address.address.zipCode }}</span>
         </label>
       </div>
     </div>
@@ -42,9 +42,33 @@ export default {
       accordionOpen: false
     };
   },
+  created() {
+    this.selectDefaultAddress();
+  },
+  watch: {
+    addresses: {
+      immediate: true,
+      handler() {
+        this.selectDefaultAddress();
+      }
+    }
+  },
   methods: {
     toggleAccordion() {
       this.accordionOpen = !this.accordionOpen;
+    },
+    selectDefaultAddress() {
+      console.log("Endereços recebidos:", this.addresses);
+      if (!this.selectedAddressId) {
+        const defaultAddress = this.addresses.find(address => address.addressType === 'Casa');
+        if (defaultAddress) {
+          console.log("Endereço padrão encontrado:", defaultAddress);
+          this.$emit('update:selectedAddressId', defaultAddress.address.id);
+          this.$emit('addressSelected', defaultAddress.address); // Emitir evento para centralizar o mapa
+        } else {
+          console.log("Nenhum endereço do tipo 'Casa' encontrado.");
+        }
+      }
     }
   }
 };
@@ -52,13 +76,13 @@ export default {
 
 <style scoped>
 .address-list {
-    margin-right: 2rem !important;
     background-color: #ffffff;
     border-radius: 2rem;
-    margin-top: 1rem;
     padding: 2rem;
+
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-height: 100%;
+
 }
 
 .accordion-header {
@@ -66,7 +90,7 @@ export default {
   justify-content: space-between; /* Ajuste para distribuir espaço entre os itens */
   align-items: center;
   font-size: 1.5rem;
-  height: 4rem;
+  height: 2rem;
   cursor: pointer;
 }
 
@@ -76,15 +100,16 @@ export default {
 
 .accordion-content {
   margin-top: 1rem;
+  overflow-y: auto;
+  height: 10rem;
 }
 
 .address-option {
   margin-bottom: 1rem;
-  background-color: #efefef; /* Background para cada card de endereço */
-  padding: 1rem;
+  background-color: #e7e7e7; /* Background para cada card de endereço */
   border-radius: 1rem;
   opacity: 1; /* Opacidade padrão */
-  transition: opacity 0.3s; /* Transição suave para a opacidade */
+  transition: opacity 0.5s; /* Transição suave para a opacidade */
 }
 
 .address-option:not(.selected) {
@@ -96,9 +121,8 @@ export default {
   justify-content: space-between; /* Ajuste para distribuir espaço entre os itens */
   align-items: center;
   width: 100%;
-  height: 5rem;
+
   padding: 1rem;
-  margin-bottom: 1rem;
   font-size: 2rem;
 }
 
@@ -107,9 +131,7 @@ export default {
   margin-left: 1rem; /* Espaço entre o nome da rua e o CEP */
 }
 
-.space-x-4 {
-margin: 0 !important;
-}
+
 
 .address-label input {
   margin-right: 1rem;

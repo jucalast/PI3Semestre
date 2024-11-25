@@ -66,6 +66,7 @@ export default {
   flex-direction: column;
   justify-content: flex-end; /* Alinha os dados na parte inferior do cartão */
   backdrop-filter: blur(20px); /* Adiciona o efeito de desfoque */
+
 }
 .card-number {
   font-size: 20px;

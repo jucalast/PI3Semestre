@@ -2,10 +2,14 @@ package com.app.service;
 
 import com.app.model.AddressModel;
 import com.app.model.UserModel;
+import com.app.model.UserAddress;
 import com.app.repository.AddressRepository;
 import com.app.repository.UserRepository;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,31 +53,33 @@ public class AddressService {
      * @param userId O ID do usuário ao qual o endereço será associado.
      * @param address O objeto AddressModel que representa o endereço a ser
      * adicionado.
+     * @param addressType O tipo do endereço a ser adicionado.
      * @return O objeto AddressModel adicionado ao usuário.
      * @throws RuntimeException Se o usuário não for encontrado.
      */
-    public AddressModel addAddressToUser(Long userId, AddressModel address) {
-        userService.addAddressToUser(userId, address);
+    public AddressModel addAddressToUser(Long userId, AddressModel address, String addressType) {
+        userService.addAddressToUser(userId, address, addressType);
         return address;
     }
 
     /**
-     * Busca todos os endereços de um usuário pelo seu ID.
-     *
-     * Este método retorna uma lista de endereços associados ao usuário. Se o
-     * usuário não for encontrado, uma exceção é lançada.
+     * Busca todos os endereços de um usuário pelo seu ID, incluindo o tipo de endereço.
      *
      * @param userId O ID do usuário cujos endereços serão recuperados.
      * @return Uma lista de objetos AddressModel associados ao usuário.
      * @throws RuntimeException Se o usuário não for encontrado.
      */
-    public List<AddressModel> getAddressesByUserId(Long userId) {
-        Optional<UserModel> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get().getAddresses();
-        } else {
-            throw new RuntimeException("Usuário não encontrado");
-        }
+    public List<Map<String, Object>> getAddressesByUserId(Long userId) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+        return user.getUserAddresses().stream()
+                .map(userAddress -> {
+                    Map<String, Object> addressWithType = new HashMap<>();
+                    addressWithType.put("address", userAddress.getAddress());
+                    addressWithType.put("addressType", userAddress.getAddressType());
+                    return addressWithType;
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -83,7 +89,9 @@ public class AddressService {
      * @return Uma lista de objetos AddressModel associados ao usuário.
      */
     public List<AddressModel> getAddressesByAuthenticatedUser(Long userId) {
-        return getAddressesByUserId(userId);
+        return getAddressesByUserId(userId).stream()
+                .map(addressWithType -> (AddressModel) addressWithType.get("address"))
+                .collect(Collectors.toList());
     }
 
     /**
