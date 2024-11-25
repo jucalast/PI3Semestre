@@ -2,6 +2,8 @@ package com.app.controller;
 
 import com.app.exceptions.ProdutoNotFoundException;
 import com.app.model.*;
+import com.app.model.pagamento.MetodoPagamentoModel;
+import com.app.model.pagamento.PagamentoModel;
 import com.app.repository.CartaoRepository;
 import com.app.repository.ProdutoRepository;
 import com.app.repository.UserRepository;
@@ -19,7 +21,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Controlador para gerenciamento de pedidos dentro da aplicação.
@@ -42,7 +43,6 @@ public class PedidoController {
 
     /**
      * Endpoint POST para criar um novo pedido com base nos dados enviados no corpo da requisição.
-     * Este método manipula a criação completa do pedido, incluindo validação de usuário, produtos e registro de pagamento.
      *
      * @param pedidoData Dados estruturados do pedido incluindo usuário, produtos e detalhes de pagamento.
      * @param request    Objeto HttpServletRequest para acesso à sessão e autenticação do usuário.
@@ -51,19 +51,13 @@ public class PedidoController {
     @PostMapping("/api/pedidos")
     public ResponseEntity<?> criarPedido(@RequestBody Map<String, Object> pedidoData, HttpServletRequest request) {
         try {
-            // Recupera o usuário autenticado
             Long userId = (Long) request.getSession().getAttribute("userId");
             UserModel usuario = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + userId));
 
-            // Valida os dados do pedido
-            if (pedidoData == null || pedidoData.isEmpty()) {
-                throw new IllegalArgumentException("Dados do pedido não podem estar vazios.");
-            }
-
-            // Cria o modelo de pedido
+            // Configura o pedido
             PedidoModel pedido = new PedidoModel();
-            LocalDateTime now = LocalDateTime.now(); // Data e hora atuais
+            LocalDateTime now = LocalDateTime.now();
             pedido.setDataPedido(now);
             pedido.setStatusPedido((String) pedidoData.get("statusPedido"));
             pedido.setObservacoes((String) pedidoData.get("observacoes"));
@@ -75,7 +69,7 @@ public class PedidoController {
             pedido.setRua((String) pedidoData.get("rua"));
             pedido.setComplemento((String) pedidoData.get("complemento"));
 
-            // Processa os produtos
+            // Processa os produtos do pedido
             List<Map<String, Object>> produtos = (List<Map<String, Object>>) pedidoData.get("produtos");
             if (produtos == null || produtos.isEmpty()) {
                 throw new IllegalArgumentException("A lista de produtos não pode estar vazia.");
@@ -91,59 +85,31 @@ public class PedidoController {
                 Integer quantidade = (Integer) produtoData.get("quantidade");
                 produtoPedido.setQuantidade(quantidade);
 
-                // Calcula o subtotal
                 BigDecimal subtotal = produto.getPreco().multiply(BigDecimal.valueOf(quantidade));
                 produtoPedido.setSubtotal(subtotal);
 
                 return produtoPedido;
             }).toList();
 
-            // Calcula o total do pedido
             BigDecimal totalPedido = produtosPedido.stream()
                     .map(ProdutoPedidoModel::getSubtotal)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             pedido.setTotal(totalPedido);
 
-            // Processa os dados de pagamento
+            // Processa o pagamento usando o serviço
             Map<String, Object> pagamentoData = (Map<String, Object>) pedidoData.get("pagamento");
             if (pagamentoData == null || pagamentoData.isEmpty()) {
                 throw new IllegalArgumentException("Os dados de pagamento não podem estar vazios.");
             }
 
-            PagamentoModel pagamento = new PagamentoModel();
-            pagamento.setDataPagamento(now); // Define a data atual
-            pagamento.setMetodoPagamento((String) pagamentoData.get("metodoPagamento"));
+            MetodoPagamentoModel metodoPagamento = pedidoService.processarPagamento(pagamentoData, totalPedido, usuario);
+
+            PagamentoModel pagamento = new PagamentoModel();            pagamento.setMetodoPagamento(metodoPagamento);
+            pagamento.setValorTotal(totalPedido);
+            pagamento.setDataPagamento(LocalDateTime.now());
             pagamento.setStatus((String) pagamentoData.get("status"));
-            pagamento.setValorTotal(totalPedido); // Define o valor total igual ao total do pedido
 
-            // Processa os dados do cartão, se fornecido
-            if (pagamentoData.containsKey("cartao")) {
-                Map<String, Object> cartaoData = (Map<String, Object>) pagamentoData.get("cartao");
-                String numeroCartao = (String) cartaoData.get("numeroCartao");
-
-                // Verifica se o cartão já existe no banco
-                Optional<CartaoModel> cartaoExistente = pagCartaoRepository.findByNumeroCartao(numeroCartao);
-
-                if (cartaoExistente.isPresent()) {
-                    // Reutiliza o cartão existente
-                    pagamento.setCartao(cartaoExistente.get());
-                } else {
-                    // Cria um novo cartão, pois ele não existe
-                    CartaoModel novoCartao = new CartaoModel();
-                    novoCartao.setNumeroCartao(numeroCartao);
-                    novoCartao.setNomeTitular((String) cartaoData.get("nomeTitular"));
-                    novoCartao.setValidade((String) cartaoData.get("validade"));
-                    novoCartao.setBandeira((String) cartaoData.get("bandeira"));
-                    novoCartao.setCpfTitular((String) cartaoData.get("cpfTitular"));
-                    novoCartao.setUser(usuario); // Associa o cartão ao usuário autenticado
-
-                    // Salva o novo cartão
-                    pagCartaoRepository.save(novoCartao);
-                    pagamento.setCartao(novoCartao);
-                }
-            }
-
-            // Salva o pedido usando o serviço
+            // Cria o pedido
             PedidoModel pedidoCriado = pedidoService.criarPedido(pedido, produtosPedido, pagamento, userId);
 
             return ResponseEntity.ok(pedidoCriado);

@@ -2,12 +2,16 @@ package com.app.service;
 
 import com.app.exceptions.ProdutoNotFoundException;
 import com.app.model.*;
+import com.app.model.pagamento.*;
 import com.app.repository.*;
+import com.app.repository.pagamento.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Serviço que fornece operações de negócio para o gerenciamento de pedidos.
@@ -35,24 +39,23 @@ public class PedidoService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Cria um pedido e orquestra o salvamento de todos os componentes associados, incluindo produtos e pagamento.
-     * Verifica a existência dos produtos, calcula o total, e associa o pagamento e os produtos ao pedido.
-     *
-     * @param pedido          Objeto PedidoModel contendo informações básicas do pedido.
-     * @param produtosPedido  Lista de ProdutoPedidoModel com os produtos e quantidades.
-     * @param pagamento       Objeto PagamentoModel com detalhes sobre o pagamento do pedido.
-     * @param userId          ID do usuário que realiza o pedido.
-     * @return O PedidoModel persistido com todas as associações necessárias.
-     * @throws ProdutoNotFoundException Se algum dos produtos especificados não existir.
-     */
+    @Autowired
+    private PagamentoCreditoRepository pagamentoCreditoRepository;
+
+    @Autowired
+    private PagamentoDebitoRepository pagamentoDebitoRepository;
+
+    @Autowired
+    private PagamentoPixRepository pagamentoPixRepository;
+
+    @Autowired
+    private PagamentoBoletoRepository pagamentoBoletoRepository;
+
     public PedidoModel criarPedido(PedidoModel pedido, List<ProdutoPedidoModel> produtosPedido, PagamentoModel pagamento, Long userId) {
-        // Busca o usuário autenticado
         UserModel usuario = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + userId));
         pedido.setUsuario(usuario);
 
-        // Valida se todos os produtos existem antes de salvar
         BigDecimal total = BigDecimal.ZERO;
         for (ProdutoPedidoModel produtoPedido : produtosPedido) {
             Long produtoId = produtoPedido.getProduto().getId();
@@ -63,24 +66,69 @@ public class PedidoService {
         }
         pedido.setTotal(total);
 
-        // Salva o pedido no banco
         PedidoModel pedidoSalvo = pedidoRepository.save(pedido);
 
-        // Salva os produtos do pedido com referência ao pedido criado
         for (ProdutoPedidoModel produtoPedido : produtosPedido) {
             produtoPedido.setPedido(pedidoSalvo);
             produtoPedidoRepository.save(produtoPedido);
         }
 
-        // Salva o cartão se fornecido
-        if (pagamento.getCartao() != null) {
-            cartaoRepository.save(pagamento.getCartao());
-        }
-
-        // Associa o pedido ao pagamento e salva
         pagamento.setPedido(pedidoSalvo);
         pagamentoRepository.save(pagamento);
 
         return pedidoSalvo;
     }
+
+
+    public MetodoPagamentoModel processarPagamento(Map<String, Object> pagamentoData, BigDecimal totalPedido, UserModel usuario) {
+        String tipoPagamento = (String) pagamentoData.get("tipoPagamento");
+
+        switch (TipoPagamento.valueOf(tipoPagamento.toUpperCase())) {
+            case CREDITO:
+                PagamentoCreditoModel pagamentoCredito = new PagamentoCreditoModel();
+                pagamentoCredito.setCartao(buscarOuCriarCartao((Map<String, Object>) pagamentoData.get("cartao"), usuario));
+                pagamentoCredito.setNumeroParcelas((Integer) pagamentoData.get("numeroParcelas"));
+                pagamentoCredito.setTaxaJuros(TaxaPagamento.CREDITO.getTaxa());
+                return pagamentoCredito;
+
+            case DEBITO:
+                PagamentoDebitoModel pagamentoDebito = new PagamentoDebitoModel();
+                pagamentoDebito.setCartao(buscarOuCriarCartao((Map<String, Object>) pagamentoData.get("cartao"), usuario));
+                pagamentoDebito.setTaxaTransacao(TaxaPagamento.DEBITO.getTaxa());
+                return pagamentoDebito;
+
+            case PIX:
+                PagamentoPixModel pagamentoPix = new PagamentoPixModel();
+                pagamentoPix.setChavePix((String) pagamentoData.get("chavePix"));
+                pagamentoPix.setTaxaPix(TaxaPagamento.PIX.getTaxa());
+                return pagamentoPix;
+
+            case BOLETO:
+                PagamentoBoletoModel pagamentoBoleto = new PagamentoBoletoModel();
+                pagamentoBoleto.setCodigoBoleto((String) pagamentoData.get("codigoBoleto"));
+                pagamentoBoleto.setDataVencimento(LocalDate.parse((String) pagamentoData.get("dataVencimento")));
+                pagamentoBoleto.setTaxaBoleto(TaxaPagamento.BOLETO.getTaxa());
+                return pagamentoBoleto;
+
+            default:
+                throw new IllegalArgumentException("Tipo de pagamento inválido: " + tipoPagamento);
+        }
+    }
+
+
+    private CartaoModel buscarOuCriarCartao(Map<String, Object> cartaoData, UserModel usuario) {
+        String numeroCartao = (String) cartaoData.get("numeroCartao");
+        return cartaoRepository.findById(numeroCartao).orElseGet(() -> {
+            CartaoModel novoCartao = new CartaoModel();
+            novoCartao.setNumeroCartao(numeroCartao);
+            novoCartao.setNomeTitular((String) cartaoData.get("nomeTitular"));
+            novoCartao.setValidade((String) cartaoData.get("validade"));
+            novoCartao.setBandeira((String) cartaoData.get("bandeira"));
+            novoCartao.setCpfTitular((String) cartaoData.get("cpfTitular"));
+            novoCartao.setUser(usuario);
+            return cartaoRepository.save(novoCartao);
+        });
+    }
+
+
 }

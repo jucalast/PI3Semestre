@@ -1,5 +1,6 @@
-package com.app.model;
+package com.app.model.pagamento;
 
+import com.app.model.UserModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;

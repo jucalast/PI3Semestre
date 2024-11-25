@@ -1,5 +1,6 @@
 package com.app.model;
 
+import com.app.model.pagamento.PagamentoModel;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -54,7 +55,7 @@ public class PedidoModel {
     /**
      * CEP para entrega do pedido.
      */
-    @Column(name = "cep", nullable = false, length = 8)
+    @Column(name = "cep", nullable = false, length = 9)
     private String cep;
 
     /**
