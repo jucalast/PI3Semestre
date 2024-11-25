@@ -1,6 +1,6 @@
 package com.app.service;
 
-import com.app.model.CartaoModel;
+import com.app.model.pagamento.CartaoModel;
 import com.app.repository.CartaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,5 +26,15 @@ public class CartaoService {
      */
     public List<CartaoModel> findCartoesByUserId(Long userId) {
         return cartaoRepository.findByUserId(userId);
+    }
+
+    /**
+     * Salva um novo cartão no repositório.
+     *
+     * @param cartaoModel O modelo do cartão a ser salvo.
+     * @return O modelo do cartão salvo.
+     */
+    public CartaoModel saveCartao(CartaoModel cartaoModel) {
+        return cartaoRepository.save(cartaoModel);
     }
 }

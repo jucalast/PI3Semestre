@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -76,14 +77,9 @@ public class UserModel {
     /**
      * Relação N:N com AddressModel.
      */
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    @JoinTable(
-            name = "TB_USER_ADDRESS",
-            joinColumns = @JoinColumn(name = "USER_ID"), 
-            inverseJoinColumns = @JoinColumn(name = "ADDRESS_ID") 
-    )
-    private List<AddressModel> addresses;
+    private List<UserAddress> userAddresses;
 
     /**
      * Relação N:N com Carrinho

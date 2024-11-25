@@ -35,4 +35,10 @@ public interface FavoritesRepository extends JpaRepository<FavoritesModel, Long>
      */
     @Transactional
     void deleteByUserAndProduto(UserModel user, Produto produto);
+
+    /**
+     * Encontra todos os favoritos.
+     * @return Uma lista de objetos FavoritesModel.
+     */
+    List<FavoritesModel> findAll();
 }

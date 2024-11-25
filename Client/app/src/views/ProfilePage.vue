@@ -184,6 +184,12 @@
 </script>
 
 <style scoped>
+  @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+  .profile-page {
+    font-family: 'Poppins', sans-serif;
+  }
+
   .input-field {
     margin-top: 0.25rem;
     display: block;
@@ -193,11 +199,29 @@
     border-radius: 0.375rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     padding: 0.5rem;
+    font-size: 1rem;
   }
 
   .input-field:focus {
     border-color: #d97706;
     outline: none;
     box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.25);
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  label {
+    font-size: 1rem;
+    color: #4a5568;
+  }
+
+  button {
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
   }
 </style>

@@ -2,10 +2,13 @@ package com.app.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Table(name = "produto")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Produto {
 
     /**
@@ -54,9 +58,14 @@ public class Produto {
     private BigDecimal preco;
 
     /**
-     * URL da imagem do produto
+     * imagem do produto
      */
-    private String imagem;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "produto_imagens", joinColumns = @JoinColumn(name = "produto_id"))
+    @Column(name = "imagem_base64")
+    @Lob
+    @OrderColumn(name = "imagem_order")
+    private List<String> imagens = new ArrayList<>();
 
     /**
      * Quantidade em estoque do produto
@@ -70,6 +79,12 @@ public class Produto {
      * Avaliação do produto
      */
     private Integer avaliacao;
+
+    /**
+     * Indica se o produto está ativo.
+     */
+    @Column(nullable = false)
+    private boolean ativo = true;
 
     /**
      * Relacionamento com o Café Especial
@@ -118,12 +133,12 @@ public class Produto {
         this.preco = preco;
     }
 
-    public String getImagem() {
-        return imagem;
+    public List<String> getImagens() {
+        return imagens;
     }
 
-    public void setImagem(String imagem) {
-        this.imagem = imagem;
+    public void setImagens(List<String> imagens) {
+        this.imagens = imagens != null ? new ArrayList<>(imagens) : new ArrayList<>();
     }
 
     public int getQuantidadeEstoque() {
@@ -142,11 +157,22 @@ public class Produto {
         this.avaliacao = avaliacao;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public CafeEspecial getCafeEspecial() {
         return cafeEspecial;
     }
 
     public void setCafeEspecial(CafeEspecial cafeEspecial) {
+        if (cafeEspecial != null) {
+            cafeEspecial.setProduto(this);
+        }
         this.cafeEspecial = cafeEspecial;
     }
 
@@ -155,6 +181,25 @@ public class Produto {
     }
 
     public void setMetodoPreparo(MetodoPreparo metodoPreparo) {
+        if (metodoPreparo != null) {
+            metodoPreparo.setProduto(this);
+        }
         this.metodoPreparo = metodoPreparo;
+    }
+
+    @Override
+    public String toString() {
+        return "Produto{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", preco=" + preco +
+                ", quantidadeEstoque=" + quantidadeEstoque +
+                ", avaliacao=" + avaliacao +
+                ", ativo=" + ativo +
+                // Evitar chamada recursiva
+                ", cafeEspecial=" + (cafeEspecial != null ? cafeEspecial.getId() : null) +
+                ", metodoPreparo=" + (metodoPreparo != null ? metodoPreparo.getId() : null) +
+                '}';
     }
 }

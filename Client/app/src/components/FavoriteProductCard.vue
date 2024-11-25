@@ -1,5 +1,5 @@
 <template>
-  <div id="card-container">
+  <div id="card-container" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave">
     <div @click="openModal" class="product-card">
       <div class="product-image-container">
         <img :src="produto.imagem" :alt="produto.nome" class="product-image" />
@@ -39,11 +39,14 @@
     data() {
       return {
         showModal: false,
+        isHovered: false,
       };
     },
     methods: {
       openModal() {
-        this.showModal = true;
+        if (this.isHovered) {
+          this.showModal = true;
+        }
       },
       closeModal() {
         this.showModal = false;
@@ -61,6 +64,17 @@
         } catch (error) {
           console.error('Erro ao enviar requisição DELETE:', error);
         }
+      },
+      handleMouseOver() {
+        this.isHovered = true;
+      },
+      handleMouseLeave() {
+        this.isHovered = false;
+        setTimeout(() => {
+          if (!this.isHovered) {
+            this.closeModal();
+          }
+        }, 3000);
       },
     },
     filters: {

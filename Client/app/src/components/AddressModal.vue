@@ -10,6 +10,11 @@
         <input v-model="address.bairro" placeholder="Bairro" required>
         <input v-model="address.cidade" placeholder="Cidade" required>
         <input v-model="address.estado" placeholder="Estado" required>
+        <select v-model="address.tipo" required>
+          <option value="Casa">Casa</option>
+          <option value="Trabalho">Trabalho</option>
+          <option value="Outro">Outro</option>
+        </select>
         <button type="submit" class="add-address-btn">Adicionar Endereço</button>
       </form>
     </div>
@@ -33,7 +38,8 @@ export default {
         numero: '',
         bairro: '',
         cidade: '',
-        estado: ''
+        estado: '',
+        tipo: 'Casa' // Tipo de endereço padrão
       }
     };
   },
@@ -42,11 +48,10 @@ export default {
       this.$emit('close');
     },
     submitAddress() {
-      const fullAddress = `${this.address.rua}, ${this.address.numero}, ${this.address.bairro}, ${this.address.cidade}, ${this.address.estado}, ${this.address.cep}`;
+      const fullAddress = `${this.address.rua}, ${this.address.numero}, ${this.address.bairro}, ${this.address.cidade}, ${this.address.estado}, ${this.address.cep}, ${this.address.tipo}`;
       this.$emit('submit-address', fullAddress);
       this.closeModal();
     }
-
   }
 };
 </script>
