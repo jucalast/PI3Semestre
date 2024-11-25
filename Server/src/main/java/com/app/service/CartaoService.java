@@ -1,6 +1,6 @@
 package com.app.service;
 
-import com.app.model.CartaoModel;
+import com.app.model.pagamento.CartaoModel;
 import com.app.repository.CartaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

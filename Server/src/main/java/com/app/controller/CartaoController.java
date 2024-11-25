@@ -1,6 +1,6 @@
 package com.app.controller;
 
-import com.app.model.CartaoModel;
+import com.app.model.pagamento.CartaoModel;
 import com.app.model.UserModel;
 import com.app.service.CartaoService;
 import jakarta.servlet.http.HttpServletRequest;
