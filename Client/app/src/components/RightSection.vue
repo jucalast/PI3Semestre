@@ -69,7 +69,8 @@ export default {
   data() {
     return {
       showCardInputs: false,
-      boxShadowColor: 'rgba(128, 128, 128, 0.5)' // Cor padrão inicial
+      boxShadowColor: 'rgba(128, 128, 128, 0.5)', // Cor padrão inicial
+      selectedAddressId: null // ID do endereço selecionado
     };
   },
   computed: {
@@ -175,9 +176,9 @@ export default {
 
 .header-info-card {
   display: flex;
+  justify-content: space-between; /* Ajuste para distribuir espaço entre os itens */
   width: 90%;
   gap: 10px; /* Adiciona espaço entre os botões */
-  justify-content: center;
 }
 
 .card-inputs input {
@@ -212,7 +213,7 @@ export default {
 
 .card-option {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Ajuste para distribuir espaço entre os itens */
   align-items: center;
   width: 100%;
   height: 5rem;
@@ -324,4 +325,4 @@ export default {
   background-color: #3a5bff;
   color: white;
 }
-</style> 
+</style>

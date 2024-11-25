@@ -197,9 +197,9 @@
       submitForm() {
         const formattedProduct = {
           ...this.localProduct,
-          preco: parseFloat(
-            this.localProduct.preco.replace(/\./g, '').replace(',', '.')
-          ), // Converte para BigDecimal
+          preco: typeof this.localProduct.preco === 'string'
+            ? parseFloat(this.localProduct.preco.replace(/\./g, '').replace(',', '.'))
+            : this.localProduct.preco, // Converte para BigDecimal se for string
           metodoPreparo: Object.entries(this.localProduct.metodoPreparo).reduce(
             (acc, [key, value]) => {
               if (value) acc[key] = value;
@@ -208,11 +208,11 @@
             {}
           ),
         };
-
+      
         if (!Object.keys(formattedProduct.metodoPreparo).length) {
           delete formattedProduct.metodoPreparo;
         }
-
+      
         console.log('Produto enviado:', formattedProduct); // Exibe os dados no console para teste
         this.$emit('submit-product', formattedProduct); // Emite o evento para o pai com os dados do produto
       },

@@ -1,6 +1,8 @@
 package com.app.service;
 
+import com.app.model.AddressModel;
 import com.app.model.UserModel;
+import com.app.repository.AddressRepository;
 import com.app.repository.UserRepository;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +27,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AddressRepository addressRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     /**
@@ -32,10 +35,12 @@ public class UserService implements UserDetailsService {
      *
      * @param userRepository O repositório de usuários.
      * @param passwordEncoder O encoder de senha.
+     * @param addressRepository O repositório de endereços.
      */
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AddressRepository addressRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.addressRepository = addressRepository;
     }
 
     /**
@@ -151,6 +156,22 @@ public class UserService implements UserDetailsService {
         }
 
         userRepository.save(existingUser);
+    }
+
+    /**
+     * Adiciona um endereço a um usuário existente.
+     *
+     * @param userId O ID do usuário ao qual o endereço será adicionado.
+     * @param address O objeto AddressModel a ser adicionado.
+     * @throws RuntimeException Se o usuário com o ID fornecido não for
+     * encontrado.
+     */
+    public void addAddressToUser(Long userId, AddressModel address) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+        addressRepository.save(address);
+        user.getAddresses().add(address);
+        userRepository.save(user);
     }
 
 }
