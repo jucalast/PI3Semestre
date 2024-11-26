@@ -7,6 +7,10 @@ import com.app.repository.AddressRepository;
 import com.app.repository.UserRepository;
 import java.util.Collections;
 import java.util.List;
+<<<<<<< HEAD
+=======
+import java.util.Map;
+>>>>>>> 72e8f3890fdff8e9b46495f556a6bf3db217f8c7
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Map;
 
 /**
  * Classe de serviço responsável pela lógica de negócios relacionada à entidade
@@ -160,6 +165,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(existingUser);
     }
 
+<<<<<<< HEAD
     /**
      * Adiciona um endereço a um usuário existente.
      *
@@ -203,4 +209,6 @@ public class UserService implements UserDetailsService {
                 .map(UserAddress::getAddress)
                 .collect(Collectors.toList());
     }
+=======
+>>>>>>> 72e8f3890fdff8e9b46495f556a6bf3db217f8c7
 }

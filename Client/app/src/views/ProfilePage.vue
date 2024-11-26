@@ -113,6 +113,7 @@ export default {
 </script>
 
 <style scoped>
+<<<<<<< HEAD
   @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
   .profile-page {
@@ -153,4 +154,100 @@ export default {
     padding: 0.75rem 1.5rem;
     border-radius: 0.375rem;
   }
+=======
+.profile-container {
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.profile-content {
+  display: flex;
+  gap: 20%;
+}
+
+.profile-photo {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-photo img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.profile-photo .user-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 10px;
+  text-align: center; 
+}
+
+.profile-photo button {
+  margin-right: auto;
+  padding: 8px 16px;
+  background-color: #f4b400; 
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.profile-photo button:hover {
+  background-color: #e0a400; 
+}
+
+.profile-form {
+  flex: 2;
+}
+
+h3 {
+  margin-bottom: 10px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-section {
+  margin-bottom: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-submit {
+  padding: 10px;
+  background-color: #f4b400;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #e0a400;
+}
+
+.success {
+  color: green;
+}
+
+.error {
+  color: red;
+}
+>>>>>>> 72e8f3890fdff8e9b46495f556a6bf3db217f8c7
 </style>
