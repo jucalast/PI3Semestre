@@ -1,10 +1,13 @@
 package com.app.service;
 
+import com.app.model.AddressModel;
 import com.app.model.UserModel;
+import com.app.model.UserAddress;
+import com.app.repository.AddressRepository;
 import com.app.repository.UserRepository;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -26,6 +29,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AddressRepository addressRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     /**
@@ -33,10 +37,12 @@ public class UserService implements UserDetailsService {
      *
      * @param userRepository O repositório de usuários.
      * @param passwordEncoder O encoder de senha.
+     * @param addressRepository O repositório de endereços.
      */
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AddressRepository addressRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.addressRepository = addressRepository;
     }
 
     /**
@@ -133,39 +139,68 @@ public class UserService implements UserDetailsService {
     /**
      * Atualiza o perfil do usuário com base no ID e nos campos fornecidos.
      *
-     * @param userId ID do usuário autenticado.
-     * @param updates Mapa contendo os campos a serem atualizados.
+     * @param userId O ID do usuário a ser atualizado.
+     * @param updatedUser O objeto UserModel com os dados atualizados do
+     * usuário.
+     * @throws RuntimeException Se o usuário com o ID fornecido não for
+     * encontrado.
      */
-    public void updateUserProfile(Long userId, Map<String, Object> updates) {
+    public void updateUser(Long userId, UserModel updatedUser) {
+        UserModel existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+
+        existingUser.setUserName(updatedUser.getUserName());
+        existingUser.setEmailId(updatedUser.getEmailId());
+        existingUser.setRoles(updatedUser.getRoles());
+
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        userRepository.save(existingUser);
+    }
+
+    /**
+     * Adiciona um endereço a um usuário existente.
+     *
+     * @param userId O ID do usuário ao qual o endereço será adicionado.
+     * @param address O objeto AddressModel a ser adicionado.
+     * @param addressType O tipo de endereço a ser adicionado.
+     * @throws RuntimeException Se o usuário com o ID fornecido não for
+     * encontrado.
+     */
+    public void addAddressToUser(Long userId, AddressModel address, String addressType) {
         UserModel user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+        
+        // Salva o endereço primeiro
+        addressRepository.save(address);
 
-        updates.forEach((key, value) -> {
-            switch (key) {
-                case "userName":
-                    user.setUserName((String) value);
-                    break;
-                case "emailId":
-                    user.setEmailId((String) value);
-                    break;
-                case "mobileNumber":
-                    user.setMobileNumber((String) value);
-                    break;
-                case "currentPassword":
-                    String currentPassword = (String) value;
-                    if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-                        throw new IllegalArgumentException("Senha atual incorreta.");
-                    }
-                    break;
-                case "newPassword":
-                    String newPassword = (String) value;
-                    user.setPassword(passwordEncoder.encode(newPassword)); 
-                    break;
-                default:
-                    throw new IllegalArgumentException("Campo '" + key + "' não é válido.");
-            }
-        });
+        // Cria a relação entre o usuário e o endereço
+        UserAddress userAddress = new UserAddress();
+        userAddress.setUser(user);
+        userAddress.setAddress(address);
+        userAddress.setAddressType(addressType);
 
+        // Adiciona a relação à lista de endereços do usuário
+        user.getUserAddresses().add(userAddress);
+
+        // Salva a relação na tabela TB_USER_ADDRESS
         userRepository.save(user);
+    }
+
+    /**
+     * Obtém todos os endereços de um usuário pelo seu ID.
+     *
+     * @param userId O ID do usuário cujos endereços serão recuperados.
+     * @return Uma lista de objetos AddressModel associados ao usuário.
+     * @throws RuntimeException Se o usuário não for encontrado.
+     */
+    public List<AddressModel> getAddressesByUserId(Long userId) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
+        return user.getUserAddresses().stream()
+                .map(UserAddress::getAddress)
+                .collect(Collectors.toList());
     }
 }

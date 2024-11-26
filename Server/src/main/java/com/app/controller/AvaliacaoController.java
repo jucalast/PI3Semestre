@@ -9,6 +9,8 @@ import com.app.repository.AvaliacaoRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/avaliacoes")
 public class AvaliacaoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AvaliacaoController.class);
 
     /**
      * Serviço de avaliação usado para criar novas avaliações.
@@ -97,6 +101,7 @@ public class AvaliacaoController {
     public List<Map<String, Object>> getAvaliacoesPorProduto(@PathVariable Integer produtoId) {
         List<ProdutoPedidoModel> produtoPedidos = produtoPedidoRepository.findByProdutoId(produtoId);
         if (produtoPedidos.isEmpty()) {
+            logger.error("Nenhum ProdutoPedido encontrado para o produto ID: {}", produtoId);
             throw new NoSuchElementException("Nenhum ProdutoPedido encontrado para o produto ID: " + produtoId);
         }
 
@@ -127,6 +132,7 @@ public class AvaliacaoController {
     public double calcularMediaDeAvaliacoes(@PathVariable Integer produtoId) {
         List<ProdutoPedidoModel> produtoPedidos = produtoPedidoRepository.findByProdutoId(produtoId);
         if (produtoPedidos.isEmpty()) {
+            logger.error("Nenhum ProdutoPedido encontrado para o produto ID: {}", produtoId);
             throw new NoSuchElementException("Nenhum ProdutoPedido encontrado para o produto ID: " + produtoId);
         }
 

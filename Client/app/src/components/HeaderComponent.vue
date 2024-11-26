@@ -67,12 +67,17 @@
         <div
           class="favorites-container"
           @mouseover="handleFavoriteHover"
-          @mouseleave="handleFavoriteLeave"
+          @mouseleave="handleFavoriteLeaveWithDelay"
         >
           <button class="action-button favorite-button">
             <font-awesome-icon icon="star" class="favorite-icon" />
           </button>
-          <div v-if="showModal" class="modal">
+          <div
+            v-if="showModal"
+            class="modal"
+            @mouseover="clearFavoriteLeaveTimeout"
+            @mouseleave="handleFavoriteLeaveWithDelay"
+          >
             <div class="headerfav">favoritos:</div>
             <div v-if="!authenticated">
               <p>Você precisa estar logado.</p>
@@ -96,7 +101,7 @@
                   class="product-card"
                 >
                   <div class="product-image">
-                    <img :src="product.imagem" alt="Imagem do Produto" />
+                    <img :src="product.imagens[0]" alt="Imagem do Produto" />
                   </div>
                   <div class="product-details">
                     <div class="nameandprice">
@@ -144,7 +149,7 @@
             <div v-if="isAuthenticated" class="useroptions">
               <router-link to="/profile">Perfil</router-link>
               <router-link to="/settings">Configurações</router-link>
-              <router-link v-if="isAdmin" to="/manage">Gerenciar</router-link>
+              <router-link v-if="isAdmin" to="/admin">Gerenciar</router-link>
               <button class="exitbtn" @click="handleLogout">
                 Sair
                 <img src="@/assets/icons8-sair-96.png" alt="" />
@@ -188,6 +193,7 @@ export default {
       favorite_products: [],
       baseURL: import.meta.env.VITE_API_BASE_URL,
       isCartModalVisible: false,
+      favoriteLeaveTimeout: null,
     };
   },
   computed: {
@@ -238,6 +244,15 @@ export default {
     handleFavoriteLeave() {
       this.showModal = false;
       console.log('Mouse leave');
+    },
+    handleFavoriteLeaveWithDelay() {
+      this.favoriteLeaveTimeout = setTimeout(() => {
+        this.showModal = false;
+        console.log('Mouse leave with delay');
+      }, 3000);
+    },
+    clearFavoriteLeaveTimeout() {
+      clearTimeout(this.favoriteLeaveTimeout);
     },
     async handleFavoriteHover() {
       try {
@@ -318,7 +333,7 @@ export default {
   font-size: 2rem !important;
   flex-direction: column;
   position: fixed;
-  width: 98vw;
+  width: 100%;
   height: 6.7rem;
   z-index: 200;
 }
@@ -336,9 +351,6 @@ export default {
   filter: invert(1);
 }
 
-.logo-container {
-
-}
 
 .exitbtn {
   display: flex !important;

@@ -2,7 +2,7 @@
   <DefaultLayout @search="updateSearchQuery">
     <div class="home-page">
       <div class="sessionone">
-        <img class="banner" src="../assets/bannerhomepage.png" alt="Banner" />
+        <ImageCarousel :images="bannerImages" />
       </div>
       <div class="sessiontwo">
         <div class="product-list">
@@ -20,27 +20,32 @@
 <script>
   import DefaultLayout from '@/layouts/DefaultLayout.vue';
   import ProductCard from '@/components/ProductCardComponent.vue';
+  import ImageCarousel from '@/components/ImageCarousel.vue';
   import axios from 'axios';
 
   export default {
     components: {
       DefaultLayout,
       ProductCard,
+      ImageCarousel,
     },
     data() {
       return {
         produtos: [],
         isLoading: true,
         searchQuery: '',
+        bannerImages: [],
       };
     },
     computed: {
       filteredProducts() {
         if (!this.searchQuery) {
-          return this.produtos;
+          return this.produtos.filter(produto => produto.ativo);
         }
-        return this.produtos.filter((produto) =>
-          produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
+        return this.produtos.filter(
+          (produto) =>
+            produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+            produto.ativo
         );
       },
     },
@@ -57,12 +62,21 @@
           this.isLoading = false;
         }
       },
+      async fetchBanners() {
+        try {
+          const response = await axios.get('http://localhost:8080/api/banners');
+          this.bannerImages = response.data.map(banner => banner.imageBase64);
+        } catch (error) {
+          console.error('Erro ao buscar banners:', error);
+        }
+      },
       updateSearchQuery(query) {
         this.searchQuery = query;
       },
     },
     mounted() {
       this.fetchProdutos(); // Chama a função uma vez ao montar o componente
+      this.fetchBanners(); // Chama a função para buscar os banners ao montar o componente
     },
   };
 </script>

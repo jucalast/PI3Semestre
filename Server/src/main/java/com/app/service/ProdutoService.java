@@ -33,6 +33,12 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Autowired
+    private CafeEspecialRepository cafeEspecialRepository;
+
+    @Autowired
+    private MetodoPreparoRepository metodoPreparoRepository;
+
     /**
      * Cria um novo produto no sistema após validação.
      *
@@ -119,30 +125,70 @@ public class ProdutoService {
     @Transactional
     public Produto updateProduto(Long id, Produto produto) {
         logger.info("Atualizando produto com ID: {}", id);
-    
+
         ValidationUtil.validarObjeto(produto);
-    
+
         Produto existingProduto = getProdutoById(id);
-    
+
+        // Log dos valores recebidos
+        logger.info("Valores recebidos para atualização: Nome: {}, Descrição: {}, Preço: {}, Quantidade Estoque: {}, Avaliação: {}",
+                produto.getNome(), produto.getDescricao(), produto.getPreco(), produto.getQuantidadeEstoque(), produto.getAvaliacao());
+
+        if (produto.getCafeEspecial() != null) {
+            CafeEspecial cafeEspecial = produto.getCafeEspecial();
+            logger.info("Valores de CafeEspecial recebidos: Notas Sensoriais: {}, Origem: {}, Variedade: {}, Torrefação: {}, Torra: {}, Beneficiamento: {}, Data Torra: {}, Data Validade: {}, Recomendações Preparo: {}",
+                    cafeEspecial.getNotasSensoriais(), cafeEspecial.getOrigem(), cafeEspecial.getVariedade(), cafeEspecial.getTorrefacao(), cafeEspecial.getTorra(), cafeEspecial.getBeneficiamento(), cafeEspecial.getDataTorra(), cafeEspecial.getDataValidade(), cafeEspecial.getRecomendacoesPreparo());
+        }
+
         // Atualiza os dados do produto
         existingProduto.setNome(produto.getNome());
         existingProduto.setDescricao(produto.getDescricao());
         existingProduto.setPreco(produto.getPreco());
-        existingProduto.setImagem(produto.getImagem());
         existingProduto.setQuantidadeEstoque(produto.getQuantidadeEstoque());
         existingProduto.setAvaliacao(produto.getAvaliacao());
-    
+
+        // Atualiza as imagens do produto, permitindo remoção e adição
+        if (produto.getImagens() != null) {
+            existingProduto.setImagens(produto.getImagens());
+        }
+
         // Atualiza a especialização CafeEspecial se existir
         if (produto.getCafeEspecial() != null) {
             if (existingProduto.getCafeEspecial() == null) {
                 existingProduto.setCafeEspecial(produto.getCafeEspecial());
                 produto.getCafeEspecial().setProduto(existingProduto);
             } else {
-                existingProduto.getCafeEspecial().setNotasSensoriais(produto.getCafeEspecial().getNotasSensoriais());
-                // Atualizar outros campos conforme necessário...
+                CafeEspecial cafeEspecial = produto.getCafeEspecial();
+                if (cafeEspecial.getNotasSensoriais() != null) {
+                    existingProduto.getCafeEspecial().setNotasSensoriais(cafeEspecial.getNotasSensoriais());
+                }
+                if (cafeEspecial.getOrigem() != null) {
+                    existingProduto.getCafeEspecial().setOrigem(cafeEspecial.getOrigem());
+                }
+                if (cafeEspecial.getVariedade() != null) {
+                    existingProduto.getCafeEspecial().setVariedade(cafeEspecial.getVariedade());
+                }
+                if (cafeEspecial.getTorrefacao() != null) {
+                    existingProduto.getCafeEspecial().setTorrefacao(cafeEspecial.getTorrefacao());
+                }
+                if (cafeEspecial.getTorra() != null) {
+                    existingProduto.getCafeEspecial().setTorra(cafeEspecial.getTorra());
+                }
+                if (cafeEspecial.getBeneficiamento() != null) {
+                    existingProduto.getCafeEspecial().setBeneficiamento(cafeEspecial.getBeneficiamento());
+                }
+                if (cafeEspecial.getDataTorra() != null) {
+                    existingProduto.getCafeEspecial().setDataTorra(cafeEspecial.getDataTorra());
+                }
+                if (cafeEspecial.getDataValidade() != null) {
+                    existingProduto.getCafeEspecial().setDataValidade(cafeEspecial.getDataValidade());
+                }
+                if (cafeEspecial.getRecomendacoesPreparo() != null) {
+                    existingProduto.getCafeEspecial().setRecomendacoesPreparo(cafeEspecial.getRecomendacoesPreparo());
+                }
             }
         }
-    
+
         // Atualiza a especialização MetodoPreparo se existir
         if (produto.getMetodoPreparo() != null) {
             if (existingProduto.getMetodoPreparo() == null) {
@@ -153,12 +199,20 @@ public class ProdutoService {
                 // Atualizar outros campos conforme necessário...
             }
         }
-    
+
         Produto updatedProduto = produtoRepository.save(existingProduto);
         logger.info("Produto {} atualizado com sucesso", updatedProduto.getNome());
         return updatedProduto;
     }
-    
+
+    @Transactional
+    public void bulkUpdateProdutos(List<Produto> produtos) {
+        for (Produto produto : produtos) {
+            Produto existingProduto = getProdutoById(produto.getId());
+            existingProduto.setPreco(produto.getPreco());
+            produtoRepository.save(existingProduto);
+        }
+    }
 
     /**
      * Deleta um produto pelo ID.
@@ -170,33 +224,66 @@ public class ProdutoService {
     @Transactional
     public void deleteProduto(Long id) {
         logger.info("Deletando produto com ID: {}", id);
-    
+
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
-    
+
         // Verifica e deleta a especialização CafeEspecial se existir
         if (produto.getCafeEspecial() != null) {
             cafeEspecialRepository.delete(produto.getCafeEspecial());
             logger.info("Especialização CafeEspecial deletada para o produto ID: {}", id);
         }
-    
+
         // Verifica e deleta a especialização MetodoPreparo se existir
         if (produto.getMetodoPreparo() != null) {
             metodoPreparoRepository.delete(produto.getMetodoPreparo());
             logger.info("Especialização MetodoPreparo deletada para o produto ID: {}", id);
         }
-    
+
         // Após deletar as especializações, deleta o próprio produto
         produtoRepository.delete(produto);
         logger.info("Produto com ID {} deletado com sucesso", id);
     }
-    
 
-    @Autowired
-    private CafeEspecialRepository cafeEspecialRepository;
+    /**
+     * Desativa um produto pelo ID.
+     *
+     * @param id ID do produto a ser desativado.
+     * @return Produto desativado.
+     * @throws RuntimeException se o produto com o ID especificado não for
+     * encontrado.
+     */
+    @Transactional
+    public Produto deactivateProduto(Long id) {
+        logger.info("Desativando produto com ID: {}", id);
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+        logger.info("Produto encontrado: {}", produto);
+        produto.setAtivo(false);
+        Produto updatedProduto = produtoRepository.save(produto);
+        logger.info("Produto com ID {} desativado com sucesso", id);
+        return updatedProduto;
+    }
 
-    @Autowired
-    private MetodoPreparoRepository metodoPreparoRepository;
+    /**
+     * Ativa um produto pelo ID.
+     *
+     * @param id ID do produto a ser ativado.
+     * @return Produto ativado.
+     * @throws RuntimeException se o produto com o ID especificado não for
+     * encontrado.
+     */
+    @Transactional
+    public Produto activateProduto(Long id) {
+        logger.info("Ativando produto com ID: {}", id);
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+        logger.info("Produto encontrado: {}", produto);
+        produto.setAtivo(true);
+        Produto updatedProduto = produtoRepository.save(produto);
+        logger.info("Produto com ID {} ativado com sucesso", id);
+        return updatedProduto;
+    }
 
     /**
      * Lista atributos dos produtos, incluindo especializações de CafeEspecial e

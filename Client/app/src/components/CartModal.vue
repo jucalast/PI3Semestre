@@ -13,17 +13,14 @@
           >
             <div class="image-bckg">
               <img
-                  class="image-product"
-                  :src="cartItem.imagem_produto"
-                  :alt="cartItem.nome_produto"
+                class="image-product"
+                :src="cartItem.imagens ? cartItem.imagens[0] : ''"
+                :alt="cartItem.nome"
               />
             </div>
             <div class="nameandbutton">
-              <h2>{{ cartItem.nome_produto }}</h2>
-              <button
-                  class="excluir"
-                  @click="removeItemOnCartUser(cartItem.produtoId)"
-              >
+              <h2>{{ cartItem.nome }}</h2>
+              <button class="excluir" @click="removeItemOnCartUser(cartItem.produtoId)">
                 Excluir
               </button>
             </div>
@@ -44,7 +41,7 @@
               <option value="7">7</option>
               <option value="8">8</option>
             </select>
-            <span>R${{ cartItem.preco_produto * cartItem.quantidade }}</span>
+            <span>R${{ cartItem.preco * cartItem.quantidade }}</span>
           </section>
         </section>
       </div>
@@ -62,11 +59,23 @@
             <span id="info-ft-02">Inserir cupom</span>
           </div>
         </div>
+        <section v-if="false" class="frete-section">
+          <div class="frete">
+            <span id="info-01">Frete</span>
+            <span id="info-02">R$14,59</span>
+          </div>
+          <p id="info-03">
+            Aproveite o
+            <strong>frete grátis</strong>
+            adicionando mais produtos ao pedido
+          </p>
+        </section>
         <button class="btn-compra" @click="continueToCheckout">Continuar a compra</button>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import axiosInstance from '@/utils/axiosInstance';
@@ -100,8 +109,14 @@ export default {
     async fetchCarts() {
       try {
         const responseCart = await axiosInstance.get(`/api/carrinho/`);
-        this.cartItems = responseCart.data;
-        this.somasCarrinho(responseCart.data);
+        this.cartItems = responseCart.data.map(item => ({
+          produtoId: item.produtoId,
+          imagens: item.imagens,
+          nome: item.nome,
+          preco: item.preco,
+          quantidade: item.quantidade
+        }));
+        this.somasCarrinho(this.cartItems);
       } catch (error) {
         console.error('Erro ao buscar produtos do carrinho: ', error);
         return;
@@ -129,12 +144,28 @@ export default {
       );
       this.fetchCarts();
     },
-    continueToCheckout() {
-      const productIds = this.cartItems.map(item => item.produtoId);
-      if (productIds.length > 0) {
-        this.$router.push({ name: 'Checkout', query: { ids: productIds.join(',') } });
-      } else {
-        alert('Seu carrinho está vazio.');
+    async addToCart(product) {
+      try {
+        const response = await axiosInstance.post(`/api/carrinho/${product.id}`);
+        if (response.status === 200) {
+          this.fetchCarts();
+          alert(`Produto ${product.nome} adicionado ao carrinho.`);
+        } else {
+          alert('Erro ao adicionar produto ao carrinho.');
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar produto ao carrinho:', error);
+        alert('Erro ao adicionar produto ao carrinho.');
+      }
+    },
+    async continueToCheckout() {
+      try {
+        const response = await axiosInstance.get('/api/carrinho/user-id');
+        const userId = response.data;
+        this.$router.push({ name: 'Checkout', query: { userId } });
+      } catch (error) {
+        console.error('Erro ao obter o ID do usuário:', error);
+        alert('Erro ao continuar para o checkout.');
       }
     }
   },
@@ -149,19 +180,19 @@ export default {
     font-size: 14pt;
   }
 
-  .cart-modal-bckg {
-    position: fixed;
-    background-color: rgba(0, 0, 0, 0.7);
-    margin-top: 5rem;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: right;
-    align-items: center;
-    z-index: 20;
-    backdrop-filter: blur(5px);
-  }
+.cart-modal-bckg {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.7);
+  margin-top: 5.6rem;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  z-index: 20;
+  backdrop-filter: blur(5px);
+}
 
   .cart-modal {
     background-color: #ffffff;

@@ -2,11 +2,11 @@ package com.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
-import java.util.List;
 
 /**
  * Representa a entidade Endereço para a aplicação.
@@ -28,7 +28,7 @@ public class AddressModel {
      * Este campo é gerado automaticamente.
      */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
@@ -76,7 +76,7 @@ public class AddressModel {
     /**
      * Relação N:N com UserModel.
      */
+    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
     @JsonIgnore
-    @ManyToMany(mappedBy = "addresses") 
-    private List<UserModel> users; 
+    private List<UserAddress> userAddresses;
 }

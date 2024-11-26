@@ -21,10 +21,4 @@
     background: #3a5bff !important;
   }
 
-  .layout {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Faz o layout ocupar pelo menos 100% da altura da janela */
-    width: 100vw;
-  }
 </style>

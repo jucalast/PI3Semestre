@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +27,6 @@ import lombok.Data;
  * A entidade está vinculada ao produto ao qual pertence e contém informações
  * detalhadas para categorização e recomendação de preparo.
  *
- * @author João
  * @version 1.0
  * @since 2024-10-05
  */
@@ -117,4 +116,26 @@ public class CafeEspecial {
     @JoinColumn(name = "produto_id")
     @JsonBackReference // Para evitar loop de serialização
     private Produto produto;
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
+    @Override
+    public String toString() {
+        return "CafeEspecial{" +
+                "id=" + id +
+                ", notasSensoriais='" + notasSensoriais + '\'' +
+                ", origem='" + origem + '\'' +
+                ", variedade='" + variedade + '\'' +
+                ", torrefacao='" + torrefacao + '\'' +
+                ", torra='" + torra + '\'' +
+                ", beneficiamento='" + beneficiamento + '\'' +
+                ", dataTorra=" + dataTorra +
+                ", dataValidade=" + dataValidade +
+                ", recomendacoesPreparo='" + recomendacoesPreparo + '\'' +
+                // Evitar chamada recursiva
+                ", produto=" + (produto != null ? produto.getId() : null) +
+                '}';
+    }
 }

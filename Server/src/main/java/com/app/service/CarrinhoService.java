@@ -17,13 +17,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Classe de serviço responsável pela lógica de negocios relacionada a entidade Carrinho.
+ * Classe de serviço responsável pela lógica de negocios relacionada a entidade
+ * Carrinho.
  *
  * @author Ricardo L. Ferreira
  */
 @Service
 public class CarrinhoService {
-
 
     @Autowired
     private CarrinhoRepository carrinhoRepository;
@@ -37,7 +37,7 @@ public class CarrinhoService {
      * na tabela carrinho. Caso o item já esteja no carrinho, então é feita a
      * remoção do mesmo é feita ao acionar o método deleteProductOnUserCart()
      *
-     * @param idUser    O id do usuário.
+     * @param idUser O id do usuário.
      * @param productId O id do produto.
      * @return Retorna true em caso de sucesso e false em caso de falha.
      */
@@ -74,11 +74,12 @@ public class CarrinhoService {
     }
 
     /**
-     * Read do carrinho - Método responsável por fazer a leitura/trazer as registros
-     * existentes no banco de dados relacionados ao carrinho.
+     * Read do carrinho - Método responsável por fazer a leitura/trazer as
+     * registros existentes no banco de dados relacionados ao carrinho.
      *
      * @param idUser O id do usuário.
-     * @return Retorna um objeto do tipo Map, que guarda a chave e valor de cada atributo presente no carrinho.
+     * @return Retorna um objeto do tipo Map, que guarda a chave e valor de cada
+     * atributo presente no carrinho.
      */
     public List<Map<String, Object>> getProductsOnUserCart(Long idUser) {
         List<Carrinho> carrinhos = carrinhoRepository.findByUserModelId(idUser);
@@ -89,9 +90,9 @@ public class CarrinhoService {
                     map.put("carrinhoId", carrinho.getId());
                     map.put("userId", carrinho.getUserModel().getId());
                     map.put("produtoId", carrinho.getProduto().getId());
-                    map.put("imagem_produto", carrinho.getProduto().getImagem());
-                    map.put("nome_produto", carrinho.getProduto().getNome());
-                    map.put("preco_produto", carrinho.getProduto().getPreco());
+                    map.put("imagens", carrinho.getProduto().getImagens());
+                    map.put("nome", carrinho.getProduto().getNome());
+                    map.put("preco", carrinho.getProduto().getPreco());
                     map.put("quantidade", carrinho.getQuantidade());
                     return map;
                 })
@@ -99,8 +100,9 @@ public class CarrinhoService {
     }
 
     /**
-     * Update do carrinho - Método responsável por fazer a atualização da quantia unitária de cada
-     * produto presente no carrinho.
+     * Update do carrinho - Método responsável por fazer a atualização da
+     * quantia unitária de cada produto presente no carrinho.
+     *
      * @param idUser O id do usuário.
      * @param productId O id do produto.
      * @param quantity A nova quantidade.
@@ -108,24 +110,32 @@ public class CarrinhoService {
      */
     public boolean updateQuantityOnUserCart(Long idUser, Long productId, int quantity) {
         Optional<Carrinho> carrinhoExistente = carrinhoRepository.findByUserModelIdAndProdutoId(idUser, productId);
+
         if (carrinhoExistente.isPresent()) {
             try {
                 Carrinho carrinho = carrinhoExistente.get();
-                carrinho.setQuantidade(quantity);
-                carrinhoRepository.save(carrinho);
-                return true;
+                // Verifique se a quantidade é válida (não negativa)
+                if (quantity > 0) {
+                    carrinho.setQuantidade(quantity);
+                    carrinhoRepository.save(carrinho); // Salva a atualização
+                    return true;
+                } else {
+                    System.out.println("Erro: Quantidade inválida");
+                    return false;
+                }
             } catch (Exception e) {
-                System.out.println("Erro: Não foi possível alterar a quantidade" + e.getMessage());
+                System.out.println("Erro ao atualizar quantidade no carrinho: " + e.getMessage());
                 return false;
             }
         } else {
-            System.out.println("Erro: Dados não encontrados");
+            System.out.println("Erro: Produto não encontrado no carrinho do usuário");
             return false;
         }
     }
 
     /**
      * Delete do carrinho - Método responsável por remover um item do carrinho.
+     *
      * @param idUser O id do usuário.
      * @param productId o id do produto.
      * @return Retorna true em caso de sucesso e false em caso de falha.
@@ -144,4 +154,3 @@ public class CarrinhoService {
         return false;
     }
 }
-
