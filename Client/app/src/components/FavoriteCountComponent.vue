@@ -71,6 +71,23 @@ export default {
   padding: 2rem;
   background: #00000017!important;
   border-radius: 2rem !important;
+  height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.favorites-section::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+ul {
+  max-height: 45vh;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+ul::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 h3 {
@@ -79,6 +96,7 @@ h3 {
   line-height: 1 !important;
   padding-bottom: 2rem;
   color:#ffffff;
+
 }
 
 .product-image {

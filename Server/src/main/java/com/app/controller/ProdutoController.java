@@ -113,6 +113,12 @@ public class ProdutoController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/sem-especializacoes/{id}")
+    public ResponseEntity<Produto> getProdutoSemEspecializacoesById(@PathVariable Long id) {
+        Optional<Produto> produto = Optional.ofNullable(produtoService.getProdutoSemEspecializacoesById(id));
+        return produto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     /**
      * Rota para criar um novo produto.
      *
