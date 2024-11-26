@@ -51,6 +51,7 @@ public class PedidoController {
     @PostMapping("/api/pedidos")
     public ResponseEntity<?> criarPedido(@RequestBody Map<String, Object> pedidoData, HttpServletRequest request) {
         try {
+            System.out.println("Dados recebidos: " + pedidoData);
             Long userId = (Long) request.getSession().getAttribute("userId");
             UserModel usuario = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + userId));
@@ -75,16 +76,19 @@ public class PedidoController {
                 throw new IllegalArgumentException("A lista de produtos não pode estar vazia.");
             }
 
+
             List<ProdutoPedidoModel> produtosPedido = produtos.stream().map(produtoData -> {
                 ProdutoPedidoModel produtoPedido = new ProdutoPedidoModel();
-                Long produtoId = ((Number) produtoData.get("produtoId")).longValue();
+
+                // Conversões explícitas
+                Long produtoId = Long.valueOf(produtoData.get("produtoId").toString());
+                Integer quantidade = Integer.valueOf(produtoData.get("quantidade").toString());
+
                 Produto produto = produtoRepository.findById(produtoId)
                         .orElseThrow(() -> new ProdutoNotFoundException("Produto com ID " + produtoId + " não encontrado."));
                 produtoPedido.setProduto(produto);
 
-                Integer quantidade = (Integer) produtoData.get("quantidade");
                 produtoPedido.setQuantidade(quantidade);
-
                 BigDecimal subtotal = produto.getPreco().multiply(BigDecimal.valueOf(quantidade));
                 produtoPedido.setSubtotal(subtotal);
 
