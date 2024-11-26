@@ -4,7 +4,7 @@
   "statusPedido": 0,
   "observacoes": "Entregar no endereço indicado.",
   "estado": "SP",
-  "cep": "12345-678",
+  "cep": "12345678",
   "cidade": "São Paulo",
   "bairro": "Centro",
   "complemento": "Próximo à praça",

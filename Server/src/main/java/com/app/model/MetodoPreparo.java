@@ -88,12 +88,16 @@ public class MetodoPreparo {
     @JsonBackReference // Para evitar loop de serialização
     private Produto produto;
 
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
     /**
      * Enum para representar a complexidade do método de preparo.
      */
     public enum Complexidade {
-        FACIL,
-        INTERMEDIARIO,
-        AVANCADO
+        Fácil,
+        Intermediário,
+        Avançado
     }
 }

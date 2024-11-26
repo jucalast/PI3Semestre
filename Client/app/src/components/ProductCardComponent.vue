@@ -17,7 +17,7 @@
           <div class="backcard">
             <div class="imgcardcont">
               <img
-                :src="produto.imagem"
+                :src="produto.imagens[0]"
                 :alt="produto.nome"
                 class="product-image"
               />
@@ -117,13 +117,14 @@
         const searchFiltered = this.produtos.filter((produto) =>
           produto.nome.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
+        const activeFiltered = searchFiltered.filter(produto => produto.ativo);
         if (
           !this.selectedValues ||
           Object.keys(this.selectedValues).length === 0
         ) {
-          return searchFiltered;
+          return activeFiltered;
         }
-        return this.filterBySelectedAttributes(searchFiltered);
+        return this.filterBySelectedAttributes(activeFiltered);
       },
     },
     async mounted() {
@@ -259,14 +260,7 @@
 </script>
 
 <style scoped>
-  .card-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: center;
-    width: 100%;
-    margin-top: 5rem;
-  }
+
 
   .not {
     margin-top: 20rem;
@@ -274,10 +268,11 @@
   .cards {
     margin-top: -7rem;
     margin-bottom: 10rem;
-    display: flex;
+    display: flex
+;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     align-content: center;
     gap: 2rem;

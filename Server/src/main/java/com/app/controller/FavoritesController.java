@@ -164,4 +164,18 @@ public class FavoritesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao remover o produto dos favoritos: " + e.getMessage());
         }
     }
+
+    /**
+     * Recupera a contagem de favoritos para cada produto.
+     * @return Uma ResponseEntity contendo um mapa com a contagem de favoritos por produto.
+     */
+    @GetMapping("/count-by-product")
+    public ResponseEntity<?> countFavoritesByProduct() {
+        try {
+            Map<Long, Long> favoriteCounts = favoritesService.countFavoritesByProduct();
+            return ResponseEntity.ok(favoriteCounts);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao recuperar a contagem de favoritos.");
+        }
+    }
 }

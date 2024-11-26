@@ -357,6 +357,11 @@
     font-size: 1.5rem;
   }
 
+.accordion {
+  width: 100%;
+  position: relative;
+
+}
   .input-group {
     display: flex;
     align-items: center;

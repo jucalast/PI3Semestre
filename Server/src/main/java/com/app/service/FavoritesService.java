@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -93,5 +94,14 @@ public class FavoritesService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Conta o número de favoritos para cada produto.
+     * @return Um mapa onde a chave é o ID do produto e o valor é o número de favoritos.
+     */
+    public Map<Long, Long> countFavoritesByProduct() {
+        return favoritesRepository.findAll().stream()
+                .collect(Collectors.groupingBy(favorite -> favorite.getProduto().getId(), Collectors.counting()));
     }
 }
