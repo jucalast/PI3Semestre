@@ -35,8 +35,13 @@ public class CartaoController {
     @GetMapping("/meus-cartoes")
     public List<CartaoModel> getMyCartoes(HttpServletRequest request) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+        if (authenticatedUser == null) {
+            throw new RuntimeException("Usuário não autenticado");
+        }
         Long userId = authenticatedUser.getId();
-        return cartaoService.findCartoesByUserId(userId);
+        List<CartaoModel> cartoes = cartaoService.findCartoesByUserId(userId);
+        cartoes.forEach(cartao -> System.out.println("Número do cartão retornado: " + cartao.getNumeroCartao()));
+        return cartoes;
     }
 
     /**
@@ -49,6 +54,9 @@ public class CartaoController {
     @PostMapping("/salvar-cartao")
     public CartaoModel saveCartao(HttpServletRequest request, @RequestBody CartaoModel cartaoModel) {
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
+        if (authenticatedUser == null) {
+            throw new RuntimeException("Usuário não autenticado");
+        }
         cartaoModel.setUser(authenticatedUser);
         return cartaoService.saveCartao(cartaoModel);
     }

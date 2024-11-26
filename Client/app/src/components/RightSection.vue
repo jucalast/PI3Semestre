@@ -6,16 +6,13 @@
     <div class="info-card" :style="{ boxShadow: boxShadowStyle }">
       <div class="header-info-card">
         <button @click="showCardInputs && isCardFilled ? saveCard() : toggleCardInputs()" :class="['add-card-btn', { 'filled': showCardInputs && isCardFilled }]">
-          <font-awesome-icon :icon="showCardInputs ? 'fa-solid fa-check' : 'fa-solid fa-plus'" /> {{ showCardInputs ? 'OK' : 'Add' }}
+          <font-awesome-icon :icon="showCardInputs ? 'fa-solid fa-check' : 'fa-solid fa-plus'" /> {{ showCardInputs ? 'OK' : 'Add Cartão' }}
         </button>
         <button class="payment-btn">
           <font-awesome-icon icon="fa-solid fa-qrcode" /> Pix
         </button>
         <button class="payment-btn">
           <font-awesome-icon icon="fa-solid fa-file-invoice" /> Boleto
-        </button>
-        <button class="payment-btn">
-          <font-awesome-icon icon="fa-solid fa-credit-card" /> Débito
         </button>
       </div>
       <div v-if="showCardInputs" class="card-inputs">
@@ -32,14 +29,38 @@
           <input type="checkbox" v-model="saveForNextPurchase" /> Salvar para a próxima compra
         </label>
       </div>
-      <div v-if="isCardFilled && !showCardInputs" class="card-summary">
-        <label class="card-option">
-          <input class="radio-option" type="radio" name="card" />
-          <span>Final {{ localCardDetails.number.slice(-4) }}</span>
-          <span class="card-type">Crédito</span>
-        </label>
+      <div class="card-summary">
+        <div class="card-list">
+          <div class="card-option-container fixed-card" @click="selectCard(filteredUserCards[0]?.number)">
+            <label class="card-option">
+              <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="filteredUserCards[0]?.number" @change="moveCardToTop(filteredUserCards[0]?.number)" />
+              <span> {{ filteredUserCards[0]?.number.slice(-4) }}</span>
+              <div v-if="selectedCard === filteredUserCards[0]?.number" class="toggle-container">
+                <label class="switch">
+                  <input type="checkbox" v-model="isCredit" />
+                  <span class="slider round"></span>
+                </label>
+                <span>{{ isCredit ? 'Crédito' : 'Débito' }}</span>
+              </div>
+            </label>
+            <font-awesome-icon class="accordion-toggle" :icon="showCardList ? 'fa-chevron-up' : 'fa-chevron-down'" @click="toggleCardAccordion" />
+          </div>
+          <div v-if="showCardList" class="scrollable-card-list">
+            <label v-for="card in filteredUserCards.slice(1)" :key="card.number" class="card-option" @click="selectCard(card.number)">
+              <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="card.number" @change="moveCardToTop(card.number)" />
+              <span> {{ card.number.slice(-4) }}</span>
+              <div v-if="selectedCard === card.number" class="toggle-container">
+                <label class="switch">
+                  <input type="checkbox" v-model="isCredit" />
+                  <span class="slider round"></span>
+                </label>
+                <span>{{ isCredit ? 'Crédito' : 'Débito' }}</span>
+              </div>
+            </label>
+          </div>
+        </div>
       </div>
-      <div v-if="!showCardInputs" class="price-details">
+      <div class="price-details">
         <div class="price-item">
           <span>Preço dos Produtos:</span>
           <span>R$ {{ totalProductPrice }}</span>
@@ -58,10 +79,10 @@
 import cartaoTemplate from '@/components/CartaoTemplate.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import axiosInstance from '../utils/axiosInstance'; // Importe o axiosInstance
 
-library.add(faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard);
+library.add(faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp);
 
 export default {
   components: {
@@ -77,10 +98,15 @@ export default {
   data() {
     return {
       showCardInputs: false,
+      showCardList: false,
       boxShadowColor: 'rgba(128, 128, 128, 0.5)', // Cor padrão inicial
       selectedAddressId: null, // ID do endereço selecionado
       localCardDetails: { ...this.cardDetails }, // Copia os detalhes do cartão para evitar conflito
-      saveForNextPurchase: true // Valor padrão true
+      saveForNextPurchase: true, // Valor padrão true
+      userCards: [], // Lista de cartões do usuário
+      selectedCard: null, // Cartão selecionado
+      paymentType: 'Crédito', // Tipo de pagamento selecionado
+      isCredit: true // Tipo de pagamento selecionado (true para crédito, false para débito)
     };
   },
   computed: {
@@ -99,6 +125,9 @@ export default {
     },
     boxShadowStyle() {
       return `0px -200px 150px -90px ${this.boxShadowColor}`;
+    },
+    filteredUserCards() {
+      return this.userCards.filter(card => card.numeroCartao !== this.localCardDetails.number.replace(/\s+/g, ''));
     }
   },
   methods: {
@@ -108,6 +137,12 @@ export default {
       } else {
         this.showCardInputs = true;
       }
+    },
+    toggleCardList() {
+      this.showCardList = !this.showCardList;
+    },
+    toggleCardAccordion() {
+      this.showCardList = !this.showCardList;
     },
     updateBoxShadowColor(color) {
       if (color) {
@@ -125,11 +160,39 @@ export default {
           withCredentials: true // Certifique-se de enviar cookies de autenticação
         });
         alert('Cartão salvo com sucesso!');
+        this.showCardInputs = false; // Fecha o formulário de cartão
+        this.fetchUserCards(); // Atualiza a lista de cartões do usuário
       } catch (error) {
         alert('Erro ao salvar o cartão.');
       }
       this.finalizePurchase();
+    },
+    async fetchUserCards() {
+      try {
+        const response = await axiosInstance.get('/api/cartoes/meus-cartoes', {
+          withCredentials: true // Certifique-se de enviar cookies de autenticação
+        });
+        this.userCards = response.data;
+        console.log('Cartões recebidos:', this.userCards); // Verifique os dados recebidos
+        console.log('Números dos cartões:', this.userCards.map(card => card.number)); // Use 'number' para corresponder ao JSON
+      } catch (error) {
+        console.error('Erro ao buscar cartões do usuário:', error);
+      }
+    },
+    moveCardToTop(cardNumber) {
+      const index = this.userCards.findIndex(card => card.number === cardNumber);
+      if (index > 0) {
+        const [selectedCard] = this.userCards.splice(index, 1);
+        this.userCards.unshift(selectedCard);
+      }
+    },
+    selectCard(cardNumber) {
+      this.selectedCard = cardNumber;
+      this.moveCardToTop(cardNumber);
     }
+  },
+  created() {
+    this.fetchUserCards(); // Busca os cartões do usuário ao criar o componente
   }
 };
 </script>
@@ -266,22 +329,49 @@ position:absolute;
   flex-direction: column;
   align-items: center;
   margin-top: 1rem;
-  width: 95%;
+  width: 100%;
+}
+
+.card-list {
+  width: 100%;
+}
+
+.fixed-card {
+  position: sticky;
+  top: 0;
+  background: #efefef;
+  z-index: 1;
+}
+
+.scrollable-card-list {
+  max-height: 10rem;
+  overflow-y: auto;
+  border-radius: 2rem;
+  padding: 1rem;
+}
+
+.card-option-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 2rem;
 }
 
 .card-option {
-  display: flex;
-  justify-content: space-between; /* Ajuste para distribuir espaço entre os itens */
-  align-items: center;
-  width: 100%;
-  height: 5rem;
-  padding: 1rem;
-  background: #efefef;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-  font-size: 2rem;
+  display: flex
+;
+    align-items: center;
+    width: 100%;
+    height: 5rem;
+    padding: 1rem;
+    background: #efefef;
+    border-radius: 1rem;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+    flex-direction: row;
+    gap:2rem;
 }
-
 .radio-option {
   margin-left: 1rem;
   transform: scale(2); /* Aumenta o tamanho do botão de rádio */
@@ -371,5 +461,73 @@ position:absolute;
 .save-card-checkbox input {
   margin-right: 10px;
   box-shadow: none; /* Remove o box shadow */
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+}
+
+
+
+.accordion-toggle {
+  cursor: pointer;
+  font-size: 1.5rem;
+  margin-left: 1rem;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
 }
 </style>

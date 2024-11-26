@@ -8,16 +8,35 @@
           <img src="../assets/logo.png" alt="Logo" />
           <h3 class="header-title">Quase tudo pronto!</h3>
         </header>
+        <!-- Acordeão de Resumo dos Produtos -->
+        <div class="accordion w-full">
+          <div class="accordion-header" @click="toggleAccordion">
+            <span>Resumo dos produtos no carrinho</span>
+            <font-awesome-icon
+              :icon="accordionOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
+            />
+          </div>
+          <div v-if="accordionOpen" class="accordion-content">
+            <div
+              v-for="(product, index) in productDetails"
+              :key="index"
+              :class="['product-summary-card', getCardClass(index)]"
+            >
+              <img
+                :src="product.imagens ? product.imagens[0] : ''"
+                :alt="product.nome"
+                class="product-summary-image"
+              />
+              <div class="product-summary-info">
+                <h4>{{ product.nome }}</h4>
+                <p class="product-quantity">Quantidade: {{ getProductQuantity(product.id) }}</p>
+                <p class="product-price">R$ {{ product.preco ? product.preco.toFixed(2) : '0.00' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Produtos e Endereço lado a lado -->
-        <div
-          class="product-and-address flex flex-row justify-between items-start equal-height"
-        >
-          <!-- PRODUTOS -->
-          <ProductSection
-            :productDetails="productDetails"
-            :productCount="productCount"
-            class="equal-height"
-          />
+        <div class="product-and-address flex flex-row justify-between items-start equal-height">
           <!-- Lista de Endereços -->
           <AddressList
             :addresses="allAddresses"
@@ -37,42 +56,6 @@
                 <button @click="showModal = true" class="icon-button">
                   <font-awesome-icon icon="fa-solid fa-edit" />
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Acordeão de Resumo dos Produtos e Lista de Endereços -->
-        <div
-          class="accordion-and-address-list flex flex-row justify-between items-start"
-        >
-          <!-- Acordeão de Resumo dos Produtos -->
-          <div class="accordion w-full">
-            <div class="accordion-header" @click="toggleAccordion">
-              <span>Resumo dos produtos no carrinho</span>
-              <font-awesome-icon
-                :icon="
-                  accordionOpen
-                    ? 'fa-solid fa-chevron-up'
-                    : 'fa-solid fa-chevron-down'
-                "
-              />
-            </div>
-            <div v-if="accordionOpen" class="accordion-content">
-              <div
-                v-for="(product, index) in productDetails"
-                :key="index"
-                :class="['product-summary-card', getCardClass(index)]"
-              >
-                <img
-                  :src="product.imagens ? product.imagens[0] : ''"
-                  :alt="product.nome"
-                  class="product-summary-image"
-                />
-                <div class="product-summary-info">
-                  <h4>{{ product.nome }}</h4>
-                  <p class="product-quantity">Quantidade: {{ getProductQuantity(product.id) }}</p>
-                  <p class="product-price">R$ {{ product.preco ? product.preco.toFixed(2) : '0.00' }}</p>
-                </div>
               </div>
             </div>
           </div>
@@ -154,6 +137,7 @@
       this.processQuery();
       this.fetchAddresses();
       this.fetchAllAddresses();
+      this.fetchUserCards(); // Busca os cartões do usuário ao criar o componente
     },
     watch: {
       productId(newVal) {
@@ -174,7 +158,7 @@
     methods: {
       handleCardDetails(card) {
         this.cardDetails = card; // Salva os dados do cartão
-        this.showCardModal = false; // Fecha o modal
+        this.showCardInputs = false; // Fecha o formulário de cartão
       },
       async processQuery() {
         const userId = this.$route.query.userId;
@@ -251,6 +235,17 @@
           } else {
             console.error('Erro ao buscar todos os endereços:', error);
           }
+        }
+      },
+      async fetchUserCards() {
+        try {
+          const response = await axiosInstance.get('/api/cartoes/meus-cartoes', {
+            withCredentials: true // Certifique-se de enviar cookies de autenticação
+          });
+          this.userCards = response.data;
+          console.log('Números dos cartões:', this.userCards.map(card => card.number)); // Use 'number' para corresponder ao JSON
+        } catch (error) {
+          console.error('Erro ao buscar cartões do usuário:', error);
         }
       },
       handleAddressClick(address) {
@@ -336,6 +331,7 @@
       },
       saveCardDetails() {
         this.showCardInputs = false; // Esconde os inputs após salvar
+        this.$refs.rightSection.showCardInputs = false; // Fecha o formulário de cartão
       },
       toggleAccordion() {
         this.accordionOpen = !this.accordionOpen;

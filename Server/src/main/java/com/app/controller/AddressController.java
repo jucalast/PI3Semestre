@@ -6,6 +6,8 @@ import com.app.service.AddressService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +83,10 @@ public class AddressController {
             return ResponseEntity.status(401).build();
         }
 
-        List<AddressModel> addresses = addressService.getAddressesByUserId(authenticatedUser.getId());
+        // Converte o Map para AddressModel
+        List<AddressModel> addresses = addressService.getAddressesByUserId(authenticatedUser.getId()).stream()
+                .map(addressWithType -> (AddressModel) addressWithType.get("address"))
+                .collect(Collectors.toList());
         return ResponseEntity.ok(addresses);
     }
 

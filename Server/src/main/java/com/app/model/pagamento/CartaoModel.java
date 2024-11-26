@@ -20,8 +20,8 @@ public class CartaoModel {
      * Deve ser tratado com alta confidencialidade.
      */
     @Id
-    @Column(name = "numero_cartao", nullable = false, length = 19) // Aumentar o comprimento para 19
-    @JsonProperty("number")
+    @Column(name = "numero_cartao", nullable = false, length = 19)
+    @JsonProperty("number") // Corrija a anotação para corresponder ao nome esperado no JSON
     private String numeroCartao;
 
     /**
