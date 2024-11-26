@@ -25,7 +25,9 @@ public class CartaoService {
      * @return Lista de CartaoModel pertencentes ao usuário especificado.
      */
     public List<CartaoModel> findCartoesByUserId(Long userId) {
-        return cartaoRepository.findByUserId(userId);
+        List<CartaoModel> cartoes = cartaoRepository.findByUserId(userId);
+        cartoes.forEach(cartao -> System.out.println("Número do cartão: " + cartao.getNumeroCartao()));
+        return cartoes;
     }
 
     /**

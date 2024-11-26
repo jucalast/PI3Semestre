@@ -19,6 +19,13 @@
           <img src="@/assets/icons8-v60-coffee-dripper-100 (1).png" alt="" />
           Método de Preparo
         </button>
+        <button
+          @click="selectForm('generic')"
+          :class="{ 'active-link': selectedForm === 'generic' }"
+        >
+          <img src="@/assets/icons8-v60-coffee-dripper-100 (1).png" alt="" />
+          Produto Genérico
+        </button>
       </div>
 
       <SpecialCoffeeForm
@@ -28,6 +35,11 @@
       />
       <PreparationMethodForm
         v-else-if="selectedForm === 'metodoPreparo'"
+        @submit-product="submitProduct"
+        :disabled="isSubmitting"
+      />
+      <GenericProductForm
+        v-else-if="selectedForm === 'generic'"
         @submit-product="submitProduct"
         :disabled="isSubmitting"
       />
@@ -47,6 +59,7 @@
 <script>
 import SpecialCoffeeForm from "./SpecialCoffeeForm.vue";
 import PreparationMethodForm from "./PreparationMethodForm.vue";
+import GenericProductForm from "./GenericProductForm.vue";
 import { useToast } from "vue-toastification";
 import axiosInstance from "../utils/axiosInstance";
 
@@ -55,6 +68,7 @@ export default {
   components: {
     SpecialCoffeeForm,
     PreparationMethodForm,
+    GenericProductForm,
   },
   data() {
     return {

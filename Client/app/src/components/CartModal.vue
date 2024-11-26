@@ -56,7 +56,6 @@
             <span id="info-ft-03">
               Total: R${{ parseFloat(somaValorItens.toFixed(2)) }}
             </span>
-            <span id="info-ft-02">Inserir cupom</span>
           </div>
         </div>
         <section v-if="false" class="frete-section">
@@ -92,6 +91,9 @@ export default {
     isModalVisible(newValue) {
       if (newValue) {
         this.fetchCarts();
+        document.body.style.overflowY = 'hidden'; // Desativa o overflow-y do body
+      } else {
+        document.body.style.overflowY = 'auto'; // Reativa o overflow-y do body
       }
     },
   },
@@ -105,6 +107,7 @@ export default {
   methods: {
     close() {
       this.$emit('close');
+      document.body.style.overflowY = 'auto'; // Reativa o overflow-y do body
     },
     async fetchCarts() {
       try {
@@ -134,7 +137,7 @@ export default {
       this.somaValorItens = 0;
       this.somaQuantidade = 0;
       itensCarrinho.forEach(item => {
-        this.somaValorItens += parseFloat(item.preco_produto) * parseInt(item.quantidade);
+        this.somaValorItens += parseFloat(item.preco) * parseInt(item.quantidade); // Corrige o cálculo do preço
         this.somaQuantidade += parseInt(item.quantidade);
       });
     },
@@ -183,10 +186,10 @@ export default {
 .cart-modal-bckg {
   position: fixed;
   background-color: rgba(0, 0, 0, 0.7);
-  margin-top: 5.6rem;
   left: 0;
+  bottom: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   justify-content: right;
   align-items: center;
@@ -197,7 +200,7 @@ export default {
   .cart-modal {
     background-color: #ffffff;
     width: 35%;
-    height: 100%;
+    height: 100vh;
     z-index: 21;
     display: flex;
     flex-wrap: wrap;
@@ -207,7 +210,7 @@ export default {
   .header-cart {
     background-color: #5170fc;
     width: 100%;
-    height: 15%;
+    height: 10%;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -227,7 +230,7 @@ export default {
 
   .main-cart {
     width: 95%;
-    height: 40%;
+    height: 63%;
 
     margin: 0 auto 0;
     font-size: 18pt;

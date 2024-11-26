@@ -319,7 +319,7 @@
   }
 
   .backcard {
-    background: #d8d8d8;
+    background: #ffffff;
     height: 23rem;
     border-radius: 3rem;
   }

@@ -5,13 +5,13 @@
   --primary-color: #ff96ff; /* Azul primário */
   --secondary-color: #2ecc71; /* Verde secundário */
   --accent-color: #e74c3c; /* Cor de destaque */
-  --background-color: #f4f4f4; /* Cor de fundo */
+  --background-color: #ffffff; /* Cor de fundo */
   --text-color: #4b4b4b; /* Cor do texto */
   --border-color: #ddd; /* Cor da borda */
   --header-color: #ffffff; /* Cor do cabeçalho */
   --inputs-color: #d1d1d1; /* Cor dos inputs */
   --btns-color: #d1d1d1; /* Cor dos botões */
-  --card-background: #cacaca; /* Cor de fundo do card */
+  --card-background: #f7f7f7; /* Cor de fundo do card */
   --card-text-color: white; /* Cor do texto no card */
   --element-background: rgba(
     59,

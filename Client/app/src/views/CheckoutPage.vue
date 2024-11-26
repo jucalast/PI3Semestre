@@ -1,67 +1,20 @@
 <template>
   <AdminLayout>
     <div class="checkout-page flex flex-row h-full p-4">
-      <!-- ESQUERDA -->
-      <div class="left-section w-full flex flex-col space-y-4 h-full">
-        <!-- HEADER -->
+      <div class="left-section flex flex-col h-full">
         <header class="checkout-header p-4">
           <img src="../assets/logo.png" alt="Logo" />
           <h3 class="header-title">Quase tudo pronto!</h3>
         </header>
-        <!-- Produtos e Endereço lado a lado -->
-        <div
-          class="product-and-address flex flex-row justify-between items-start equal-height"
-        >
-          <!-- PRODUTOS -->
-          <ProductSection
-            :productDetails="productDetails"
-            :productCount="productCount"
-            class="equal-height"
-          />
-          <!-- Lista de Endereços -->
-          <AddressList
-            :addresses="allAddresses"
-            :selectedAddressId="selectedAddressId"
-            @update:selectedAddressId="updateSelectedAddressId"
-            @addressSelected="centerMapOnAddress"
-          />
-          <!-- ENDEREÇO -->
-          <div class="section address equal-height">
-            <GoogleMap ref="googleMap" @addressClicked="handleAddressClick" />
-            <div class="elements-card">
-              <h2>{{ truncatedAddress }}</h2>
-              <div>
-                <button @click="addAddress" class="icon-button">
-                  <font-awesome-icon icon="fa-solid fa-plus" />
-                </button>
-                <button @click="showModal = true" class="icon-button">
-                  <font-awesome-icon icon="fa-solid fa-edit" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Acordeão de Resumo dos Produtos e Lista de Endereços -->
-        <div
-          class="accordion-and-address-list flex flex-row justify-between items-start"
-        >
-          <!-- Acordeão de Resumo dos Produtos -->
-          <div class="accordion w-full">
-            <div class="accordion-header" @click="toggleAccordion">
-              <span>Resumo dos produtos no carrinho</span>
-              <font-awesome-icon
-                :icon="
-                  accordionOpen
-                    ? 'fa-solid fa-chevron-up'
-                    : 'fa-solid fa-chevron-down'
-                "
-              />
-            </div>
-            <div v-if="accordionOpen" class="accordion-content">
+        <div class="content-left">
+        <div class="summary-and-address">
+          <div class="product-summary">
+            <span>Resumo dos produtos no carrinho</span>
+            <div class="product-summary-content">
               <div
                 v-for="(product, index) in productDetails"
                 :key="index"
-                :class="['product-summary-card', getCardClass(index)]"
+                class="product-summary-card"
               >
                 <img
                   :src="product.imagens ? product.imagens[0] : ''"
@@ -70,21 +23,60 @@
                 />
                 <div class="product-summary-info">
                   <h4>{{ product.nome }}</h4>
-                  <p class="product-quantity">Quantidade: {{ getProductQuantity(product.id) }}</p>
+                  <p class="product-quantity">{{ getProductQuantity(product.id) }}x</p>
                   <p class="product-price">R$ {{ product.preco ? product.preco.toFixed(2) : '0.00' }}</p>
                 </div>
               </div>
             </div>
           </div>
+          <div class="address-list">
+            <div class="address-list-header flex justify-between items-center">
+              <span>Lista de Endereços</span>
+              <button class="add-address-btn" @click="showModal = true">
+                <FontAwesomeIcon :icon="['fas', 'plus']" /> Adicionar Endereço
+              </button>
+            </div>
+            <div class="address-list-content">
+              <div
+                v-for="(address, index) in allAddresses"
+                :key="index"
+                class="address-option"
+                @click="updateSelectedAddressId(address.address.id)"
+                :class="{ 'selected': selectedAddressId === address.address.id }"
+              >
+                <label class="address-label">
+                  <input
+                    type="radio"
+                    name="address"
+                    :value="address.address.id"
+                    v-model="selectedAddressId"
+                  />
+                  <span>{{ address.address.street }}, {{ address.address.number }}</span>
+                  <span class="zip-code">{{ address.address.zipCode }}</span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+          
         </div>
+        <OrderSummary
+          ref="orderSummary"
+          :selectedAddress="selectedAddress"
+          :truncatedAddress="truncatedAddress"
+          :productDetails="productDetails"
+          @addressClicked="handleAddressClick"
+        />
       </div>
-      <!-- DIREITA (Detalhes da Compra) -->
+      </div>
       <RightSection
         :cardDetails="cardDetails"
         @saveCardDetails="saveCardDetails"
         class="right-section"
         :allAddresses="allAddresses"
         @finalizePurchase="finalizePurchase"
+        :productDetails="productDetails"
+        :shippingPrice="shippingPrice"
       />
       <AddressModal
         :isVisible="showModal"
@@ -99,7 +91,6 @@
   import cartaoTemplate from '@/components/CartaoTemplate.vue';
   import GoogleMap from '@/components/GoogleMap.vue';
   import AddressModal from '@/components/AddressModal.vue';
-  import AddressList from '@/components/AddressList.vue';
   import axiosInstance from '@/utils/axiosInstance';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';
@@ -113,6 +104,7 @@
   import AdminLayout from '@/layouts/AdminLayout.vue';
   import RightSection from '@/components/RightSection.vue'; // Importar o novo componente
   import ProductSection from '@/components/ProductSection.vue'; // Importar o novo componente
+  import OrderSummary from '@/components/OrderSummary.vue'; // Importar o novo componente
 
   library.add(faPlus, faEdit, faCheck, faChevronDown, faChevronUp);
 
@@ -122,10 +114,11 @@
       cartaoTemplate,
       GoogleMap,
       AddressModal,
-      AddressList,
+      
       FontAwesomeIcon,
       RightSection,
       ProductSection, // Registrar o novo componente
+      OrderSummary, // Registrar o novo componente
     },
     data() {
       return {
@@ -154,6 +147,7 @@
       this.processQuery();
       this.fetchAddresses();
       this.fetchAllAddresses();
+      this.fetchUserCards(); // Busca os cartões do usuário ao criar o componente
     },
     watch: {
       productId(newVal) {
@@ -170,11 +164,17 @@
           'Nenhum endereço selecionado';
         return address.length > 15 ? address.slice(0, 15) + '...' : address;
       },
+      selectedAddress() {
+        const selected = this.allAddresses.find(
+          (address) => address.address.id === this.selectedAddressId
+        );
+        return selected ? selected.address : null;
+      },
     },
     methods: {
       handleCardDetails(card) {
         this.cardDetails = card; // Salva os dados do cartão
-        this.showCardModal = false; // Fecha o modal
+        this.showCardInputs = false; // Fecha o formulário de cartão
       },
       async processQuery() {
         const userId = this.$route.query.userId;
@@ -244,6 +244,8 @@
         try {
           const response = await axiosInstance.get('/api/addresses/user');
           this.allAddresses = response.data;
+          console.log('Endereços recebidos:', this.allAddresses); // Adicionar console.log para verificar os endereços recebidos
+          this.selectDefaultAddress(); // Seleciona o endereço principal após buscar todos os endereços
         } catch (error) {
           if (error.response && error.response.status === 401) {
             console.error('Usuário não autenticado');
@@ -253,58 +255,20 @@
           }
         }
       },
+      async fetchUserCards() {
+        try {
+          const response = await axiosInstance.get('/api/cartoes/meus-cartoes', {
+            withCredentials: true // Certifique-se de enviar cookies de autenticação
+          });
+          this.userCards = response.data;
+          console.log('Números dos cartões:', this.userCards.map(card => card.number)); // Use 'number' para corresponder ao JSON
+        } catch (error) {
+          console.error('Erro ao buscar cartões do usuário:', error);
+        }
+      },
       handleAddressClick(address) {
         this.clickedAddress = address;
         this.savedAddress = address; // Atualiza o endereço salvo com o endereço clicado no mapa
-      },
-      async addAddress() {
-        if (this.clickedAddress) {
-          try {
-            const addressParts = this.clickedAddress.split(',');
-            const street = addressParts[0] || 'Rua Desconhecida';
-            const number = addressParts[1]
-              ? addressParts[1].trim().split(' ')[0]
-              : 'S/N';
-            const neighborhood = addressParts[2]
-              ? addressParts[2].trim()
-              : 'Bairro Desconhecido';
-            const city = addressParts[3]
-              ? addressParts[3].trim()
-              : 'Cidade Desconhecida';
-            const state = addressParts[4]
-              ? addressParts[4].trim()
-              : 'Estado Desconhecido';
-            const zipCode = addressParts[5]
-              ? addressParts[5].trim()
-              : '00000-000'; // Ajuste conforme necessário
-            const addressType = this.addressType || 'Casa'; // Obtenha o tipo de endereço do modal
-
-            const requestBody = {
-              street,
-              number,
-              neighborhood,
-              city,
-              state,
-              zipCode,
-              addressType, // Adicione o campo addressType
-            };
-
-            console.log('Enviando dados do endereço:', requestBody);
-
-            const response = await axiosInstance.post(
-              '/api/addresses/create',
-              requestBody,
-              {
-                withCredentials: true, // Certifique-se de enviar cookies de autenticação
-              }
-            );
-            this.savedAddress = response.data;
-            this.clickedAddress = null; // Limpa o texto do endereço exibido
-            this.fetchAddresses(); // Atualiza a lista de endereços
-          } catch (error) {
-            console.error('Erro ao adicionar endereço:', error);
-          }
-        }
       },
       async handleManualAddress(fullAddress) {
         const addressParts = fullAddress.split(',');
@@ -336,9 +300,13 @@
       },
       saveCardDetails() {
         this.showCardInputs = false; // Esconde os inputs após salvar
+        this.$refs.rightSection.showCardInputs = false; // Fecha o formulário de cartão
       },
       toggleAccordion() {
         this.accordionOpen = !this.accordionOpen;
+      },
+      cancelCardCreation() {
+        this.showCardInputs = false; // Fecha o formulário de cartão
       },
       getCardClass(index) {
         const classes = ['bg-blue', 'bg-yellow', 'bg-green', 'bg-pink'];
@@ -354,7 +322,7 @@
       async centerMapOnAddress(address) {
         try {
           const fullAddress = `${address.street}, ${address.number}, ${address.neighborhood}, ${address.city}, ${address.state}, ${address.zipCode}`;
-          await this.$refs.googleMap.centerMapOnAddress(fullAddress);
+          await this.$refs.orderSummary.$refs.googleMap.centerMapOnAddress(fullAddress);
           this.handleAddressClick(fullAddress); // Atualiza o elements-card com o endereço selecionado
         } catch (err) {
           console.error('Erro ao centralizar o mapa:', err);
@@ -368,12 +336,20 @@
         console.log('Valores recebidos do carrinho:', this.cartItems);
         // Adicione aqui a lógica para finalizar a compra
       },
+      selectDefaultAddress() {
+        const defaultAddress = this.allAddresses.find(
+          (address) => address.addressType === 'Principal'
+        );
+        if (defaultAddress) {
+          this.selectedAddressId = defaultAddress.address.id;
+          this.centerMapOnAddress(defaultAddress.address);
+        }
+      },
     },
   };
 </script>
 
 <style scoped>
-  /* Estilo para o container principal que segura as duas seções */
   .checkout-page {
     display: flex;
     flex-direction: row;
@@ -382,7 +358,6 @@
     background: #ececec;
   }
 
-  /* Estilo para o cabeçalho */
   .checkout-header {
     background: transparent;
     display: flex;
@@ -393,26 +368,25 @@
     font-size: 1.5rem;
   }
 
-  checkout-header img {
-    width: 8rem; /* Ajuste o tamanho do logo para 8rem */
-    filter: invert(1); /* Aplique o filtro invert */
+  .checkout-header img {
+    width: 6rem;
+    filter: invert(1);
   }
 
   .header-title {
-    font-size: 3rem; /* Aumenta o tamanho da fonte */
-    margin-left: 1rem; /* Adiciona espaço entre a imagem e o texto */
+    font-size: 3rem;
+    margin-left: 1rem;
   }
 
-  /* Seção da esquerda */
   .left-section {
-    flex-grow: 1; /* Permite que a seção da esquerda cresça para preencher o espaço */
-    flex-basis: 70%; /* Define a base inicial como 70% do espaço disponível */
+    flex-grow: 1;
+    flex-basis: 70%;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+
   }
 
-  /* Seção da direita */
   .right-section {
     display: flex;
     background: #ffffff;
@@ -422,6 +396,7 @@
     flex-direction: column;
     padding: 2rem;
     height: 100%;
+    position: relative;
   }
 
   @media (max-width: 768px) {
@@ -435,39 +410,91 @@
   .info-card {
     background: #ffffff;
     width: 100%;
-    height: 80%;
+    height: 90%;
     border-radius: 2rem;
-    padding: 2rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: 10rem;
+    padding-top: 12rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-container1 {
+    position: absolute;
+    height: 30%;
+    width: 80%;
+    top: 19%;
+    left: 10%;
+    transform: translateY(-50%);
+    z-index: 2;
   }
 
   .card-inputs {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 1rem;
     width: fit-content;
+    background: #e8e8e8;
+    border-radius: 2rem;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem;
+  }
+
+  .card-inputs-top {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .card-inputs-bottom {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .card-number {
+    width: 80%;
+  }
+
+  .card-expiry {
+    width: 20%;
+  }
+
+  .card-name {
+    width: 100%;
+  }
+
+  .card-cpf {
+    width: 70%;
+  }
+
+  .card-bandeira {
+    width: 30%;
   }
 
   .header-info-card {
     display: flex;
-    width: 100%;
+    justify-content: space-between;
+    width: 90%;
+    gap: 10px;
+    border-radius: 1rem;
   }
 
   .card-inputs input {
     color: #3a5bff;
     border: solid 1px #aeaeaeb6;
-    background: #ededed;
-    border-radius: 2rem;
-    height: 5rem;
-    padding-left: 2rem;
-    font-size: 1.5rem;
+    background: #ffffff;
+    border-radius: 1.5rem;
+    height: 4rem;
+    padding-left: 1rem;
+    font-size: 1.3rem;
     outline: none;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
   }
 
   .card-inputs input::placeholder {
@@ -480,9 +507,282 @@
     box-shadow: 1px 0px 20px 1px #3a5bff3b;
   }
 
+  .card-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .card-list {
+    width: 100%;
+  }
+
+  .fixed-card {
+    position: sticky;
+    top: 0;
+    background: #efefef;
+    z-index: 1;
+  }
+
+  .scrollable-card-list {
+    max-height: 10rem;
+    overflow-y: auto;
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: solid 1px #d3d3d3;
+    margin-top: 0.5rem;
+  }
+
+  .card-option-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 1rem;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .card-option-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .card-option {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 5rem;
+    padding: 1rem;
+    background: #efefef;
+    border-radius: 1rem;
+    font-size: 2rem;
+    justify-content: flex-start;
+    flex-direction: row;
+    gap: 2rem;
+  }
+
+  .radio-option {
+    margin-left: 1rem;
+    transform: scale(2);
+    accent-color: black;
+  }
+
+  .card-type {
+    font-weight: bold;
+  }
+
+  .submit-btn, .total-price {
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 1rem;
+    padding: 1rem 2rem;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .submit-btn:hover, .total-price:hover {
+    background-color: #131313;
+  }
+
+  .price-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+    position: absolute;
+    bottom: -1rem;
+    gap: 1rem;
+  }
+
+  .price-details .price-item {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  .content-left {
+    display:flex;
+  }
+
+  .prices {
+    background: #efefef;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  .price-details .total-price {
+    font-size: 2rem;
+    margin-top: auto;
+    width: 100%;
+  }
+
+  .add-card-btn, .payment-btn {
+    background-color: #efefef;
+    color: #1e1e1e;
+    border-radius: 1rem;
+    padding: 1rem 1rem;
+    font-size: 1.3rem;
+    cursor: pointer;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
+  }
+
+  .add-card-btn:hover, .payment-btn:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .add-card-btn.filled {
+    background-color: #3a5bff;
+    color: white;
+  }
+
+  .add-card-btn:not(.filled):hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .save-card-checkbox {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 1.3rem;
+  }
+
+  .save-card-checkbox input {
+    margin-right: 10px;
+    box-shadow: none;
+  }
+
+  .icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+  }
+
+  .accordion-toggle {
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
+
+  .toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 1rem;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #3a5bff;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background-color: #43ce7d;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  .accordion-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #efefef;
+    width: 16%;
+    border-radius: 1rem;
+    text-align: center;
+    line-height: 6rem;
+    padding: 1.5rem;
+  }
+
+  .accordion-toggle-container:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .installment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 1rem;
+    width: 100%;
+    background: #efefef;
+    border-radius: 1rem;
+    padding: 1rem;
+    padding-left: 1rem;
+    font-size: 1.5rem;
+    max-height: 25%;
+    overflow-y: auto;
+  }
+
+  .installment-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+    border-bottom: solid 1px #d3d3d3;
+    padding-left: 1rem;
+  }
+
+  .installment-option input {
+    transform: scale(1.5);
+  }
+
   .submit-btn,
   .total-price {
-    background-color: #ff4d4d;
+    background-color: #000000;
     color: white;
     border: none;
     border-radius: 2rem;
@@ -495,7 +795,7 @@
 
   .submit-btn:hover,
   .total-price:hover {
-    background-color: #e04343;
+    background-color: #111111;
   }
 
   .price-details {
@@ -509,15 +809,14 @@
     margin: 20px 0;
   }
 
-  /* Estilo para os subcontainers de produtos e endere��o dentro da seção de detalhes */
   .products,
   .address {
-    display: flex; /* Usa flexbox para melhor controle de layout */
-    flex-direction: column; /* Organiza os conteúdos verticalmente */
-    justify-content: space-between; /* Distribui o espaço igualmente entre os elementos internos */
-    align-items: center; /* Centraliza os elementos horizontalmente */
-    padding: 20px; /* Adiciona um pouco de espa��o interno para não tocar as bordas */
-    flex-basis: 30%; /* Define a base inicial como 30% do espaço disponível */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    flex-basis: 30%;
     padding-top: 0;
     display: flex;
     flex-direction: column !important;
@@ -556,19 +855,27 @@
 
   .product-checkout-image,
   .map-image {
-    max-width: 100px; /* Define a largura máxima das imagens */
-    height: auto; /* Mantém a proporção das imagens ajustando a altura automaticamente */
+    max-width: 100px;
+    height: auto;
   }
 
   .add-address-btn {
     padding: 10px 20px;
-    background-color: #4caf50; /* Verde */
-    color: white;
+    background-color: #ffffff;
+    color: rgb(19, 19, 19);
     border: none;
-    border-radius: 5px;
+    border-radius: 1rem;
     cursor: pointer;
-    margin-top: 10px; /* Espaço acima do botão */
-    font-size: 1rem; /* Tamanho do texto */
+    border: solid 1px #d3d3d3;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .add-address-btn:hover {
+    background-color: #f8f8f8;
   }
 
   .product-and-address {
@@ -586,7 +893,7 @@
     z-index: 2;
     padding: 1rem;
     text-align: center;
-    width: 100%; /* Ocupa a largura total do mapa */
+    width: 100%;
     color: #1e1e1e;
   }
 
@@ -621,8 +928,8 @@
     background-color: #efefef;
     color: #1e1e1e;
     border-radius: 2rem;
-    padding: 1rem; /* Tamanho reduzido */
-    font-size: 1.5rem; /* Tamanho reduzido */
+    padding: 1rem;
+    font-size: 1.5rem;
     cursor: pointer;
     transition:
       background-color 0.3s,
@@ -631,7 +938,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    justify-content: flex-start; /* Encosta o botão na esquerda */
+    justify-content: flex-start;
   }
 
   .add-card-btn:hover {
@@ -665,44 +972,29 @@
     color: white;
   }
 
-  .accordion {
+  .product-summary {
     margin-right: 1rem;
     background-color: #ffffff;
     border-radius: 2rem;
     padding: 2rem;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    height:100% !important;
-  
+    height: 45vh !important;
+
   }
 
-  .accordion-header {
-    display: flex
-;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .accordion-content {
+  .product-summary-content {
     margin-top: 1rem;
-    overflow-y:auto;
+    overflow-y: auto;
     max-height: 90%;
-  }
-
-  header img {
-    width: 9rem;
-    filter: invert(1);
   }
 
   .product-summary-card {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Adiciona espaço entre os elementos */
+    justify-content: space-between;
     margin-bottom: 1rem;
     padding: 1rem;
     border-radius: 1rem;
+    background-color: #efefef;
   }
 
   .product-summary-info {
@@ -716,40 +1008,20 @@
   .product-summary-info h4 {
     margin: 0;
     font-size: 2rem !important;
-    margin-right: 1rem; /* Adiciona espaço entre o nome e o preço */
+    margin-right: 1rem;
   }
 
   .product-quantity {
     font-size: 1.5rem;
-    margin-right: 1rem; /* Adiciona espaço entre a quantidade e o preço */
+    margin-right: 1rem;
   }
 
   .product-price {
     font-size: 2rem;
   }
 
-  .bg-blue {
-    background: #d8dfff;
-    color: #5271ff;
-  }
-
-  .bg-yellow {
-    background: #fff5da;
-    color: #e4bf5f;
-  }
-
-  .bg-green {
-    background: #ebffe6;
-    color: #6ec757;
-  }
-
-  .bg-pink {
-    background: #ffdeff;
-    color: #ff96ff;
-  }
-
   .product-summary-image {
-    width: 30px; /* Reduz a largura da imagem */
+    width: 30px;
     height: auto;
     margin-right: 1rem;
   }
@@ -758,74 +1030,70 @@
     margin-top: 1rem;
   }
 
-
-  .address-list {
-    width: 50%; /* Cada componente ocupa 50% do espaço disponível */
+  .address-and-map {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
   }
 
-.accordion {
-  width:70%;
-}
+  .address-list {
+    margin-right: 1rem;
+    background-color: #ffffff;
+    border-radius: 2rem;
+    padding: 2rem;
+    height: 35vh !important;
 
-  .accordion-header,
-  .address-list .accordion-header {
-    display: flex
-;
+    padding-top:1rem;
+  }
+
+  .address-list-header {
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.5rem;
-    cursor: pointer;
+    margin-bottom: 1rem;
   }
 
-  .accordion-header span,
-  .address-list .accordion-header h3 {
-    margin-right: 1rem;
-  }
-
-  .accordion-content {
+  .address-list-content {
     margin-top: 1rem;
-  }
-
-  .address-list {
-    margin-left: 2rem;
-    background-color: #ffffff; /* Background para a div pai de endereço */
-    padding: 1rem;
-
-    padding: 2rem;
+    overflow-y: auto;
+    max-height: 80%;
   }
 
   .address-option {
     margin-bottom: 1rem;
-    background-color: #efefef; /* Background para cada card de endereço */
+    padding: 1rem;
     border-radius: 1rem;
-    opacity: 1; /* Opacidade padrão */
-    transition: opacity 0.3s; /* Transição suave para a opacidade */
-    height:2rem;
+    background-color: #efefef;
+    opacity: 0.5;
+    transition: opacity 0.3s;
   }
 
-  .address-option:not(.selected) {
-    opacity: 0.5; /* Opacidade reduzida para cards não selecionados */
+  .address-option.selected {
+    opacity: 1;
   }
 
   .address-label {
     display: flex;
-    justify-content: space-between; /* Ajuste para distribuir espaço entre os itens */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 5rem;
-    padding: 1rem;
-    margin-bottom: 1rem;
     font-size: 2rem;
-  }
-
-  .address-label span.zip-code {
-    color: #5271ff; /* Azul padrão */
-    margin-left: 1rem; /* Espaço entre o nome da rua e o CEP */
   }
 
   .address-label input {
     margin-right: 1rem;
-    transform: scale(2); /* Aumenta o tamanho do botão de rádio */
-    accent-color: black; /* Altera a cor do botão de rádio para preto */
+    transform: scale(2);
+    accent-color: black;
+  }
+
+  .address-label .zip-code {
+    color: #5271ff;
+    margin-left: 1rem;
+  }
+  .summary-and-address {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width:60%;
   }
 </style>

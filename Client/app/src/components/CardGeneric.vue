@@ -12,6 +12,10 @@
           @mouseover="showButtons = produto.id"
           @mouseleave="showButtons = null"
         >
+          <!-- Ícone de olho -->
+          <div class="eye-icon" @click="toggleProductStatus(produto)">
+            <i :class="produto.ativo ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+          </div>
           <div class="imgcardcont">
             <img :src="produto.imagens[0]" :alt="produto.nome" class="product-image" />
           </div>
@@ -43,6 +47,11 @@
         :isVisible="isEditModalVisible"
         @close="isEditModalVisible = false"
         @save="handleSave"
+      />
+      <CreateProductModal
+        v-if="isCreateModalVisible"
+        @close="isCreateModalVisible = false"
+        @product-created="handleProductCreated"
       />
 
       <ProductModal
@@ -89,6 +98,8 @@ export default {
       isEditModalVisible: false,
       selectedProduct: null,
       showButtons: null,
+      isEyeOpen: {},
+      isCreateModalVisible: false,
     };
   },
   setup() {
@@ -215,6 +226,36 @@ export default {
         console.error("Erro ao excluir produto:", error.message);
         this.toast.error("Erro ao excluir produto.");
       }
+    },
+
+    toggleEyeIcon(productId) {
+      this.$set(this.isEyeOpen, productId, !this.isEyeOpen[productId]);
+    },
+
+    async toggleProductStatus(produto) {
+      try {
+        const endpoint = produto.ativo
+          ? `http://localhost:8080/api/produtos/protected/deactivate/${produto.id}`
+          : `http://localhost:8080/api/produtos/protected/activate/${produto.id}`;
+        const response = await axiosInstance.put(endpoint);
+
+        if (response.status === 200) {
+          produto.ativo = !produto.ativo;
+          this.toast.success(`Produto ${produto.ativo ? 'ativado' : 'desativado'} com sucesso.`);
+        } else {
+          this.toast.error(`Erro ao ${produto.ativo ? 'desativar' : 'ativar'} produto.`);
+        }
+      } catch (error) {
+        console.error(`Erro ao ${produto.ativo ? 'desativar' : 'ativar'} produto:`, error.message);
+        this.toast.error(`Erro ao ${produto.ativo ? 'desativar' : 'ativar'} produto.`);
+      }
+    },
+
+    openCreateModal() {
+      this.isCreateModalVisible = true;
+    },
+    handleProductCreated(newProduct) {
+      this.produtos.push(newProduct);
     },
   },
 };
@@ -418,5 +459,13 @@ p {
 
 .excluir {
   background: #dfdfdf !important;
+}
+
+.eye-icon {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 2rem; /* Ajustar o tamanho para ser igual aos outros ícones */
+  color: #6b6b6b; /* Ajustar a cor para ser igual aos outros ícones */
 }
 </style>

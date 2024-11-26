@@ -1,6 +1,12 @@
 <template>
-  <div class="map">
-    <div ref="mapContainer" class="map-container"></div>
+  <div class="map-container">
+    <div ref="mapContainer" class="map"></div>
+    <div class="elements-card">
+      <h2>{{ truncatedAddress }}</h2>
+      <div class="freight-calculation">
+        <p v-if="freightCost !== null">Frete: R$ {{ freightCost.toFixed(2) }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -16,10 +22,24 @@ export default {
   components: {
     FontAwesomeIcon
   },
+  props: {
+    truncatedAddress: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
-      marker: null // Armazena o marcador
+      marker: null, // Armazena o marcador
+      freightCost: null // Armazena o custo do frete calculado
     };
+  },
+  watch: {
+    truncatedAddress(newAddress) {
+      if (newAddress) {
+        this.calculateFreight(newAddress);
+      }
+    }
   },
   methods: {
     async initMap() {
@@ -112,6 +132,16 @@ export default {
         });
       });
     },
+    async calculateFreight(address) {
+      // Lógica para calcular o frete com base no CEP
+      // Exemplo fictício de cálculo de frete
+      const cep = address.split(',').pop().trim(); // Extrai o CEP do endereço
+      if (cep) {
+        this.freightCost = Math.random() * 100; // Substitua com a lógica real de cálculo de frete
+      } else {
+        this.freightCost = null;
+      }
+    },
     addAddress() {
       // Lógica para adicionar endereço
     },
@@ -127,13 +157,36 @@ export default {
 
 <style scoped>
 .map-container {
+  width: 100%; /* Ajusta a largura do elemento pai para 100% */
+  position: relative; /* Define o pai como relativo */
+}
+.map {
   height: 12rem;
   width: 100% !important;
   margin-left: 0 !important;
   border-radius: 2rem 2rem 0 0;
 }
-.map {
-  width: 100%; /* Ajusta a largura do elemento pai para 100% */
+.elements-card {
+  background-color: #ffffff;
+  border-radius: 0 0 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin: 0;
+  font-size: 2rem;
+  position: relative;
+  z-index: 2;
+  padding: 1rem;
+  text-align: center;
+  width: 100%;
+  color: #000000;
+}
+.freight-calculation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.5rem;
+  color :#3a5bff;
 }
 .icon-button {
   background: none;
