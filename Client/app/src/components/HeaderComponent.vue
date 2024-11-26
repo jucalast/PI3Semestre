@@ -321,21 +321,22 @@ export default {
 <style scoped>
 @import '@/assets/css/variables.css';
 
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 1rem;
-  padding-bottom: 0;
-  margin-top: 0.5rem;
-  background-color: var(--background-color);
-  margin: 0;
-  font-size: 2rem !important;
-  flex-direction: column;
-  position: fixed;
-  width: 100%;
-  height: 6.7rem;
-  z-index: 200;
+.header[data-v-727bebfc] {
+    display: flex
+;
+    align-items: flex-start;
+    justify-content: center;
+    padding-bottom: 0;
+    margin-top: 0.5rem;
+    background-color: var(--background-color);
+    margin: 0;
+    font-size: 2rem !important;
+    flex-direction: column;
+    position: fixed;
+    width: 100%;
+    height: 6.7rem;
+    z-index: 200;
+    padding-left:1rem;
 }
 
 .topheader {
@@ -422,7 +423,7 @@ form {
 
 .search-input {
   border: solid 1px #aeaeaeb6;
-  background: #ededed;
+  background: #f2f2f2;
   border-radius: 2rem;
   width: 100%;
   color: var(--text-color);

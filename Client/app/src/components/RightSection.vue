@@ -1,17 +1,18 @@
 <template>
   <div class="right-section w-full md:w-2/5">
     <div class="card-container1">
-      <cartaoTemplate :cardDetails="localCardDetails" @updateColor="updateBoxShadowColor" />
+      <cartaoTemplate :cardDetails="selectedCardDetails" @updateColor="updateBoxShadowColor" />
     </div>
     <div class="info-card" :style="{ boxShadow: boxShadowStyle }">
       <div class="header-info-card">
-        <button @click="showCardInputs && isCardFilled ? saveCard() : toggleCardInputs()" :class="['add-card-btn', { 'filled': showCardInputs && isCardFilled }]">
-          <font-awesome-icon :icon="showCardInputs ? 'fa-solid fa-check' : 'fa-solid fa-plus'" /> {{ showCardInputs ? 'OK' : 'Add Cartão' }}
+        <button @click="showCardInputs ? (isCardFilled ? saveCard() : cancelCardCreation()) : toggleCardInputs()" :class="['add-card-btn', { 'filled': showCardInputs && isCardFilled }]">
+          <font-awesome-icon :icon="showCardInputs ? (isCardFilled ? 'fa-solid fa-check' : 'fa-solid fa-times') : 'fa-solid fa-plus'" />
+          {{ showCardInputs ? (isCardFilled ? 'OK' : 'Cancelar') : 'Add Cartão' }}
         </button>
-        <button class="payment-btn">
+        <button class="payment-btn" v-if="!showCardInputs">
           <font-awesome-icon icon="fa-solid fa-qrcode" /> Pix
         </button>
-        <button class="payment-btn">
+        <button class="payment-btn" v-if="!showCardInputs">
           <font-awesome-icon icon="fa-solid fa-file-invoice" /> Boleto
         </button>
       </div>
@@ -29,21 +30,25 @@
           <input type="checkbox" v-model="saveForNextPurchase" /> Salvar para a próxima compra
         </label>
       </div>
-      <div class="card-summary">
+      <div v-if="!showCardInputs" class="card-summary">
         <div class="card-list">
-          <div class="card-option-container fixed-card" @click="selectCard(filteredUserCards[0]?.number)">
-            <label class="card-option">
-              <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="filteredUserCards[0]?.number" @change="moveCardToTop(filteredUserCards[0]?.number)" />
-              <span> {{ filteredUserCards[0]?.number.slice(-4) }}</span>
-              <div v-if="selectedCard === filteredUserCards[0]?.number" class="toggle-container">
-                <label class="switch">
-                  <input type="checkbox" v-model="isCredit" />
-                  <span class="slider round"></span>
-                </label>
-                <span>{{ isCredit ? 'Crédito' : 'Débito' }}</span>
-              </div>
-            </label>
-            <font-awesome-icon class="accordion-toggle" :icon="showCardList ? 'fa-chevron-up' : 'fa-chevron-down'" @click="toggleCardAccordion" />
+          <div class="card-option-wrapper">
+            <div class="card-option-container fixed-card" @click="selectCard(filteredUserCards[0]?.number)">
+              <label class="card-option">
+                <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="filteredUserCards[0]?.number" @change="moveCardToTop(filteredUserCards[0]?.number)" />
+                <span> {{ filteredUserCards[0]?.number.slice(-4) }}</span>
+                <div v-if="selectedCard === filteredUserCards[0]?.number" class="toggle-container">
+                  <label class="switch">
+                    <input type="checkbox" v-model="isCredit" />
+                    <span class="slider round"></span>
+                  </label>
+                  <span>{{ isCredit ? 'Crédito' : 'Débito' }}</span>
+                </div>
+              </label>
+            </div>
+            <div class="accordion-toggle-container">
+              <font-awesome-icon class="accordion-toggle" :icon="showCardList ? 'fa-chevron-up' : 'fa-chevron-down'" @click="toggleCardAccordion" />
+            </div>
           </div>
           <div v-if="showCardList" class="scrollable-card-list">
             <label v-for="card in filteredUserCards.slice(1)" :key="card.number" class="card-option" @click="selectCard(card.number)">
@@ -60,14 +65,22 @@
           </div>
         </div>
       </div>
-      <div class="price-details">
-        <div class="price-item">
-          <span>Preço dos Produtos:</span>
-          <span>R$ {{ totalProductPrice }}</span>
-        </div>
-        <div class="price-item">
-          <span>Preço do Frete:</span>
-          <span>R$ {{ formattedShippingPrice }}</span>
+      <div v-if="showInstallmentOptions" class="installment-options">
+        <label v-for="installment in installmentOptions" :key="installment.quantity" class="installment-option">
+          <input type="radio" name="installment" v-model="selectedInstallment" :value="installment.quantity" />
+          <span>{{ installment.quantity }}x R$ {{ installment.value.toFixed(2) }}</span>
+        </label>
+      </div>
+      <div v-if="!showCardInputs" class="price-details">
+        <div class="prices">
+          <div class="price-item">
+            <span>Preço dos Produtos:</span>
+            <span>R$ {{ totalProductPrice }}</span>
+          </div>
+          <div class="price-item">
+            <span>Preço do Frete:</span>
+            <span>R$ {{ formattedShippingPrice }}</span>
+          </div>
         </div>
         <button class="total-price">Total: R$ {{ totalPrice }}</button>
       </div>
@@ -79,10 +92,10 @@
 import cartaoTemplate from '@/components/CartaoTemplate.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp, faTimes } from '@fortawesome/free-solid-svg-icons';
 import axiosInstance from '../utils/axiosInstance'; // Importe o axiosInstance
 
-library.add(faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp);
+library.add(faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp, faTimes);
 
 export default {
   components: {
@@ -92,6 +105,14 @@ export default {
   props: {
     cardDetails: {
       type: Object,
+      required: true
+    },
+    productDetails: {
+      type: Array,
+      required: true
+    },
+    shippingPrice: {
+      type: Number,
       required: true
     }
   },
@@ -106,7 +127,10 @@ export default {
       userCards: [], // Lista de cartões do usuário
       selectedCard: null, // Cartão selecionado
       paymentType: 'Crédito', // Tipo de pagamento selecionado
-      isCredit: true // Tipo de pagamento selecionado (true para crédito, false para débito)
+      isCredit: true, // Tipo de pagamento selecionado (true para crédito, false para débito)
+      showInstallmentOptions: false,
+      selectedInstallment: null,
+      interestRate: 0.08, // 8% de juros
     };
   },
   computed: {
@@ -114,21 +138,37 @@ export default {
       return this.localCardDetails.number && this.localCardDetails.name && this.localCardDetails.expiry;
     },
     totalProductPrice() {
-      // Calcula a soma dos preços dos produtos
-      return this.$parent.totalProductPrice ? this.$parent.totalProductPrice : '0.00';
-    },
-    formattedShippingPrice() {
-      return this.$parent.shippingPrice ? this.$parent.shippingPrice.toFixed(2) : '0.00';
+      if (!this.productDetails || this.productDetails.length === 0) return '0.00';
+      return this.productDetails.reduce((total, product) => {
+        return total + (product.preco * product.quantidade);
+      }, 0).toFixed(2);
     },
     totalPrice() {
-      return this.$parent.totalPrice ? this.$parent.totalPrice : '0.00';
+      const totalProductPrice = parseFloat(this.totalProductPrice) || 0;
+      const shippingPrice = parseFloat(this.shippingPrice) || 0;
+      return (totalProductPrice + shippingPrice).toFixed(2);
+    },
+    formattedShippingPrice() {
+      return this.shippingPrice ? parseFloat(this.shippingPrice).toFixed(2) : '0.00';
     },
     boxShadowStyle() {
       return `0px -200px 150px -90px ${this.boxShadowColor}`;
     },
     filteredUserCards() {
       return this.userCards.filter(card => card.numeroCartao !== this.localCardDetails.number.replace(/\s+/g, ''));
-    }
+    },
+    selectedCardDetails() {
+      return this.userCards.find(card => card.number === this.selectedCard) || this.localCardDetails;
+    },
+    installmentOptions() {
+      const total = parseFloat(this.totalPrice);
+      const options = [];
+      for (let i = 2; i <= 12; i++) {
+        const value = (total * Math.pow(1 + this.interestRate, i)) / i;
+        options.push({ quantity: i, value });
+      }
+      return options;
+    },
   },
   methods: {
     toggleCardInputs() {
@@ -189,7 +229,22 @@ export default {
     selectCard(cardNumber) {
       this.selectedCard = cardNumber;
       this.moveCardToTop(cardNumber);
-    }
+    },
+    cancelCardCreation() {
+      this.showCardInputs = false; // Fecha o formulário de cartão
+    },
+    toggleInstallmentOptions() {
+      this.showInstallmentOptions = !this.showInstallmentOptions;
+    },
+  },
+  watch: {
+    isCredit(newVal) {
+      if (newVal) {
+        this.toggleInstallmentOptions();
+      } else {
+        this.showInstallmentOptions = false;
+      }
+    },
   },
   created() {
     this.fetchUserCards(); // Busca os cartões do usuário ao criar o componente
@@ -209,6 +264,7 @@ export default {
   height: 100%;
   position: relative; /* Adiciona posição relativa */
 }
+
 
 @media (max-width: 768px) {
   .right-section {
@@ -243,11 +299,15 @@ position:absolute;
   z-index: 1; /* Garante que o info-card fique atrás do cartão */
 }
 
+
+
 @media (max-width: 768px) {
   .info-card {
     padding-top: 5rem;
   }
 }
+
+
 
 .card-inputs {
   display: flex;
@@ -300,6 +360,7 @@ position:absolute;
   justify-content: space-between; /* Ajuste para distribuir espaço entre os itens */
   width: 90%;
   gap: 10px; /* Adiciona espaço entre os botões */
+  border-radius: 1rem; /* Define o border-radius como 1rem */
 }
 
 .card-inputs input {
@@ -346,15 +407,30 @@ position:absolute;
 .scrollable-card-list {
   max-height: 10rem;
   overflow-y: auto;
-  border-radius: 2rem;
+  border-radius: 1rem;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Adiciona espaçamento entre os itens */
+  border: solid 1px #d3d3d3;
+  margin-top:0.5rem;
 }
 
 .card-option-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: 2rem;
+  border-radius: 1rem;
+  width:100%;
+  gap:1rem;
+}
+
+.card-option-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+gap:1rem;
+
 }
 
 .card-option {
@@ -367,7 +443,6 @@ position:absolute;
     background: #efefef;
     border-radius: 1rem;
     font-size: 2rem;
-    margin-bottom: 1rem;
     justify-content: flex-start;
     flex-direction: row;
     gap:2rem;
@@ -383,19 +458,18 @@ position:absolute;
 }
 
 .submit-btn, .total-price {
-  background-color: #ff4d4d;
+  background-color: #000000;
   color: white;
   border: none;
-  border-radius: 2rem;
+  border-radius: 1rem;
   padding: 1rem 2rem;
   font-size: 2rem;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-top: 10px;
 }
 
 .submit-btn:hover, .total-price:hover {
-  background-color: #e04343;
+  background-color: #131313;
 }
 
 .price-details {
@@ -403,9 +477,10 @@ position:absolute;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width:95%;
   position: absolute; /* Adiciona posição absoluta */
-  bottom: 2rem; /* Posiciona na parte inferior */
+  bottom: -1rem; /* Posiciona na parte inferior */
+  gap: 1rem; /* Adiciona espaçamento entre os itens */
 }
 
 .price-details .price-item {
@@ -416,16 +491,25 @@ position:absolute;
   margin-bottom: 10px;
 }
 
+.prices {
+
+background: #efefef;
+width: 100%;
+padding: 1rem;
+border-radius:1rem;
+}
+
 .price-details .total-price {
-  align-self: flex-end;
   font-size: 2rem;
   margin-top: auto;
+  width:100%;
+
 }
 
 .add-card-btn, .payment-btn {
   background-color: #efefef;
   color: #1e1e1e;
-  border-radius: 1.5rem;
+  border-radius: 1rem; /* Define o border-radius como 1rem */
   padding: 1rem 1rem; /* Tamanho reduzido */
   font-size: 1.3rem; /* Tamanho reduzido */
   cursor: pointer;
@@ -476,7 +560,7 @@ position:absolute;
 .accordion-toggle {
   cursor: pointer;
   font-size: 1.5rem;
-  margin-left: 1rem;
+;
 }
 
 .toggle-container {
@@ -506,7 +590,7 @@ position:absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #3a5bff;
   transition: 0.4s;
   border-radius: 34px;
 }
@@ -524,10 +608,56 @@ position:absolute;
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #43ce7d;
 }
 
 input:checked + .slider:before {
   transform: translateX(26px);
+}
+
+.accordion-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:#efefef;
+  width:16%;
+  border-radius: 1rem;
+  text-align: center; /* Centraliza o conteúdo horizontalmente */
+  line-height: 6rem; /* Centraliza o conteúdo verticalmente */
+  padding:1.5rem;
+}
+
+.accordion-toggle-container:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.installment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+  width:100%;
+  background: #efefef;
+  border-radius: 1rem;
+  padding: 1rem;
+  padding-left:1rem;
+  font-size: 1.5rem;
+  max-height: 25%;
+  overflow-y: auto;
+}
+
+.installment-option[data-v-05f4d63b] {
+    display: flex
+;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+    border-bottom: solid 1px #d3d3d3;
+    padding-left:1rem;
+}
+
+.installment-option input {
+  transform: scale(1.5);
 }
 </style>

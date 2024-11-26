@@ -15,6 +15,13 @@
         @submit-product="submitProduct"
         :disabled="isSubmitting"
       />
+      <GenericProductForm
+        v-else
+        :product="product"
+        :isEditMode="true"
+        @submit-product="submitProduct"
+        :disabled="isSubmitting"
+      />
 
       <!-- Overlay de carregamento com GIF -->
       <div v-if="isSubmitting" class="loading-overlay">
@@ -31,6 +38,7 @@
 <script>
 import SpecialCoffeeForm from "./SpecialCoffeeForm.vue";
 import PreparationMethodForm from "./PreparationMethodForm.vue";
+import GenericProductForm from "./GenericProductForm.vue";
 import { useToast } from "vue-toastification";
 import axiosInstance from "../utils/axiosInstance";
 
@@ -39,6 +47,7 @@ export default {
   components: {
     SpecialCoffeeForm,
     PreparationMethodForm,
+    GenericProductForm,
   },
   props: {
     product: Object,
@@ -58,6 +67,8 @@ export default {
           this.selectedForm = 'cafeEspecial';
         } else if (newVal.metodoPreparo) {
           this.selectedForm = 'metodoPreparo';
+        } else {
+          this.selectedForm = 'generic';
         }
       }
     }
