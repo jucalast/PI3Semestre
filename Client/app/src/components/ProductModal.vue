@@ -306,7 +306,7 @@ export default {
       }
     },
     buyNow(product) {
-      this.$router.push({ name: 'Checkout', query: { ids: product.id } });
+      this.$router.push({ name: 'Checkout', query: { product: JSON.stringify(product) } });
     },
     async handleFavoriteClick(produto) {
       try {
