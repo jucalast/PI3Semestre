@@ -277,6 +277,13 @@
     border: solid 1px #d2d2d2;
     border-radius: 1.5rem;
     padding: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .product-list::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 
   img {
@@ -329,6 +336,14 @@
     padding: 2rem;
     background: #f9f9f9;
     border-radius: 1rem;
+    max-height: 70vh;
+height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .favorites-section::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 
   .bulk-edit-button {

@@ -23,7 +23,12 @@
                   />
                   <div class="product-summary-info">
                     <h4>{{ product.nome }}</h4>
-                    <p class="product-quantity">{{ getProductQuantity(product.id) }}x</p>
+                    <div v-if="isFromModal">
+                      <input type="number" v-model.number="product.quantidade" min="1" class="product-quantity-input" />
+                    </div>
+                    <div v-else>
+                      <p class="product-quantity">{{ getProductQuantity(product.id) }}x</p>
+                    </div>
                     <p class="product-price">R$ {{ product.preco ? product.preco.toFixed(2) : '0.00' }}</p>
                   </div>
                 </div>
@@ -83,8 +88,12 @@
           @close="showModal = false"
           @submit-address="handleManualAddress"
       />
+      <SuccessModal
+        :isVisible="showSuccessModal"
+        :deliveryDate="deliveryDate"
+        @close="handleSuccessModalClose"
+      />
     </div>
-    <button class="debug-info-btn" @click="printDebugInfo">Exibir Informações de Debug</button>
 
   </AdminLayout>
 </template>
@@ -107,6 +116,7 @@ import AdminLayout from '@/layouts/AdminLayout.vue';
 import RightSection from '@/components/RightSection.vue'; // Importar o novo componente
 import ProductSection from '@/components/ProductSection.vue'; // Importar o novo componente
 import OrderSummary from '@/components/OrderSummary.vue'; // Importar o novo componente
+import SuccessModal from '@/components/SuccessModal.vue'; // Importar o novo componente
 
 library.add(faPlus, faEdit, faCheck, faChevronDown, faChevronUp);
 
@@ -121,6 +131,7 @@ export default {
     RightSection,
     ProductSection, // Registrar o novo componente
     OrderSummary, // Registrar o novo componente
+    SuccessModal, // Registrar o novo componente
   },
   data() {
     return {
@@ -142,7 +153,10 @@ export default {
       addresses: [],
       selectedAddressId: null,
       allAddresses: [],
-      cartItems: []
+      cartItems: [],
+      isFromModal: false,
+      showSuccessModal: false,
+      deliveryDate: null,
     };
   },
   created() {
@@ -252,18 +266,28 @@ export default {
         const response = await axiosInstance.post(`/api/pedidos`, payload);
 
         if (response.status === 200 || response.status === 201) {
-          alert('Compra realizada com sucesso!');
-          console.log('Resposta da API:', response.data);
+          this.deliveryDate = response.data.deliveryDate; // Supondo que a data de entrega venha na resposta
+          this.showSuccessModal = true;
         }
       } catch (error) {
         console.error('Erro ao finalizar compra:', error);
         alert('Ocorreu um erro ao finalizar a compra. Tente novamente.');
       }
     },
+    handleSuccessModalClose() {
+      this.showSuccessModal = false;
+      this.$router.push('/'); // Redireciona para a página inicial
+    },
     async processQuery() {
       const userId = this.$route.query.userId;
+      const product = this.$route.query.product ? JSON.parse(this.$route.query.product) : null;
       if (userId) {
         await this.fetchCartItems(userId);
+      } else if (product) {
+        product.quantidade = 1; // Define a quantidade padrão como 1
+        this.productDetails = [product];
+        this.productCount = 1;
+        this.isFromModal = true;
       }
     },
     async fetchCartItems(userId) {

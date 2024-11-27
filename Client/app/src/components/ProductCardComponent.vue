@@ -132,46 +132,49 @@
       // await this.fetchCart();
     },
     methods: {
-      async openModal(product) {
-        this.selectedProduct = { ...product };
-        await this.fetchProductDetails(product.id);
-        if (
-          this.selectedProduct.cafeEspecial ||
-          this.selectedProduct.metodoPreparo
-        ) {
-          this.isModalVisible = true;
-        } else {
-          this.selectedProduct = null;
-          alert('Nenhum detalhe encontrado para este produto.');
-        }
-      },
       async fetchProductDetails(productId) {
         try {
-          const cafeResponse = await axios.get(
-            `http://localhost:8080/api/cafes-especiais/produto/${productId}`
-          );
-          if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
-            this.selectedProduct.cafeEspecial = cafeResponse.data;
-          } else {
-            const metodoResponse = await axios.get(
-              `http://localhost:8080/api/metodo-preparo/produto/${productId}`
+          if (this.selectedProduct.cafeEspecial === null && this.selectedProduct.metodoPreparo === null) {
+            const produtoResponse = await axios.get(
+              `http://localhost:8080/api/produtos/sem-especializacoes/${productId}`
             );
-            if (
-              metodoResponse.data &&
-              Object.keys(metodoResponse.data).length > 0
-            ) {
-              this.selectedProduct.metodoPreparo = metodoResponse.data;
+            if (produtoResponse.data) {
+              this.selectedProduct = produtoResponse.data;
             } else {
               throw new Error(
                 `Produto com ID ${productId} não encontrado em nenhum dos endpoints.`
               );
             }
+          } else {
+            const cafeResponse = await axios.get(
+              `http://localhost:8080/api/cafes-especiais/produto/${productId}`
+            );
+            if (cafeResponse.data && Object.keys(cafeResponse.data).length > 0) {
+              this.selectedProduct.cafeEspecial = cafeResponse.data;
+            } else {
+              const metodoResponse = await axios.get(
+                `http://localhost:8080/api/metodo-preparo/produto/${productId}`
+              );
+              if (metodoResponse.data && Object.keys(metodoResponse.data).length > 0) {
+                this.selectedProduct.metodoPreparo = metodoResponse.data;
+              } else {
+                throw new Error(
+                  `Produto com ID ${productId} não encontrado em nenhum dos endpoints.`
+                );
+              }
+            }
           }
         } catch (error) {
-          console.error('Erro ao buscar detalhes do produto:', error.message);
+          console.error("Erro ao buscar detalhes do produto:", error.message);
           this.selectedProduct = null;
           alert(`Erro: ${error.message}`);
         }
+      },
+      async openModal(product) {
+        console.log("Produto clicado:", product);
+        this.selectedProduct = { ...product };
+        await this.fetchProductDetails(product.id);
+        this.isModalVisible = true;
       },
       filterBySelectedAttributes(produtos) {
         const hasSelectedValues = Object.values(this.selectedValues).some(

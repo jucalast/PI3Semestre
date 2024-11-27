@@ -113,6 +113,17 @@ public class ProdutoService {
         return produto;
     }
 
+    public Produto getProdutoSemEspecializacoesById(Long id) {
+        logger.info("Buscando produto sem especializações com ID: {}", id);
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error("Produto não encontrado com ID: {}", id);
+                    return new RuntimeException("Produto não encontrado com ID: " + id);
+                });
+
+        return produto;
+    }
+
     /**
      * Atualiza um produto existente.
      *

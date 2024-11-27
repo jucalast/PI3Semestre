@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isVisible" class="modal-overlay" @click.self="close">
+  <div v-if="isVisible && showModal" class="modal-overlay" @click.self="close">
     <div class="modal-content">
       <!-- Carrossel de Comentários -->
       <div class="comments-carousel" v-if="comments.length > 0">
@@ -98,7 +98,7 @@
             <p>
               <strong>Torra:</strong>
               {{
-                product.cafeEspecial[0]?.torra || "Informação n��o disponível"
+                product.cafeEspecial[0]?.torra || "Informação não disponível"
               }}
             </p>
             <p>
@@ -161,7 +161,7 @@
         </div>
 
         <!-- Accordion para Outros Detalhes -->
-        <div class="accordion-item">
+        <div v-if="product.cafeEspecial || product.metodoPreparo" class="accordion-item">
           <div
             class="accordion-header"
             @click="toggleAccordion('outrosDetalhes')"
@@ -210,6 +210,7 @@ export default {
         outrosDetalhes: false,
       },
       averageRating: 0,
+      showModal: true,
     };
   },
   setup() {
@@ -228,6 +229,7 @@ export default {
         this.fetchComments();
         this.fetchAverageRating();
         this.disableScroll();
+        this.showModal = true;
       } else {
         clearInterval(this.commentInterval);
         this.enableScroll();
@@ -238,14 +240,13 @@ export default {
     async fetchAverageRating() {
       try {
         const response = await axiosInstance.get(
-          `http://localhost:8080/avaliacoes/media/${this.product.id}`
+          `http://localhost:8080/api/avaliacoes/media/${this.product.id}`
         );
         this.averageRating = response.data;
         console.log("Fetched average rating:", this.averageRating);
       } catch (error) {
         console.error("Erro ao buscar a média de avaliações:", error);
         this.averageRating = 0;
-        alert("Erro ao buscar a média de avaliações. Por favor, tente novamente mais tarde.");
       }
     },
     getStarClass(star) {
@@ -262,7 +263,7 @@ export default {
     async fetchComments() {
       try {
         const response = await axiosInstance.get(
-          `http://localhost:8080/avaliacoes/produto/${this.product.id}`
+          `http://localhost:8080/api/avaliacoes/produto/${this.product.id}`
         );
         this.comments = response.data;
         console.log("Comments fetched:", this.comments);
@@ -280,12 +281,12 @@ export default {
       } catch (error) {
         console.error("Erro ao buscar comentários:", error);
         this.comments = [];
-        alert("Erro ao buscar comentários. Por favor, tente novamente mais tarde.");
       }
     },
     close() {
       console.log("Modal closed.");
       this.$emit("close");
+      this.showModal = false;
     },
     toggleAccordion(section) {
       console.log(`Toggling accordion for section: ${section}`);
@@ -305,7 +306,7 @@ export default {
       }
     },
     buyNow(product) {
-      this.$router.push({ name: 'Checkout', query: { ids: product.id } });
+      this.$router.push({ name: 'Checkout', query: { product: JSON.stringify(product) } });
     },
     async handleFavoriteClick(produto) {
       try {
