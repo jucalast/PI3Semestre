@@ -5,6 +5,7 @@
         <div class="profile-photo">
           <img :src="previewProfilePic || getUserAvatar()" alt="Foto do usuário" />
           <p class="user-name">{{ user.userName || username }}</p>
+          <p class="user-email">{{ user.email || '' }}</p> 
           <button @click="selectProfilePicture" class="choose-photo-btn">Escolher Foto</button>
           <input
             type="file"
@@ -20,11 +21,24 @@
           <form @submit.prevent="updateProfile">
             <div class="form-section">
               <label for="name">Nome</label>
-              <input type="text" v-model="user.userName" id="name" @input="checkChanges"/>
+              <input 
+                type="text" 
+                v-model="user.userName" 
+                id="name" 
+                :placeholder="user.userName || 'Nome'" 
+                @input="checkChanges"
+              />
             </div>
             <div class="form-section">
               <label for="phone">Telefone</label>
-              <input type="text" v-model="user.mobileNumber" id="phone" @input="checkChanges"/>
+              <input 
+                type="text" 
+                v-model="user.mobileNumber" 
+                id="phone" 
+                :placeholder="user.mobileNumber || 'Telefone'" 
+                @input="checkChanges"
+                v-mask="'(##) #####-####'"
+              />
             </div>
             <div class="form-section">
               <label for="current-password">Senha Atual</label>
@@ -75,13 +89,14 @@ export default {
       user: {
         userName: '',
         mobileNumber: '',
+        email: '',
         currentPassword: '',
         newPassword: '',
         profilePic: '',
       },
-      initialUser: {}, // Guardar os dados iniciais do usuário
+      initialUser: {}, 
       previewProfilePic: '', 
-      hasChanges: false, // Indica se há alterações
+      hasChanges: false, 
     };
   },
   computed: {
@@ -106,7 +121,7 @@ export default {
       try {
         await axiosInstance.put('/api/profile', updatedUser);
         alert('Perfil atualizado com sucesso!');
-        this.hasChanges = false; // Resetar alterações após salvar
+        this.hasChanges = false; 
       } catch (error) {
         console.error('Erro ao atualizar perfil:', error);
         alert('Erro ao atualizar perfil.');
@@ -132,13 +147,12 @@ export default {
         reader.onload = () => {
           this.previewProfilePic = reader.result;
           this.user.profilePic = reader.result.split(',')[1]; 
-          this.checkChanges(); // Checar alterações após upload
+          this.checkChanges(); 
         };
         reader.readAsDataURL(file);
       }
     },
     checkChanges() {
-      // Verificar se algum campo foi alterado em relação aos dados iniciais
       this.hasChanges = (
         this.user.userName !== this.initialUser.userName ||
         this.user.mobileNumber !== this.initialUser.mobileNumber ||
@@ -154,8 +168,10 @@ export default {
         const response = await axiosInstance.get('/login/user-info');
         const userInfo = response.data;
 
-        this.user.userName = userInfo.userName || this.user.userName;
-        this.user.mobileNumber = userInfo.mobileNumber || this.user.mobileNumber;
+        // Preencher os dados do usuário
+        this.user.userName = userInfo.name || this.user.userName;
+        this.user.mobileNumber = userInfo.phone || this.user.mobileNumber;
+        this.user.email = userInfo.email || this.user.email;
         this.user.profilePic = userInfo.profilePic || this.user.profilePic;
 
         this.initialUser = { ...this.user };
@@ -167,11 +183,16 @@ export default {
     }
   },
 };
-</script> 
-
+</script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.profile-photo .user-email {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
 
 .profile-page {
   font-family: 'Poppins', sans-serif;
@@ -210,13 +231,13 @@ export default {
   font-weight: 600;
   color: #333;
   margin-top: 10px;
-  text-align: center; 
+  text-align: center;
 }
 
 .profile-photo .choose-photo-btn {
   margin-top: 10px;
   padding: 8px 16px;
-  background-color: #f4b400; 
+  background-color: #f4b400;
   color: white;
   border: none;
   border-radius: 4px;
@@ -224,7 +245,7 @@ export default {
 }
 
 .profile-photo .choose-photo-btn:hover {
-  background-color: #e0a400; 
+  background-color: #e0a400;
 }
 
 .profile-form {
