@@ -1,6 +1,5 @@
 package com.app.model.pagamento;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 
 /**

@@ -62,10 +62,9 @@ public class Produto {
      */
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "produto_imagens", joinColumns = @JoinColumn(name = "produto_id"))
-    @Column(name = "imagem_base64")
-    @Lob
-    @OrderColumn(name = "imagem_order")
+    @Column(name = "imagem_base64", columnDefinition = "TEXT") // Ajuste o tipo de coluna se necessário
     private List<String> imagens = new ArrayList<>();
+
 
     /**
      * Quantidade em estoque do produto

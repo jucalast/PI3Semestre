@@ -51,23 +51,32 @@ public class PedidoController {
     @PostMapping("/api/pedidos")
     public ResponseEntity<?> criarPedido(@RequestBody Map<String, Object> pedidoData, HttpServletRequest request) {
         try {
+            System.out.println("Dados recebidos: " + pedidoData);
             Long userId = (Long) request.getSession().getAttribute("userId");
             UserModel usuario = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + userId));
 
             // Configura o pedido
+
             PedidoModel pedido = new PedidoModel();
             LocalDateTime now = LocalDateTime.now();
+
+            // Verifica e atribui o campo 'observacoes' se estiver presente
+            if (pedidoData.containsKey("observacoes")) {
+                pedido.setObservacoes((String) pedidoData.get("observacoes"));
+            }
+            // Verifica e atribui o campo 'complemento' se estiver presente
+            if (pedidoData.containsKey("complemento")) {
+                pedido.setComplemento((String) pedidoData.get("complemento"));
+            }
             pedido.setDataPedido(now);
-            pedido.setStatusPedido((String) pedidoData.get("statusPedido"));
-            pedido.setObservacoes((String) pedidoData.get("observacoes"));
+            pedido.setStatusPedido("NovoPedido");  // Definindo o status como 'NovoPedido'
             pedido.setEstado((String) pedidoData.get("estado"));
             pedido.setCep((String) pedidoData.get("cep"));
             pedido.setCidade((String) pedidoData.get("cidade"));
             pedido.setBairro((String) pedidoData.get("bairro"));
             pedido.setNumero((Integer) pedidoData.get("numero"));
             pedido.setRua((String) pedidoData.get("rua"));
-            pedido.setComplemento((String) pedidoData.get("complemento"));
 
             // Processa os produtos do pedido
             List<Map<String, Object>> produtos = (List<Map<String, Object>>) pedidoData.get("produtos");
@@ -75,16 +84,19 @@ public class PedidoController {
                 throw new IllegalArgumentException("A lista de produtos não pode estar vazia.");
             }
 
+
             List<ProdutoPedidoModel> produtosPedido = produtos.stream().map(produtoData -> {
                 ProdutoPedidoModel produtoPedido = new ProdutoPedidoModel();
-                Long produtoId = ((Number) produtoData.get("produtoId")).longValue();
+
+                // Conversões explícitas
+                Long produtoId = Long.valueOf(produtoData.get("produtoId").toString());
+                Integer quantidade = Integer.valueOf(produtoData.get("quantidade").toString());
+
                 Produto produto = produtoRepository.findById(produtoId)
                         .orElseThrow(() -> new ProdutoNotFoundException("Produto com ID " + produtoId + " não encontrado."));
                 produtoPedido.setProduto(produto);
 
-                Integer quantidade = (Integer) produtoData.get("quantidade");
                 produtoPedido.setQuantidade(quantidade);
-
                 BigDecimal subtotal = produto.getPreco().multiply(BigDecimal.valueOf(quantidade));
                 produtoPedido.setSubtotal(subtotal);
 
@@ -104,10 +116,12 @@ public class PedidoController {
 
             MetodoPagamentoModel metodoPagamento = pedidoService.processarPagamento(pagamentoData, totalPedido, usuario);
 
-            PagamentoModel pagamento = new PagamentoModel();            pagamento.setMetodoPagamento(metodoPagamento);
+            PagamentoModel pagamento = new PagamentoModel();
+            pagamento.setMetodoPagamento(metodoPagamento);
             pagamento.setValorTotal(totalPedido);
             pagamento.setDataPagamento(LocalDateTime.now());
-            pagamento.setStatus((String) pagamentoData.get("status"));
+            pagamento.setStatus(metodoPagamento.getStatus()); // Certifique-se que o status não é null aqui.
+
 
             // Cria o pedido
             PedidoModel pedidoCriado = pedidoService.criarPedido(pedido, produtosPedido, pagamento, userId);
