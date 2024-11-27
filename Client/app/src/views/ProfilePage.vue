@@ -168,7 +168,6 @@ export default {
         const response = await axiosInstance.get('/login/user-info');
         const userInfo = response.data;
 
-        // Preencher os dados do usuário
         this.user.userName = userInfo.name || this.user.userName;
         this.user.mobileNumber = userInfo.phone || this.user.mobileNumber;
         this.user.email = userInfo.email || this.user.email;
@@ -181,6 +180,7 @@ export default {
         console.error('Erro ao buscar informações do usuário:', error);
       }
     }
+    this.checkAuth();
   },
 };
 </script>

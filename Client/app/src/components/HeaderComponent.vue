@@ -316,7 +316,6 @@ export default {
   },
   mounted() {
     this.checkAuth();
-    console.log(this.photoUrl);
   },
 };
 </script>
@@ -494,7 +493,7 @@ header .action-buttons {
 }
 
 .user-dropdown .user-name {
-  margin-left: 10%;
+  margin-left: 20%;
   margin-right: 10%;
   font-weight: bold;
   color: #333;
