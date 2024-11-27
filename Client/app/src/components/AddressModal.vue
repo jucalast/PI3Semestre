@@ -45,15 +45,28 @@ export default {
   },
   methods: {
     closeModal() {
+      console.log('Fechando o modal.');
       this.$emit('close');
     },
     submitAddress() {
-      const fullAddress = `${this.address.rua}, ${this.address.numero}, ${this.address.bairro}, ${this.address.cidade}, ${this.address.estado}, ${this.address.cep}, ${this.address.tipo}`;
-      this.$emit('submit-address', fullAddress);
+      const addressObject = {
+        rua: this.address.rua,
+        numero: this.address.numero,
+        bairro: this.address.bairro,
+        cidade: this.address.cidade,
+        estado: this.address.estado,
+        cep: this.address.cep,
+        tipo: this.address.tipo
+      };
+      console.log('Endereço submetido:', addressObject);
+      this.$emit('submit-address', addressObject);
       this.closeModal();
     }
   }
 };
+
+
+
 </script>
 
 <style scoped>

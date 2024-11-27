@@ -2,9 +2,6 @@ package com.app.model.pagamento;
 
 import jakarta.persistence.*;
 
-/**
- * Modelo base para métodos de pagamento.
- */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo_pagamento", discriminatorType = DiscriminatorType.STRING)
@@ -17,6 +14,9 @@ public abstract class MetodoPagamentoModel {
     @Column(name = "tipo_pagamento", insertable = false, updatable = false) // Evita duplicidade
     @Enumerated(EnumType.STRING)
     private TipoPagamento tipoPagamento;
+
+    @Column(name = "status", nullable = false, length = 50) // Adicionando o campo status
+    private String status;
 
     // Getters e setters
     public Long getId() {
@@ -33,5 +33,13 @@ public abstract class MetodoPagamentoModel {
 
     public void setTipoPagamento(TipoPagamento tipoPagamento) {
         this.tipoPagamento = tipoPagamento;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

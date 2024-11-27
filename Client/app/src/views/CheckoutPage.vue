@@ -56,7 +56,11 @@
                 </label>
               </div>
             </div>
+            <div>
+              <!-- Outras seções -->
 
+              <!-- Outras seções -->
+            </div>
           </div>
           
         </div>
@@ -84,6 +88,8 @@
         @submit-address="handleManualAddress"
       />
     </div>
+    <button class="debug-info-btn" @click="printDebugInfo">Exibir Informações de Debug</button>
+
   </AdminLayout>
 </template>
 
@@ -155,6 +161,12 @@
           this.fetchProductDetails();
         }
       },
+      selectedAddress(newAddress) {
+        if (newAddress) {
+          console.log('Endereço selecionado mudou. Centralizando mapa:', newAddress);
+          this.handleManualAddress(newAddress);
+        }
+      },
     },
     computed: {
       truncatedAddress() {
@@ -175,6 +187,12 @@
       handleCardDetails(card) {
         this.cardDetails = card; // Salva os dados do cartão
         this.showCardInputs = false; // Fecha o formulário de cartão
+      },
+      printDebugInfo() {
+        console.log('Endereço Salvo:', this.savedAddress);
+        console.log('Detalhes do Cartão:', this.cardDetails);
+        console.log('IDs de Produtos:', this.productIds);
+        console.log('Contagem de Produtos:', this.productCount);
       },
       async processQuery() {
         const userId = this.$route.query.userId;
@@ -268,34 +286,44 @@
       },
       handleAddressClick(address) {
         this.clickedAddress = address;
-        this.savedAddress = address; // Atualiza o endereço salvo com o endereço clicado no mapa
+        this.savedAddress = address;
+        console.log(address)// Atualiza o endereço salvo com o endereço clicado no mapa
       },
-      async handleManualAddress(fullAddress) {
-        const addressParts = fullAddress.split(',');
-        const street = addressParts[0] || 'Rua Desconhecida';
-        const number = addressParts[1]
-          ? addressParts[1].trim().split(' ')[0]
-          : 'S/N';
-        const neighborhood = addressParts[2]
-          ? addressParts[2].trim()
-          : 'Bairro Desconhecido';
-        const city = addressParts[3]
-          ? addressParts[3].trim()
-          : 'Cidade Desconhecida';
-        const state = addressParts[4]
-          ? addressParts[4].trim()
-          : 'Estado Desconhecido';
-        const zipCode = addressParts[5] ? addressParts[5].trim() : '00000-000';
-        const addressType = addressParts[6] || 'Casa'; // Obtenha o tipo de endereço do modal
+      async handleManualAddress(address) {
+        console.log('Endereço recebido no handleManualAddress:', address);
 
-        this.clickedAddress = fullAddress;
-        this.savedAddress = fullAddress;
-        this.addressType = addressType; // Defina o tipo de endereço
+        if (typeof address === 'object') {
+          const fullAddress = `${address.rua}, ${address.numero}, ${address.bairro}, ${address.cidade}, ${address.estado}, ${address.cep}`;
+          console.log('Endereço formatado:', fullAddress);
 
-        try {
-          await this.$refs.googleMap.centerMapOnAddress(fullAddress);
-        } catch (err) {
-          console.error('Erro ao centralizar o mapa:', err);
+          this.clickedAddress = fullAddress;
+          this.savedAddress = fullAddress;
+
+          const retryInterval = 500; // Intervalo para tentar novamente
+          const maxRetries = 10; // Tentativas máximas
+          let retries = 0;
+
+          const waitForOrderSummary = async () => {
+            while (!this.$refs.orderSummary || !this.$refs.orderSummary.centerMapOnAddress) {
+              if (retries >= maxRetries) {
+                console.error('OrderSummary não está pronto após várias tentativas.');
+                return;
+              }
+              console.warn('OrderSummary não está pronto. Retentando...');
+              retries++;
+              await new Promise(resolve => setTimeout(resolve, retryInterval));
+            }
+          };
+
+          await waitForOrderSummary();
+
+          try {
+            console.log('Chamando método centerMapOnAddress no OrderSummary...');
+            await this.$refs.orderSummary.centerMapOnAddress(fullAddress);
+            console.log('Mapa centralizado com sucesso.');
+          } catch (err) {
+            console.error('Erro ao centralizar o mapa no OrderSummary:', err);
+          }
         }
       },
       saveCardDetails() {

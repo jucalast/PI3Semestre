@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @DiscriminatorValue("CREDITO")
 public class PagamentoCreditoModel extends MetodoPagamentoModel {
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "cartao_id", referencedColumnName = "numero_cartao")
     private CartaoModel cartao;
 
@@ -40,5 +40,6 @@ public class PagamentoCreditoModel extends MetodoPagamentoModel {
     public void setTaxaJuros(BigDecimal taxaJuros) {
         this.taxaJuros = taxaJuros;
     }
+
 
 }
