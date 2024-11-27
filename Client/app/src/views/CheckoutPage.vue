@@ -268,7 +268,8 @@
       },
       handleAddressClick(address) {
         this.clickedAddress = address;
-        this.savedAddress = address; // Atualiza o endereço salvo com o endereço clicado no mapa
+        this.savedAddress = address;
+        console.log(address)// Atualiza o endereço salvo com o endereço clicado no mapa
       },
       async handleManualAddress(fullAddress) {
         const addressParts = fullAddress.split(',');
@@ -290,6 +291,7 @@
 
         this.clickedAddress = fullAddress;
         this.savedAddress = fullAddress;
+        console.log(fullAddress)
         this.addressType = addressType; // Defina o tipo de endereço
 
         try {

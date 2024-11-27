@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Serviço que fornece operações de negócio para o gerenciamento de pedidos.
@@ -82,6 +83,7 @@ public class PedidoService {
 
     public MetodoPagamentoModel processarPagamento(Map<String, Object> pagamentoData, BigDecimal totalPedido, UserModel usuario) {
         String tipoPagamento = (String) pagamentoData.get("tipoPagamento");
+        String status = "Aprovado"; // Supondo que você sempre configure o status para 'Aprovado' quando o pagamento for processado.
 
         switch (TipoPagamento.valueOf(tipoPagamento.toUpperCase())) {
             case CREDITO:
@@ -89,18 +91,21 @@ public class PedidoService {
                 pagamentoCredito.setCartao(buscarOuCriarCartao((Map<String, Object>) pagamentoData.get("cartao"), usuario));
                 pagamentoCredito.setNumeroParcelas((Integer) pagamentoData.get("numeroParcelas"));
                 pagamentoCredito.setTaxaJuros(TaxaPagamento.CREDITO.getTaxa());
+                pagamentoCredito.setStatus(status);
                 return pagamentoCredito;
 
             case DEBITO:
-                PagamentoDebitoModel pagamentoDebito = new PagamentoDebitoModel();
-                pagamentoDebito.setCartao(buscarOuCriarCartao((Map<String, Object>) pagamentoData.get("cartao"), usuario));
-                pagamentoDebito.setTaxaTransacao(TaxaPagamento.DEBITO.getTaxa());
-                return pagamentoDebito;
+            PagamentoDebitoModel pagamentoDebito = new PagamentoDebitoModel();
+            pagamentoDebito.setCartao(buscarOuCriarCartao((Map<String, Object>) pagamentoData.get("cartao"), usuario));
+            pagamentoDebito.setTaxaTransacao(TaxaPagamento.DEBITO.getTaxa());
+            pagamentoDebito.setStatus(status); // Assegure-se que esta linha está realmente sendo executada.
+            return pagamentoDebito;
 
             case PIX:
                 PagamentoPixModel pagamentoPix = new PagamentoPixModel();
                 pagamentoPix.setChavePix((String) pagamentoData.get("chavePix"));
                 pagamentoPix.setTaxaPix(TaxaPagamento.PIX.getTaxa());
+                pagamentoPix.setStatus(status);
                 return pagamentoPix;
 
             case BOLETO:
@@ -108,6 +113,7 @@ public class PedidoService {
                 pagamentoBoleto.setCodigoBoleto((String) pagamentoData.get("codigoBoleto"));
                 pagamentoBoleto.setDataVencimento(LocalDate.parse((String) pagamentoData.get("dataVencimento")));
                 pagamentoBoleto.setTaxaBoleto(TaxaPagamento.BOLETO.getTaxa());
+                pagamentoBoleto.setStatus(status);
                 return pagamentoBoleto;
 
             default:
@@ -116,9 +122,15 @@ public class PedidoService {
     }
 
 
+
     private CartaoModel buscarOuCriarCartao(Map<String, Object> cartaoData, UserModel usuario) {
         String numeroCartao = (String) cartaoData.get("numeroCartao");
-        return cartaoRepository.findById(numeroCartao).orElseGet(() -> {
+        CartaoModel cartao = cartaoRepository.findById(numeroCartao).orElse(null);
+        if (cartao != null) {
+            // Retorna o cartão existente sem criar um novo
+            return cartao;
+        } else {
+            // Cria um novo cartão, pois não existe no banco de dados
             CartaoModel novoCartao = new CartaoModel();
             novoCartao.setNumeroCartao(numeroCartao);
             novoCartao.setNomeTitular((String) cartaoData.get("nomeTitular"));
@@ -126,9 +138,11 @@ public class PedidoService {
             novoCartao.setBandeira((String) cartaoData.get("bandeira"));
             novoCartao.setCpfTitular((String) cartaoData.get("cpfTitular"));
             novoCartao.setUser(usuario);
-            return cartaoRepository.save(novoCartao);
-        });
+            return cartaoRepository.saveAndFlush(novoCartao);
+        }
     }
+
+
 
 
 }
