@@ -3,10 +3,8 @@
     <div class="profile-container">
       <div class="profile-content">
         <div class="profile-photo">
-          <!-- Mostra a imagem atual ou a imagem selecionada -->
           <img :src="previewProfilePic || getUserAvatar()" alt="Foto do usuário" />
           <p class="user-name">{{ user.userName || username }}</p>
-          <!-- Botão de escolher foto -->
           <button @click="selectProfilePicture" class="choose-photo-btn">Escolher Foto</button>
           <input
             type="file"
@@ -18,16 +16,15 @@
           />
         </div>
 
-        <!-- Formulário de perfil -->
         <div class="profile-form">
           <form @submit.prevent="updateProfile">
             <div class="form-section">
               <label for="name">Nome</label>
-              <input type="text" v-model="user.userName" id="name" />
+              <input type="text" v-model="user.userName" id="name" @input="checkChanges"/>
             </div>
             <div class="form-section">
               <label for="phone">Telefone</label>
-              <input type="text" v-model="user.mobileNumber" id="phone" />
+              <input type="text" v-model="user.mobileNumber" id="phone" @input="checkChanges"/>
             </div>
             <div class="form-section">
               <label for="current-password">Senha Atual</label>
@@ -35,6 +32,7 @@
                 type="password"
                 v-model="user.currentPassword"
                 id="current-password"
+                @input="checkChanges"
               />
             </div>
             <div class="form-section">
@@ -43,13 +41,16 @@
                 type="password"
                 v-model="user.newPassword"
                 id="new-password"
+                @input="checkChanges"
               />
             </div>
-            <!-- Botão de salvar com indicador de alteração -->
+
+            <!-- Botão de salvar -->
             <button
               type="submit"
               class="btn-submit"
               :class="{ 'has-changes': hasChanges, 'no-changes': !hasChanges }"
+              :disabled="!hasChanges"
             >
               {{ hasChanges ? 'Salvar Alterações' : 'Salvar' }}
             </button>
@@ -76,10 +77,11 @@ export default {
         mobileNumber: '',
         currentPassword: '',
         newPassword: '',
-        profilePic: '', 
+        profilePic: '',
       },
+      initialUser: {}, // Guardar os dados iniciais do usuário
       previewProfilePic: '', 
-      hasChanges: false,
+      hasChanges: false, // Indica se há alterações
     };
   },
   computed: {
@@ -104,7 +106,7 @@ export default {
       try {
         await axiosInstance.put('/api/profile', updatedUser);
         alert('Perfil atualizado com sucesso!');
-        this.hasChanges = false; 
+        this.hasChanges = false; // Resetar alterações após salvar
       } catch (error) {
         console.error('Erro ao atualizar perfil:', error);
         alert('Erro ao atualizar perfil.');
@@ -128,12 +130,22 @@ export default {
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
-          this.previewProfilePic = reader.result; 
+          this.previewProfilePic = reader.result;
           this.user.profilePic = reader.result.split(',')[1]; 
-          this.hasChanges = true; 
+          this.checkChanges(); // Checar alterações após upload
         };
         reader.readAsDataURL(file);
       }
+    },
+    checkChanges() {
+      // Verificar se algum campo foi alterado em relação aos dados iniciais
+      this.hasChanges = (
+        this.user.userName !== this.initialUser.userName ||
+        this.user.mobileNumber !== this.initialUser.mobileNumber ||
+        this.user.currentPassword !== this.initialUser.currentPassword ||
+        this.user.newPassword !== this.initialUser.newPassword ||
+        this.user.profilePic !== this.initialUser.profilePic
+      );
     },
   },
   async mounted() {
@@ -145,13 +157,18 @@ export default {
         this.user.userName = userInfo.userName || this.user.userName;
         this.user.mobileNumber = userInfo.mobileNumber || this.user.mobileNumber;
         this.user.profilePic = userInfo.profilePic || this.user.profilePic;
+
+        this.initialUser = { ...this.user };
+
+        this.checkChanges();
       } catch (error) {
         console.error('Erro ao buscar informações do usuário:', error);
       }
     }
   },
 };
-</script>
+</script> 
+
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
