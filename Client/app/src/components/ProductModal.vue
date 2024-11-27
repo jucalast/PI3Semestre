@@ -240,18 +240,13 @@ export default {
     async fetchAverageRating() {
       try {
         const response = await axiosInstance.get(
-          `http://localhost:8080/avaliacoes/media/${this.product.id}`
+          `http://localhost:8080/api/avaliacoes/media/${this.product.id}`
         );
         this.averageRating = response.data;
         console.log("Fetched average rating:", this.averageRating);
       } catch (error) {
         console.error("Erro ao buscar a média de avaliações:", error);
         this.averageRating = 0;
-        if (error.response && error.response.status === 404) {
-          alert("Produto não encontrado para buscar a média de avaliações.");
-        } else {
-          alert("Erro ao buscar a média de avaliações. Por favor, tente novamente mais tarde.");
-        }
       }
     },
     getStarClass(star) {
@@ -268,7 +263,7 @@ export default {
     async fetchComments() {
       try {
         const response = await axiosInstance.get(
-          `http://localhost:8080/avaliacoes/produto/${this.product.id}`
+          `http://localhost:8080/api/avaliacoes/produto/${this.product.id}`
         );
         this.comments = response.data;
         console.log("Comments fetched:", this.comments);
@@ -286,7 +281,6 @@ export default {
       } catch (error) {
         console.error("Erro ao buscar comentários:", error);
         this.comments = [];
-        alert("Erro ao buscar comentários. Por favor, tente novamente mais tarde.");
       }
     },
     close() {

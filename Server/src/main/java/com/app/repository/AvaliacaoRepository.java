@@ -14,7 +14,7 @@ import java.util.List;
  * @since 1.0
  */
 @Repository
-public interface AvaliacaoRepository extends JpaRepository<AvaliacaoModel, Integer> {
+public interface AvaliacaoRepository extends JpaRepository<AvaliacaoModel, Long> {
 
     /**
      * Encontra todas as avaliações baseadas no ID do ProdutoPedido.
