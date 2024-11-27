@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Map;
 
 /**
  * Classe de serviço responsável pela lógica de negócios relacionada à entidade
@@ -92,9 +93,9 @@ public class UserService implements UserDetailsService {
             user.setUserName(name);
             user.setEmailId(email);
             user.setRoles("ROLE_USER");
-            user = userRepository.save(user);  
+            user = userRepository.save(user);
         }
-        return user;  
+        return user;
     }
 
     /**
@@ -137,30 +138,6 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Atualiza as informações de um usuário existente.
-     *
-     * @param userId O ID do usuário a ser atualizado.
-     * @param updatedUser O objeto UserModel com os dados atualizados do
-     * usuário.
-     * @throws RuntimeException Se o usuário com o ID fornecido não for
-     * encontrado.
-     */
-    public void updateUser(Long userId, UserModel updatedUser) {
-        UserModel existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
-
-        existingUser.setUserName(updatedUser.getUserName());
-        existingUser.setEmailId(updatedUser.getEmailId());
-        existingUser.setRoles(updatedUser.getRoles());
-
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        }
-
-        userRepository.save(existingUser);
-    }
-
-    /**
      * Adiciona um endereço a um usuário existente.
      *
      * @param userId O ID do usuário ao qual o endereço será adicionado.
@@ -172,20 +149,16 @@ public class UserService implements UserDetailsService {
     public void addAddressToUser(Long userId, AddressModel address, String addressType) {
         UserModel user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + userId));
-        
-        // Salva o endereço primeiro
+
         addressRepository.save(address);
 
-        // Cria a relação entre o usuário e o endereço
         UserAddress userAddress = new UserAddress();
         userAddress.setUser(user);
         userAddress.setAddress(address);
         userAddress.setAddressType(addressType);
 
-        // Adiciona a relação à lista de endereços do usuário
         user.getUserAddresses().add(userAddress);
 
-        // Salva a relação na tabela TB_USER_ADDRESS
         userRepository.save(user);
     }
 
@@ -203,4 +176,46 @@ public class UserService implements UserDetailsService {
                 .map(UserAddress::getAddress)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Atualiza um usuário existente com as informações fornecidas.
+     *
+     * @param userId O ID do usuário a ser atualizado.
+     * @param updates Um mapa de chaves e valores contendo as informações a
+     * serem atualizadas.
+     * @return O objeto UserModel atualizado.
+     * @throws IllegalArgumentException Se o usuário não for encontrado ou a
+     * senha atual fornecida estiver incorreta.
+     */
+    public UserModel updateUser(Long userId, Map<String, Object> updates) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+
+        if (updates.containsKey("userName")) {
+            user.setUserName((String) updates.get("userName"));
+        }
+
+        if (updates.containsKey("mobileNumber")) {
+            user.setMobileNumber((String) updates.get("mobileNumber"));
+        }
+
+        if (updates.containsKey("profilePic")) {
+            logger.info("Atualizando imagem de perfil para {}", updates.get("profilePic"));
+            user.setProfilePic((String) updates.get("profilePic"));
+        }
+
+        if (updates.containsKey("currentPassword") && updates.containsKey("newPassword")) {
+            String currentPassword = (String) updates.get("currentPassword");
+            String newPassword = (String) updates.get("newPassword");
+
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                throw new IllegalArgumentException("Senha atual incorreta.");
+            }
+
+            user.setPassword(passwordEncoder.encode(newPassword));
+        }
+
+        return userRepository.save(user);
+    }
+
 }
