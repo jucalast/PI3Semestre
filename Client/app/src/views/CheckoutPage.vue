@@ -84,7 +84,6 @@
           @submit-address="handleManualAddress"
       />
     </div>
-    <button class="debug-info-btn" @click="printDebugInfo">Exibir Informações de Debug</button>
 
   </AdminLayout>
 </template>

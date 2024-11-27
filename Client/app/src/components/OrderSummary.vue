@@ -6,22 +6,22 @@
         @addressClicked="handleAddressClick"
         :truncatedAddress="truncatedAddress"
     />
-    <!-- Resumo do Pedido -->
-    <!--    <div class="order-summary">-->
-    <!--      <div class="invoice">-->
-    <!--        <h3>Resumo do Pedido</h3>-->
-    <!--        <div class="invoice-item" v-for="(product, index) in productDetails" :key="index">-->
-    <!--          <span class="product-name">{{ product.nome }}</span>-->
-    <!--          <span class="product-quantity">{{ product.quantidade }}x</span>-->
-    <!--          <span class="product-price">R$ {{ product.preco.toFixed(2) }}</span>-->
-    <!--          <span class="product-total">R$ {{ (product.preco * product.quantidade).toFixed(2) }}</span>-->
-    <!--        </div>-->
-    <!--        <div class="invoice-total">-->
-    <!--          <span>Total:</span>-->
-    <!--          <span>R$ {{ totalAmount.toFixed(2) }}</span>-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--    </div>-->
+<!-- Resumo do Pedido -->
+<div class="order-summary">
+  <div class="invoice">
+    <h3>Resumo do Pedido</h3>
+    <div class="invoice-item" v-for="(product, index) in productDetails" :key="index">
+      <span class="product-name">{{ product.nome }}</span>
+      <span class="product-quantity">{{ product.quantidade }}x</span>
+      <span class="product-price">R$ {{ product.preco.toFixed(2) }}</span>
+      <span class="product-total">R$ {{ (product.preco * product.quantidade).toFixed(2) }}</span>
+    </div>
+    <div class="invoice-total">
+      <span>Total:</span>
+      <span>R$ {{ totalAmount.toFixed(2) }}</span>
+    </div>
+  </div>
+</div>
   </div>
 </template>
 
@@ -96,6 +96,9 @@ export default {
       } catch (err) {
         console.error('Erro ao centralizar o mapa:', err);
       }
+    },
+    handleManualAddress(address) {
+      this.centerMapOnAddress(address);
     },
   },
 };
