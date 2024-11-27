@@ -3,17 +3,16 @@ package com.app.controller;
 import com.app.model.AvaliacaoModel;
 import com.app.model.ProdutoPedidoModel;
 import com.app.model.UserModel;
+import com.app.repository.AvaliacaoRepository;
 import com.app.repository.ProdutoPedidoRepository;
 import com.app.service.AvaliacaoService;
-import com.app.repository.AvaliacaoRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 /**
  * Controlador para gerenciar as operações de avaliação.
  * Este controlador expõe endpoints REST para adicionar, listar e calcular média de avaliações.
@@ -102,13 +101,15 @@ public class AvaliacaoController {
         List<ProdutoPedidoModel> produtoPedidos = produtoPedidoRepository.findByProdutoId(produtoId);
         if (produtoPedidos.isEmpty()) {
             logger.error("Nenhum ProdutoPedido encontrado para o produto ID: {}", produtoId);
-            throw new NoSuchElementException("Nenhum ProdutoPedido encontrado para o produto ID: " + produtoId);
+            return Collections.emptyList();
         }
 
         List<Map<String, Object>> avaliacoesResponse = new ArrayList<>();
         for (ProdutoPedidoModel produtoPedido : produtoPedidos) {
-            // Use a instância avaliacaoRepository para chamar o método
             List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(Math.toIntExact(produtoPedido.getId()));
+            if (avaliacoes.isEmpty()) {
+                logger.warn("Nenhuma avaliação encontrada para ProdutoPedido ID: {}", produtoPedido.getId());
+            }
             for (AvaliacaoModel avaliacao : avaliacoes) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("avaliacaoId", avaliacao.getId());
@@ -133,13 +134,16 @@ public class AvaliacaoController {
         List<ProdutoPedidoModel> produtoPedidos = produtoPedidoRepository.findByProdutoId(produtoId);
         if (produtoPedidos.isEmpty()) {
             logger.error("Nenhum ProdutoPedido encontrado para o produto ID: {}", produtoId);
-            throw new NoSuchElementException("Nenhum ProdutoPedido encontrado para o produto ID: " + produtoId);
+            return 0;
         }
 
         double totalNotas = 0;
         int countAvaliacoes = 0;
         for (ProdutoPedidoModel produtoPedido : produtoPedidos) {
             List<AvaliacaoModel> avaliacoes = avaliacaoRepository.findByProdutoPedidoId(Math.toIntExact(produtoPedido.getId()));
+            if (avaliacoes.isEmpty()) {
+                logger.warn("Nenhuma avaliação encontrada para ProdutoPedido ID: {}", produtoPedido.getId());
+            }
             for (AvaliacaoModel avaliacao : avaliacoes) {
                 totalNotas += avaliacao.getNota();
                 countAvaliacoes++;
@@ -147,7 +151,7 @@ public class AvaliacaoController {
         }
 
         if (countAvaliacoes == 0) {
-            throw new IllegalArgumentException("Não foram encontradas avaliações para os produtos pedidos.");
+            return 0;
         }
 
         return totalNotas / countAvaliacoes;
