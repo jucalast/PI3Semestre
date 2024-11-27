@@ -213,8 +213,8 @@ export default {
           withCredentials: true // Certifique-se de enviar cookies de autenticação
         });
         this.userCards = response.data;
-        console.log('Cartões recebidos:', this.userCards); // Verifique os dados recebidos
-        console.log('Números dos cartões:', this.userCards.map(card => card.number)); // Use 'number' para corresponder ao JSON
+      //   console.log('Cartões recebidos:', this.userCards); // Verifique os dados recebidos
+      //   console.log('Números dos cartões:', this.userCards.map(card => card.number)); // Use 'number' para corresponder ao JSON
       } catch (error) {
         console.error('Erro ao buscar cartões do usuário:', error);
       }

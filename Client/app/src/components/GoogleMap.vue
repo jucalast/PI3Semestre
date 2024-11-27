@@ -35,11 +35,12 @@ export default {
     };
   },
   watch: {
-    truncatedAddress(newAddress) {
+    selectedAddress(newAddress) {
       if (newAddress) {
-        this.calculateFreight(newAddress);
+        console.log('Endereço selecionado mudou. Centralizando mapa:', newAddress);
+        this.handleManualAddress(newAddress);
       }
-    }
+    },
   },
   methods: {
     async initMap() {
@@ -107,29 +108,33 @@ export default {
       }
     },
     async centerMapOnAddress(address) {
+      console.log('GoogleMap: Centralizando no endereço:', address);
+
+      if (!this.map) {
+        console.error('Mapa não inicializado.');
+        return;
+      }
+
       const geocoder = new google.maps.Geocoder();
-      return new Promise((resolve, reject) => {
-        geocoder.geocode({ address }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            const location = results[0].geometry.location;
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          const location = results[0].geometry.location;
+          console.log('Geocode bem-sucedido:', location);
 
-            // Centraliza o mapa no endereço
-            this.map.setCenter(location);
+          this.map.setCenter(location);
+          this.map.setZoom(15);
 
-            // Ajusta o nível de zoom para aproximar
-            this.map.setZoom(15); // Escolha um valor de zoom adequado (15 é uma boa aproximação para locais urbanos)
-
-            // Adiciona um marcador no local
-            new google.maps.Marker({
+          if (this.marker) {
+            this.marker.setPosition(location);
+          } else {
+            this.marker = new google.maps.Marker({
               position: location,
               map: this.map,
             });
-
-            resolve(location);
-          } else {
-            reject('Falha ao obter a localização.');
           }
-        });
+        } else {
+          console.error('Erro ao geocodificar o endereço:', status);
+        }
       });
     },
     async calculateFreight(address) {
@@ -188,11 +193,5 @@ export default {
   font-size: 1.5rem;
   color :#3a5bff;
 }
-.icon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 2rem;
-  color: var(--icon-color);
-}
+
 </style>
