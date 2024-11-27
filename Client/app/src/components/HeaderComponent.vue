@@ -62,7 +62,6 @@
 
       <!-- Parte da direita -->
       <div class="action-buttons">
-        
         <!-- Favoritos -->
         <div
           class="favorites-container"
@@ -143,7 +142,7 @@
             <span v-if="isAuthenticated" class="user-name">
               {{ username }}
             </span>
-            <img :src="getUserAvatar()" alt="User" />
+            <img class="pfp" :src="getUserAvatar()" alt="User" />
           </button>
           <div class="dropdown-content" v-if="dropdownVisible">
             <div v-if="isAuthenticated" class="useroptions">
@@ -228,7 +227,7 @@ export default {
           localStorage.clear();
           this.logout();
           this.authenticated = false;
-          window.location.reload();
+          this.$router.push('/login');
         })
         .catch((error) => {
           console.error('Erro ao tentar fazer logout', error);
@@ -293,9 +292,12 @@ export default {
     getUserAvatar() {
       if (this.isAuthenticated) {
         if (this.photoUrl) {
-          return this.photoUrl;
+          if (!this.photoUrl.startsWith('data:image')) {
+            return `data:image/png;base64,${this.photoUrl}`;
+          }
+          return this.photoUrl; 
         }
-        return `https://avatars.dicebear.com/api/shapes/${this.username}.svg`;
+        return `https://api.dicebear.com/9.x/thumbs/svg?seed=${this.username}`;
       } else {
         return '/src/assets/user.png';
       }
@@ -314,6 +316,7 @@ export default {
   },
   mounted() {
     this.checkAuth();
+    console.log(this.photoUrl);
   },
 };
 </script>
@@ -322,21 +325,20 @@ export default {
 @import '@/assets/css/variables.css';
 
 .header[data-v-727bebfc] {
-    display: flex
-;
-    align-items: flex-start;
-    justify-content: center;
-    padding-bottom: 0;
-    margin-top: 0.5rem;
-    background-color: var(--background-color);
-    margin: 0;
-    font-size: 2rem !important;
-    flex-direction: column;
-    position: fixed;
-    width: 100%;
-    height: 6.7rem;
-    z-index: 200;
-    padding-left:1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-bottom: 0;
+  margin-top: 0.5rem;
+  background-color: var(--background-color);
+  margin: 0;
+  font-size: 2rem !important;
+  flex-direction: column;
+  position: fixed;
+  width: 100%;
+  height: 6.7rem;
+  z-index: 200;
+  padding-left: 1rem;
 }
 
 .topheader {
@@ -351,7 +353,6 @@ export default {
   margin-left: 1rem;
   filter: invert(1);
 }
-
 
 .exitbtn {
   display: flex !important;
@@ -457,6 +458,7 @@ header .action-buttons {
   border-radius: 2rem;
   height: 3rem;
   width: 17%;
+  margin-right:2%;
   padding-left: 0.5rem !important;
   padding-right: 0.5rem !important;
 }
@@ -469,13 +471,16 @@ header .action-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0.1rem 0.1rem; 
+  margin: 0.1rem 0.1rem;
   border-radius: 50%;
 }
 
 .action-button img {
   width: 3rem;
   height: 3rem;
+}
+
+.cart-button {
   filter: invert(1);
 }
 
@@ -496,7 +501,7 @@ header .action-buttons {
   font-size: 1rem;
 }
 
-.user-button img {  
+.user-button img {
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -615,6 +620,4 @@ header .action-buttons {
   align-items: flex-start;
   width: 100%;
 }
-
-
 </style>

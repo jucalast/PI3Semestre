@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -73,6 +72,12 @@ public class UserModel {
      */
     @Column(nullable = false, name = "ROLES")
     private String roles;
+
+    /**
+     * URL da imagem de perfil do usuário.
+     */
+    @Column(name = "PROFILE_PIC", columnDefinition = "TEXT") 
+    private String profilePic;
 
     /**
      * Relação N:N com AddressModel.
