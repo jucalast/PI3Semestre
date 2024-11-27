@@ -7,21 +7,21 @@
         :truncatedAddress="truncatedAddress"
     />
     <!-- Resumo do Pedido -->
-    <div class="order-summary">
-      <div class="invoice">
-        <h3>Resumo do Pedido</h3>
-        <div class="invoice-item" v-for="(product, index) in productDetails" :key="index">
-          <span class="product-name">{{ product.nome }}</span>
-          <span class="product-quantity">{{ product.quantidade }}x</span>
-          <span class="product-price">R$ {{ product.preco.toFixed(2) }}</span>
-          <span class="product-total">R$ {{ (product.preco * product.quantidade).toFixed(2) }}</span>
-        </div>
-        <div class="invoice-total">
-          <span>Total:</span>
-          <span>R$ {{ totalAmount.toFixed(2) }}</span>
-        </div>
-      </div>
-    </div>
+    <!--    <div class="order-summary">-->
+    <!--      <div class="invoice">-->
+    <!--        <h3>Resumo do Pedido</h3>-->
+    <!--        <div class="invoice-item" v-for="(product, index) in productDetails" :key="index">-->
+    <!--          <span class="product-name">{{ product.nome }}</span>-->
+    <!--          <span class="product-quantity">{{ product.quantidade }}x</span>-->
+    <!--          <span class="product-price">R$ {{ product.preco.toFixed(2) }}</span>-->
+    <!--          <span class="product-total">R$ {{ (product.preco * product.quantidade).toFixed(2) }}</span>-->
+    <!--        </div>-->
+    <!--        <div class="invoice-total">-->
+    <!--          <span>Total:</span>-->
+    <!--          <span>R$ {{ totalAmount.toFixed(2) }}</span>-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </div>-->
   </div>
 </template>
 
@@ -98,14 +98,6 @@ export default {
       }
     },
   },
-  mounted() {
-    console.log('OrderSummary montado. Verificando mapa...');
-    if (this.$refs.googleMap) {
-      console.log('GoogleMap está disponível.');
-    } else {
-      console.warn('GoogleMap não está disponível no momento.');
-    }
-  }
 };
 </script>
 
@@ -117,6 +109,7 @@ export default {
   width: 38%;
   justify-content: space-between;
 }
+
 .order-summary {
   display: flex;
   flex-direction: column;
@@ -126,6 +119,7 @@ export default {
   justify-content: space-between;
   height: 60%;
 }
+
 .invoice {
   border-radius: 2rem;
   padding: 2rem;
@@ -138,20 +132,24 @@ export default {
   justify-content: space-between;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
 }
+
 .invoice-item {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
   border-bottom: dashed 1px #696969;
 }
+
 .invoice-item span {
   flex: 1;
   text-align: center;
 }
+
 .product-name {
   display: flex;
   text-align: start;
 }
+
 .invoice-total {
   display: flex;
   justify-content: space-between;

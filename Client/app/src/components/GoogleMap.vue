@@ -108,19 +108,10 @@ export default {
       }
     },
     async centerMapOnAddress(address) {
-      console.log('GoogleMap: Centralizando no endereço:', address);
-
-      if (!this.map) {
-        console.error('Mapa não inicializado.');
-        return;
-      }
-
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ address }, (results, status) => {
         if (status === 'OK' && results[0]) {
           const location = results[0].geometry.location;
-          console.log('Geocode bem-sucedido:', location);
-
           this.map.setCenter(location);
           this.map.setZoom(15);
 

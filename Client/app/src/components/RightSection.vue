@@ -9,35 +9,57 @@
           <font-awesome-icon :icon="showCardInputs ? (isCardFilled ? 'fa-solid fa-check' : 'fa-solid fa-times') : 'fa-solid fa-plus'" />
           {{ showCardInputs ? (isCardFilled ? 'OK' : 'Cancelar') : 'Add Cartão' }}
         </button>
-        <button class="payment-btn" v-if="!showCardInputs">
+        <button class="payment-btn" :class="{ selected: selectedPaymentType === 'cartao' }" @click="selectPaymentType('cartao')">
+          <font-awesome-icon icon="fa-solid fa-credit-card" /> Cartão
+        </button>
+        <button class="payment-btn" :class="{ selected: selectedPaymentType === 'pix' }" @click="selectPaymentType('pix')">
           <font-awesome-icon icon="fa-solid fa-qrcode" /> Pix
         </button>
-        <button class="payment-btn" v-if="!showCardInputs">
+        <button class="payment-btn" :class="{ selected: selectedPaymentType === 'boleto' }" @click="selectPaymentType('boleto')">
           <font-awesome-icon icon="fa-solid fa-file-invoice" /> Boleto
         </button>
       </div>
-      <div v-if="showCardInputs" class="card-inputs">
-        <div class="card-inputs-top">
-          <input v-mask="'#### #### #### ####'" v-model="localCardDetails.number" placeholder="0000 0000 0000 0000" required class="card-number" />
-          <input v-mask="'##/##'" v-model="localCardDetails.expiry" placeholder="00/00" required class="card-expiry" />
+      <div class="payment-content">
+        <div v-if="selectedPaymentType === 'cartao'">
+        <div v-if="showCardInputs" class="card-inputs">
+          <div class="card-inputs-top">
+            <input v-mask="'#### #### #### ####'" v-model="localCardDetails.number" placeholder="0000 0000 0000 0000" required class="card-number" />
+            <input v-mask="'##/##'" v-model="localCardDetails.expiry" placeholder="00/00" required class="card-expiry" />
+          </div>
+          <input v-model="localCardDetails.name" placeholder="Nome no Titular" required class="card-name" />
+          <div class="card-inputs-bottom">
+            <input v-model="localCardDetails.cpf" placeholder="CPF do Titular" required class="card-cpf" />
+            <input v-model="localCardDetails.bandeira" placeholder="Bandeira" required class="card-bandeira" />
+          </div>
+          <label class="save-card-checkbox">
+            <input type="checkbox" v-model="saveForNextPurchase" /> Salvar para a próxima compra
+          </label>
         </div>
-        <input v-model="localCardDetails.name" placeholder="Nome no Titular" required class="card-name" />
-        <div class="card-inputs-bottom">
-          <input v-model="localCardDetails.cpf" placeholder="CPF do Titular" required class="card-cpf" />
-          <input v-model="localCardDetails.bandeira" placeholder="Bandeira" required class="card-bandeira" />
-        </div>
-        <label class="save-card-checkbox">
-          <input type="checkbox" v-model="saveForNextPurchase" /> Salvar para a próxima compra
-        </label>
-      </div>
-      <div v-if="!showCardInputs" class="card-summary">
-        <div class="card-list">
-          <div class="card-option-wrapper">
-            <div class="card-option-container fixed-card" @click="selectCard(filteredUserCards[0]?.number)">
-              <label class="card-option">
-                <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="filteredUserCards[0]?.number" @change="moveCardToTop(filteredUserCards[0]?.number)" />
-                <span> {{ filteredUserCards[0]?.number.slice(-4) }}</span>
-                <div v-if="selectedCard === filteredUserCards[0]?.number" class="toggle-container">
+        <div v-if="!showCardInputs" class="card-summary">
+          <div class="card-list">
+            <div class="card-option-wrapper">
+              <div class="card-option-container fixed-card" @click="selectCard(filteredUserCards[0]?.number)">
+                <label class="card-option">
+                  <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="filteredUserCards[0]?.number" @change="moveCardToTop(filteredUserCards[0]?.number)" />
+                  <span> {{ filteredUserCards[0]?.number.slice(-4) }}</span>
+                  <div v-if="selectedCard === filteredUserCards[0]?.number" class="toggle-container">
+                    <label class="switch">
+                      <input type="checkbox" v-model="isCredit" />
+                      <span class="slider round"></span>
+                    </label>
+                    <span>{{ isCredit ? 'Crédito' : 'Débito' }}</span>
+                  </div>
+                </label>
+              </div>
+              <div class="accordion-toggle-container">
+                <font-awesome-icon class="accordion-toggle" :icon="showCardList ? 'fa-chevron-up' : 'fa-chevron-down'" @click="toggleCardAccordion" />
+              </div>
+            </div>
+            <div v-if="showCardList" class="scrollable-card-list">
+              <label v-for="card in filteredUserCards.slice(1)" :key="card.number" class="card-option" @click="selectCard(card.number)">
+                <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="card.number" @change="moveCardToTop(card.number)" />
+                <span> {{ card.number.slice(-4) }}</span>
+                <div v-if="selectedCard === card.number" class="toggle-container">
                   <label class="switch">
                     <input type="checkbox" v-model="isCredit" />
                     <span class="slider round"></span>
@@ -46,22 +68,20 @@
                 </div>
               </label>
             </div>
-            <div class="accordion-toggle-container">
-              <font-awesome-icon class="accordion-toggle" :icon="showCardList ? 'fa-chevron-up' : 'fa-chevron-down'" @click="toggleCardAccordion" />
-            </div>
           </div>
-          <div v-if="showCardList" class="scrollable-card-list">
-            <label v-for="card in filteredUserCards.slice(1)" :key="card.number" class="card-option" @click="selectCard(card.number)">
-              <input class="radio-option" type="radio" name="card" v-model="selectedCard" :value="card.number" @change="moveCardToTop(card.number)" />
-              <span> {{ card.number.slice(-4) }}</span>
-              <div v-if="selectedCard === card.number" class="toggle-container">
-                <label class="switch">
-                  <input type="checkbox" v-model="isCredit" />
-                  <span class="slider round"></span>
-                </label>
-                <span>{{ isCredit ? 'Crédito' : 'Débito' }}</span>
-              </div>
-            </label>
+        </div>
+
+          <div v-if="selectedPaymentType === 'pix'" class="pix-content">
+            <div class="qrcode-display">
+              <canvas id="qr-canvas"></canvas>
+            </div>
+
+            <span class="description">Escaneie o código para realizar o pagamento via Pix</span>
+          </div>
+
+          <div v-else-if="selectedPaymentType === 'boleto'" class="boleto-content">
+            <div class="barcode-placeholder">Espaço para o Código de Barras</div>
+            <span class="description">Código do Boleto</span>
           </div>
         </div>
       </div>
@@ -82,7 +102,12 @@
             <span>R$ {{ formattedShippingPrice }}</span>
           </div>
         </div>
-        <button class="total-price">Total: R$ {{ totalPrice }}</button>
+        <button
+            class="total-price"
+            @click="emitFinalizePurchase"
+        >
+          Finalizar: R$ {{ totalPrice }}
+        </button>
       </div>
     </div>
   </div>
@@ -94,7 +119,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp, faTimes } from '@fortawesome/free-solid-svg-icons';
 import axiosInstance from '../utils/axiosInstance'; // Importe o axiosInstance
-
+import QRCode from 'qrcode';
 library.add(faPlus, faCheck, faQrcode, faFileInvoice, faCreditCard, faChevronDown, faChevronUp, faTimes);
 
 export default {
@@ -127,10 +152,13 @@ export default {
       userCards: [], // Lista de cartões do usuário
       selectedCard: null, // Cartão selecionado
       paymentType: 'Crédito', // Tipo de pagamento selecionado
-      isCredit: true, // Tipo de pagamento selecionado (true para crédito, false para débito)
-      showInstallmentOptions: false,
-      selectedInstallment: null,
-      interestRate: 0.08, // 8% de juros
+      isCredit: false, // Controle se o cartão é de crédito
+      showInstallmentOptions: false, // Controla a visibilidade das opções de parcelamento
+      selectedInstallment: null, // Armazena a parcela selecionada
+      interestRate: 0.08, // Taxa de juros para o cálculo de parcelamento
+      selectedPaymentType: 'cartao',
+      qrCodeData: null, // Inicialmente sem dados
+      qrCodeLoading: false, //
     };
   },
   computed: {
@@ -171,6 +199,38 @@ export default {
     },
   },
   methods: {
+    async fetchQrCode() {
+      this.qrCodeLoading = true;
+      try {
+        const response = await axiosInstance.post('/api/qrcode/generate');
+        this.qrCodeData = response.data;
+        this.qrCodeLoading = false;
+        this.generateQRCode(); // Chama após confirmar a obtenção dos dados
+      } catch (error) {
+        console.error('Error fetching QR Code:', error);
+        this.qrCodeLoading = false;
+      }
+    },
+    generateQRCode() {
+      console.log('Attempting to generate QR code with data:', this.qrCodeData);
+      this.$nextTick(() => {
+        const canvas = document.getElementById('qr-canvas');
+        if (canvas) {
+          console.log('Canvas found:', canvas);
+          QRCode.toCanvas(canvas, this.qrCodeData, (error) => {
+            if (error) console.error('Error generating QR code:', error);
+          });
+        } else {
+          console.error('Canvas element not found in DOM.');
+        }
+      });
+    },
+    selectPaymentType(type) {
+      this.selectedPaymentType = type;
+      if (type === 'pix') {
+        this.fetchQrCode(); // Gera o QR Code quando Pix é selecionado
+      }
+    },
     toggleCardInputs() {
       if (this.showCardInputs && this.isCardFilled) {
         this.showCardInputs = false;
@@ -178,8 +238,13 @@ export default {
         this.showCardInputs = true;
       }
     },
-    toggleCardList() {
-      this.showCardList = !this.showCardList;
+    toggleCreditOptions() {
+      if (this.isCredit) {
+        this.showInstallmentOptions = true;
+      } else {
+        this.showInstallmentOptions = false;
+        this.selectedInstallment = null; // Resetar a seleção de parcelas quando não for crédito
+      }
     },
     toggleCardAccordion() {
       this.showCardList = !this.showCardList;
@@ -190,8 +255,8 @@ export default {
         this.boxShadowColor = primaryColor;
       }
     },
-    finalizePurchase() {
-      this.$emit('finalizePurchase');
+    emitFinalizePurchase() {
+      this.$emit('finalize-purchase', { selectedInstallment: this.selectedInstallment });
     },
     async saveCard() {
       try {
@@ -213,8 +278,8 @@ export default {
           withCredentials: true // Certifique-se de enviar cookies de autenticação
         });
         this.userCards = response.data;
-      //   console.log('Cartões recebidos:', this.userCards); // Verifique os dados recebidos
-      //   console.log('Números dos cartões:', this.userCards.map(card => card.number)); // Use 'number' para corresponder ao JSON
+        //   console.log('Cartões recebidos:', this.userCards); // Verifique os dados recebidos
+        //   console.log('Números dos cartões:', this.userCards.map(card => card.number)); // Use 'number' para corresponder ao JSON
       } catch (error) {
         console.error('Erro ao buscar cartões do usuário:', error);
       }
@@ -233,18 +298,40 @@ export default {
     cancelCardCreation() {
       this.showCardInputs = false; // Fecha o formulário de cartão
     },
-    toggleInstallmentOptions() {
-      this.showInstallmentOptions = !this.showInstallmentOptions;
-    },
   },
   watch: {
-    isCredit(newVal) {
+    qrCodeData(newVal) {
       if (newVal) {
-        this.toggleInstallmentOptions();
-      } else {
-        this.showInstallmentOptions = false;
+        this.generateQRCode();
       }
     },
+    selectedCard(newCard) {
+      const selectedCardDetails = this.userCards.find(card => card.number === newCard);
+      if (selectedCardDetails) {
+        this.$emit('update-card-details', {
+          cardDetails: selectedCardDetails,
+          paymentType: this.isCredit ? 'Crédito' : 'Débito'
+        }); // Emite os detalhes do cartão selecionado e o tipo de pagamento
+      }
+    },
+    isCredit(newValue) {
+      this.toggleCreditOptions(); // Atualiza a visibilidade das opções de parcelamento
+      // Sempre que o tipo de pagamento mudar, emite novamente os detalhes do cartão e o novo tipo
+      const selectedCardDetails = this.userCards.find(card => card.number === this.selectedCard);
+      if (selectedCardDetails) {
+        this.$emit('update-card-details', {
+          cardDetails: selectedCardDetails,
+          paymentType: newValue ? 'Crédito' : 'Débito'
+        });
+      }
+    }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      if (this.qrCodeData) {
+        this.generateQRCode();
+      }
+    });
   },
   created() {
     this.fetchUserCards(); // Busca os cartões do usuário ao criar o componente
@@ -275,7 +362,7 @@ export default {
 }
 
 .card-container1 {
-position:absolute;
+  position:absolute;
   height:30%;
   width: 80%;
   top:19%;
@@ -314,7 +401,6 @@ position:absolute;
   flex-direction: column;
   gap: 10px;
   margin-top: 1rem; /* Ajusta a margem superior para ficar logo abaixo do header-info-card */
-  width: -moz-fit-content;
   width: fit-content;
   background: #e8e8e8;
   border-radius: 2rem;
@@ -429,23 +515,23 @@ position:absolute;
   display: flex;
   align-items: center;
   justify-content: space-between;
-gap:1rem;
+  gap:1rem;
 
 }
 
 .card-option {
   display: flex
 ;
-    align-items: center;
-    width: 100%;
-    height: 5rem;
-    padding: 1rem;
-    background: #efefef;
-    border-radius: 1rem;
-    font-size: 2rem;
-    justify-content: flex-start;
-    flex-direction: row;
-    gap:2rem;
+  align-items: center;
+  width: 100%;
+  height: 5rem;
+  padding: 1rem;
+  background: #efefef;
+  border-radius: 1rem;
+  font-size: 2rem;
+  justify-content: flex-start;
+  flex-direction: row;
+  gap:2rem;
 }
 .radio-option {
   margin-left: 1rem;
@@ -493,10 +579,10 @@ gap:1rem;
 
 .prices {
 
-background: #efefef;
-width: 100%;
-padding: 1rem;
-border-radius:1rem;
+  background: #efefef;
+  width: 100%;
+  padding: 1rem;
+  border-radius:1rem;
 }
 
 .price-details .total-price {
@@ -648,16 +734,64 @@ input:checked + .slider:before {
 }
 
 .installment-option[data-v-05f4d63b] {
-    display: flex
+  display: flex
 ;
-    align-items: center;
-    gap: 10px;
-    justify-content: space-between;
-    border-bottom: solid 1px #d3d3d3;
-    padding-left:1rem;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  border-bottom: solid 1px #d3d3d3;
+  padding-left:1rem;
 }
 
 .installment-option input {
   transform: scale(1.5);
 }
+.payment-btn {
+  background-color: #efefef;
+  color: #1e1e1e;
+  border-radius: 1rem;
+  padding: 1rem 2rem;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment-btn.selected {
+  background-color: #3a5bff; /* Cor diferente para o botão selecionado */
+  color: white;
+}
+
+.payment-content {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.pix-content, .boleto-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.qrcode-placeholder, .barcode-placeholder {
+  width: 100%;
+  height: 200px;
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.description {
+  font-size: 1.2rem;
+  color: #333;
+}
+
 </style>
