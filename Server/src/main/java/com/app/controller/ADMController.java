@@ -9,6 +9,9 @@ import com.app.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/protected")
@@ -29,6 +32,15 @@ public class ADMController {
     @PutMapping("/user/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateUser(@PathVariable("id") Long userId, @RequestBody UserModel updatedUser) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("userName", updatedUser.getUserName());
+        updates.put("emailId", updatedUser.getEmailId());
+        updates.put("cpf", updatedUser.getCpf());
+        updates.put("mobileNumber", updatedUser.getMobileNumber());
+        updates.put("password", updatedUser.getPassword());
+        updates.put("roles", updatedUser.getRoles());
+        updates.put("profilePic", updatedUser.getProfilePic());
+
         try {
             userService.updateUser(userId, updatedUser);
             return ResponseEntity.ok("Usuário atualizado com sucesso.");
@@ -36,4 +48,5 @@ public class ADMController {
             return ResponseEntity.badRequest().body("Erro ao atualizar o usuário: " + e.getMessage());
         }
     }
+
 }

@@ -181,41 +181,26 @@ public class UserService implements UserDetailsService {
      * Atualiza um usuário existente com as informações fornecidas.
      *
      * @param userId O ID do usuário a ser atualizado.
-     * @param updates Um mapa de chaves e valores contendo as informações a
      * serem atualizadas.
      * @return O objeto UserModel atualizado.
      * @throws IllegalArgumentException Se o usuário não for encontrado ou a
      * senha atual fornecida estiver incorreta.
      */
-    public UserModel updateUser(Long userId, Map<String, Object> updates) {
+    public UserModel updateUser(Long userId, UserModel updatedUser) {
         UserModel user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
-        if (updates.containsKey("userName")) {
-            user.setUserName((String) updates.get("userName"));
-        }
-
-        if (updates.containsKey("mobileNumber")) {
-            user.setMobileNumber((String) updates.get("mobileNumber"));
-        }
-
-        if (updates.containsKey("profilePic")) {
-            logger.info("Atualizando imagem de perfil para {}", updates.get("profilePic"));
-            user.setProfilePic((String) updates.get("profilePic"));
-        }
-
-        if (updates.containsKey("currentPassword") && updates.containsKey("newPassword")) {
-            String currentPassword = (String) updates.get("currentPassword");
-            String newPassword = (String) updates.get("newPassword");
-
-            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-                throw new IllegalArgumentException("Senha atual incorreta.");
-            }
-
-            user.setPassword(passwordEncoder.encode(newPassword));
-        }
+        // Atualize as propriedades conforme necessário
+        user.setUserName(updatedUser.getUserName());
+        user.setEmailId(updatedUser.getEmailId());
+        user.setCpf(updatedUser.getCpf());
+        user.setMobileNumber(updatedUser.getMobileNumber());
+        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        user.setRoles(updatedUser.getRoles());
+        user.setProfilePic(updatedUser.getProfilePic());
 
         return userRepository.save(user);
     }
+
 
 }

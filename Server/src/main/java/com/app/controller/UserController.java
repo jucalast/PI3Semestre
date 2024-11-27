@@ -112,7 +112,6 @@ public class UserController {
      *
      * @param email O email fornecido pelo usuário.
      * @param password A senha fornecida pelo usuário.
-     * @param model O modelo para passar dados à view.
      * @param request O objeto HttpServletRequest para manipulação da sessão.
      * @return Um redirecionamento para a URL da home page em caso de sucesso,
      * ou retorno à página de login em caso de falha.
@@ -265,22 +264,50 @@ public class UserController {
 
     @PutMapping("/api/profile")
     public ResponseEntity<?> updateUserProfile(HttpServletRequest request, @RequestBody Map<String, Object> updates) {
-
         UserModel authenticatedUser = (UserModel) request.getSession().getAttribute("user");
-    
+
         if (authenticatedUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
-    
-        try {
 
-            UserModel updatedUser = userService.updateUser(authenticatedUser.getId(), updates);
-            return ResponseEntity.ok(updatedUser);
+        try {
+            // Cria uma instância do UserModel para preencher com os dados atualizados
+            UserModel updatedUser = new UserModel();
+            updatedUser.setId(authenticatedUser.getId()); // Preserva o ID do usuário
+
+            // Atribui os valores do mapa ao UserModel, com verificações para cada campo esperado
+            if (updates.containsKey("userName")) {
+                updatedUser.setUserName((String) updates.get("userName"));
+            }
+            if (updates.containsKey("emailId")) {
+                updatedUser.setEmailId((String) updates.get("emailId"));
+            }
+            if (updates.containsKey("cpf")) {
+                updatedUser.setCpf((String) updates.get("cpf"));
+            }
+            if (updates.containsKey("mobileNumber")) {
+                updatedUser.setMobileNumber((String) updates.get("mobileNumber"));
+            }
+            if (updates.containsKey("password")) {
+                // A senha deve ser criptografada dentro do método de atualização do serviço
+                updatedUser.setPassword((String) updates.get("password"));
+            }
+            if (updates.containsKey("roles")) {
+                updatedUser.setRoles((String) updates.get("roles"));
+            }
+            if (updates.containsKey("profilePic")) {
+                updatedUser.setProfilePic((String) updates.get("profilePic"));
+            }
+
+            // Chama o método de atualização do serviço
+            UserModel resultUser = userService.updateUser(authenticatedUser.getId(), updatedUser);
+            return ResponseEntity.ok(resultUser);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar o perfil.");
         }
     }
-    
+
+
 }
