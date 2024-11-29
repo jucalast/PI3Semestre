@@ -1,11 +1,11 @@
 PI3Semestre
 Este projeto faz parte do trabalho final do 3º semestre do curso de Análise e Desenvolvimento de Sistemas. Ele é composto por uma aplicação fullstack que utiliza tecnologias modernas para construir uma plataforma web.
 
-Integrantes do projeto
-GIOVANNI SILVA LOOSE 
-KAIRO ESTEVESA PINHEIRO CHÁCARA
-JOÃO LUCCAS FERREIRA MOURA 
-LUAN SOUZA DA SILVA
+Integrantes do projeto: 
+GIOVANNI SILVA LOOSE,  
+KAIRO ESTEVES PINHEIRO CHÁCARA, 
+JOÃO LUCCAS FERREIRA MOURA, 
+LUAN SOUZA DA SILVA, 
 RICARDO LUCIANO FERREIRA
 
 
