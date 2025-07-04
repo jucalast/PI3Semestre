@@ -14,6 +14,11 @@ spring:
       hibernate:
         format_sql: true
     packages-to-scan: com.app.model
+  
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
 
   security:
     oauth2:

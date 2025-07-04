@@ -292,7 +292,12 @@ export default {
     getUserAvatar() {
       if (this.isAuthenticated) {
         if (this.photoUrl) {
-          if (!this.photoUrl.startsWith('data:image')) {
+          // Check if photoUrl already contains a full URL or is base64 encoded
+          if (this.photoUrl.startsWith('http') || this.photoUrl.startsWith('data:image')) {
+            return this.photoUrl;
+          }
+          // Only add base64 prefix if it's not already there and seems to be base64 data
+          if (!this.photoUrl.startsWith('data:image') && this.photoUrl.length > 0) {
             return `data:image/png;base64,${this.photoUrl}`;
           }
           return this.photoUrl; 

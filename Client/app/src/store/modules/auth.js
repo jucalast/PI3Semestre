@@ -57,6 +57,13 @@ const actions = {
         });
       }
     } catch (error) {
+      // Silenciosamente define como não autenticado em caso de 401
+      // Isso é esperado quando o usuário não está logado
+      if (error.response && error.response.status === 401) {
+        // console.log('User not authenticated - this is normal');
+      } else {
+        console.error('Authentication check failed:', error);
+      }
       commit('setAuthentication', { authenticated: false, roles: [] });
     }
   },

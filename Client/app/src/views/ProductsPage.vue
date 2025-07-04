@@ -61,6 +61,11 @@
       updateFilteredProducts(produtos) {
         this.produtos = produtos; // Atualiza a lista de produtos filtrados
       },
+
+      updateSelectedRadios(selectedValues) {
+        // Handle selected radio values update
+        console.log('Selected radio values updated:', selectedValues);
+      },
     },
     mounted() {
       this.fetchProdutos();

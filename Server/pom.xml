@@ -131,12 +131,7 @@
             <version>2.2.0</version>
         </dependency>
 
-        <!-- Spring Boot Test Starter -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+
 
         <!-- Spring Boot DevTools (optional, for easier development) -->
         <dependency>
@@ -152,12 +147,7 @@
             <version>6.2.7.Final</version>
         </dependency>
 
-        <!-- Driver do banco de dados -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+
 
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -191,6 +181,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <configuration>
+                    <mainClass>com.app.Application</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Maven Compiler Plugin -->

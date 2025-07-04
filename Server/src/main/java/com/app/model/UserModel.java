@@ -76,7 +76,7 @@ public class UserModel {
     /**
      * URL da imagem de perfil do usuário.
      */
-    @Column(name = "PROFILE_PIC", columnDefinition = "TEXT") 
+    @Column(name = "PROFILE_PIC", columnDefinition = "NVARCHAR(MAX)") 
     private String profilePic;
 
     /**

@@ -7,7 +7,7 @@
       <div class="header-info-card">
         <button @click="showCardInputs ? (isCardFilled ? saveCard() : cancelCardCreation()) : toggleCardInputs()" :class="['add-card-btn', { 'filled': showCardInputs && isCardFilled }]">
           <font-awesome-icon :icon="showCardInputs ? (isCardFilled ? 'fa-solid fa-check' : 'fa-solid fa-times') : 'fa-solid fa-plus'" />
-          {{ showCardInputs ? (isCardFilled ? 'OK' : 'Cancelar') : 'Add Cartão' }}
+          {{ showCardInputs ? (isCardFilled ? 'OK' : 'Cancelar') : 'Add' }}
         </button>
         <button class="payment-btn" :class="{ selected: selectedPaymentType === 'cartao' }" @click="selectPaymentType('cartao')">
           <font-awesome-icon icon="fa-solid fa-credit-card" /> Cartão
@@ -381,7 +381,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 12rem;
+  padding-top: 13rem;
   position: relative; /* Adiciona posição relativa */
   z-index: 1; /* Garante que o info-card fique atrás do cartão */
 }
@@ -447,10 +447,11 @@ export default {
   width: 90%;
   gap: 10px; /* Adiciona espaço entre os botões */
   border-radius: 1rem; /* Define o border-radius como 1rem */
+
 }
 
 .card-inputs input {
-  color: #3a5bff;
+  color: #3a5bff; 
   border: solid 1px #aeaeaeb6;
   background: #ffffff;
   border-radius: 1.5rem;
@@ -750,7 +751,7 @@ input:checked + .slider:before {
   background-color: #efefef;
   color: #1e1e1e;
   border-radius: 1rem;
-  padding: 1rem 2rem;
+  padding: 1rem;
   font-size: 1.3rem;
   cursor: pointer;
   display: flex;

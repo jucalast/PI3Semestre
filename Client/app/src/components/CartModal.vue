@@ -78,6 +78,7 @@
 
 <script>
 import axiosInstance from '@/utils/axiosInstance';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'CartModal',
@@ -86,6 +87,9 @@ export default {
       type: Boolean,
       required: true,
     },
+  },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated']),
   },
   watch: {
     isModalVisible(newValue) {
@@ -111,17 +115,38 @@ export default {
     },
     async fetchCarts() {
       try {
+        // Check if user is authenticated before making the request
+        if (!this.isAuthenticated) {
+          console.log('User not authenticated, skipping cart fetch');
+          this.cartItems = [];
+          return;
+        }
+        
         const responseCart = await axiosInstance.get(`/api/carrinho/`);
-        this.cartItems = responseCart.data.map(item => ({
-          produtoId: item.produtoId,
-          imagens: item.imagens,
-          nome: item.nome,
-          preco: item.preco,
-          quantidade: item.quantidade
-        }));
+        
+        // Verificar se a resposta é um array
+        if (Array.isArray(responseCart.data)) {
+          this.cartItems = responseCart.data.map(item => ({
+            produtoId: item.produtoId,
+            imagens: item.imagens,
+            nome: item.nome,
+            preco: item.preco,
+            quantidade: item.quantidade
+          }));
+        } else {
+          console.log('API response is not an array:', responseCart.data);
+          this.cartItems = [];
+        }
+        
         this.somasCarrinho(this.cartItems);
       } catch (error) {
-        console.error('Erro ao buscar produtos do carrinho: ', error);
+        if (error.response && error.response.status === 401) {
+          console.log('Authentication required for cart access');
+          this.cartItems = [];
+        } else {
+          console.error('Erro ao buscar produtos do carrinho: ', error);
+          this.cartItems = [];
+        }
         return;
       }
     },

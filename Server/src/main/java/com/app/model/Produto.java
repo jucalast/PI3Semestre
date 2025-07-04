@@ -62,7 +62,7 @@ public class Produto {
      */
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "produto_imagens", joinColumns = @JoinColumn(name = "produto_id"))
-    @Column(name = "imagem_base64", columnDefinition = "TEXT") // Ajuste o tipo de coluna se necessário
+    @Column(name = "imagem_base64", columnDefinition = "NVARCHAR(MAX)") // Alterado de TEXT para NVARCHAR(MAX) para compatibilidade
     private List<String> imagens = new ArrayList<>();
 
 

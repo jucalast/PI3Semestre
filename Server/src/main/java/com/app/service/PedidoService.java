@@ -1,7 +1,10 @@
 package com.app.service;
 
 import com.app.exceptions.ProdutoNotFoundException;
-import com.app.model.*;
+import com.app.model.PedidoModel;
+import com.app.model.ProdutoPedidoModel;
+import com.app.model.Produto;
+import com.app.model.UserModel;
 import com.app.model.pagamento.*;
 import com.app.repository.*;
 import com.app.repository.pagamento.*;

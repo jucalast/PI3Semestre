@@ -4,8 +4,8 @@
       <div class="profile-content">
         <div class="profile-photo">
           <img :src="previewProfilePic || getUserAvatar()" alt="Foto do usuário" />
-          <p class="user-name">{{ user.userName || username }}</p>
-          <p class="user-email">{{ user.email || '' }}</p> 
+          <p class="user-name">{{ userForm.userName || username }}</p>
+          <p class="user-email">{{ userForm.email || '' }}</p> 
           <button @click="selectProfilePicture" class="choose-photo-btn">Escolher Foto</button>
           <input
             type="file"
@@ -23,9 +23,9 @@
               <label for="name">Nome</label>
               <input 
                 type="text" 
-                v-model="user.userName" 
+                v-model="userForm.userName" 
                 id="name" 
-                :placeholder="user.userName || 'Nome'" 
+                :placeholder="userForm.userName || 'Nome'" 
                 @input="checkChanges"
               />
             </div>
@@ -33,9 +33,9 @@
               <label for="phone">Telefone</label>
               <input 
                 type="text" 
-                v-model="user.mobileNumber" 
+                v-model="userForm.mobileNumber" 
                 id="phone" 
-                :placeholder="user.mobileNumber || 'Telefone'" 
+                :placeholder="userForm.mobileNumber || 'Telefone'" 
                 @input="checkChanges"
                 v-mask="'(##) #####-####'"
               />
@@ -44,7 +44,7 @@
               <label for="current-password">Senha Atual</label>
               <input
                 type="password"
-                v-model="user.currentPassword"
+                v-model="userForm.currentPassword"
                 id="current-password"
                 @input="checkChanges"
               />
@@ -53,7 +53,7 @@
               <label for="new-password">Nova Senha</label>
               <input
                 type="password"
-                v-model="user.newPassword"
+                v-model="userForm.newPassword"
                 id="new-password"
                 @input="checkChanges"
               />
@@ -86,7 +86,7 @@ export default {
   },
   data() {
     return {
-      user: {
+      userForm: {
         userName: '',
         mobileNumber: '',
         email: '',
@@ -103,15 +103,15 @@ export default {
     ...mapGetters('auth', ['user', 'photoUrl', 'username', 'isAuthenticated']),
   },
   methods: {
-    ...mapActions('auth', ['updateUserProfile']),
+    ...mapActions('auth', ['updateUserProfile', 'checkAuth']),
     async updateProfile() {
       const updatedUser = {};
 
-      if (this.user.userName) updatedUser.userName = this.user.userName;
-      if (this.user.mobileNumber) updatedUser.mobileNumber = this.user.mobileNumber;
-      if (this.user.currentPassword) updatedUser.currentPassword = this.user.currentPassword;
-      if (this.user.newPassword) updatedUser.newPassword = this.user.newPassword;
-      if (this.user.profilePic) updatedUser.profilePic = this.user.profilePic;
+      if (this.userForm.userName) updatedUser.userName = this.userForm.userName;
+      if (this.userForm.mobileNumber) updatedUser.mobileNumber = this.userForm.mobileNumber;
+      if (this.userForm.currentPassword) updatedUser.currentPassword = this.userForm.currentPassword;
+      if (this.userForm.newPassword) updatedUser.newPassword = this.userForm.newPassword;
+      if (this.userForm.profilePic) updatedUser.profilePic = this.userForm.profilePic;
 
       if (Object.keys(updatedUser).length === 0) {
         alert('Não há alterações para salvar.');
@@ -130,7 +130,15 @@ export default {
     getUserAvatar() {
       if (this.isAuthenticated) {
         if (this.photoUrl) {
-          return `data:image/png;base64,${this.photoUrl}`;
+          // Check if photoUrl already contains a full URL or is base64 encoded
+          if (this.photoUrl.startsWith('http') || this.photoUrl.startsWith('data:image')) {
+            return this.photoUrl;
+          }
+          // Only add base64 prefix if it's not already there and seems to be base64 data
+          if (!this.photoUrl.startsWith('data:image') && this.photoUrl.length > 0) {
+            return `data:image/png;base64,${this.photoUrl}`;
+          }
+          return this.photoUrl;
         }
         return `https://api.dicebear.com/9.x/thumbs/svg?seed=${this.username}`;
       } else {
@@ -146,7 +154,7 @@ export default {
         const reader = new FileReader();
         reader.onload = () => {
           this.previewProfilePic = reader.result;
-          this.user.profilePic = reader.result.split(',')[1]; 
+          this.userForm.profilePic = reader.result.split(',')[1]; 
           this.checkChanges(); 
         };
         reader.readAsDataURL(file);
@@ -154,11 +162,11 @@ export default {
     },
     checkChanges() {
       this.hasChanges = (
-        this.user.userName !== this.initialUser.userName ||
-        this.user.mobileNumber !== this.initialUser.mobileNumber ||
-        this.user.currentPassword !== this.initialUser.currentPassword ||
-        this.user.newPassword !== this.initialUser.newPassword ||
-        this.user.profilePic !== this.initialUser.profilePic
+        this.userForm.userName !== this.initialUser.userName ||
+        this.userForm.mobileNumber !== this.initialUser.mobileNumber ||
+        this.userForm.currentPassword !== this.initialUser.currentPassword ||
+        this.userForm.newPassword !== this.initialUser.newPassword ||
+        this.userForm.profilePic !== this.initialUser.profilePic
       );
     },
   },
@@ -168,12 +176,12 @@ export default {
         const response = await axiosInstance.get('/login/user-info');
         const userInfo = response.data;
 
-        this.user.userName = userInfo.name || this.user.userName;
-        this.user.mobileNumber = userInfo.phone || this.user.mobileNumber;
-        this.user.email = userInfo.email || this.user.email;
-        this.user.profilePic = userInfo.profilePic || this.user.profilePic;
+        this.userForm.userName = userInfo.name || this.userForm.userName;
+        this.userForm.mobileNumber = userInfo.phone || this.userForm.mobileNumber;
+        this.userForm.email = userInfo.email || this.userForm.email;
+        this.userForm.profilePic = userInfo.profilePic || this.userForm.profilePic;
 
-        this.initialUser = { ...this.user };
+        this.initialUser = { ...this.userForm };
 
         this.checkChanges();
       } catch (error) {

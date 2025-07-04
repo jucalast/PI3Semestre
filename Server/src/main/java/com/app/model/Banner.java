@@ -17,7 +17,7 @@ public class Banner {
 
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String imageBase64;
 
     // Getters and setters

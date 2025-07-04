@@ -5,14 +5,14 @@
     </div>
     <div v-else-if="produtos.length > 0" class="card-container">
       <div class="cards">
-        <div
-          v-for="produto in filteredProdutos.length > 0
-            ? filteredProdutos
-            : produtos"
-          :key="produto.id"
-          class="product-card"
-          @click="openModal(produto)"
-        >
+      <div
+        v-for="produto in filteredProdutos.length > 0
+          ? filteredProdutos
+          : produtos"
+        :key="produto.id"
+        class="product-card"
+        @click="openModal(produto)"
+      >
           <h2>{{ produto.nome }}</h2>
           <div class="backcard">
             <div class="imgcardcont">
@@ -71,6 +71,7 @@
   import axiosInstance from '@/utils/axiosInstance';
   import { globalState } from '@/state.js';
   import { computed } from 'vue';
+  import { mapGetters } from 'vuex';
 
   export default {
     props: {
@@ -112,6 +113,7 @@
       // };
     },
     computed: {
+      ...mapGetters('auth', ['isAuthenticated']),
       filteredProdutos() {
         if (!this.produtos.length) return [];
         const searchFiltered = this.produtos.filter((produto) =>
@@ -213,6 +215,13 @@
       },
       async fetchFavorites() {
         try {
+          // Check if user is authenticated before making the request
+          if (!this.isAuthenticated) {
+            console.log('User not authenticated, skipping favorites fetch');
+            globalState.favoriteProductIds = [];
+            return;
+          }
+          
           const response = await axiosInstance.get(`/api/favorites/list`);
           if (Array.isArray(response.data)) {
             globalState.favoriteProductIds = response.data.map(
@@ -222,8 +231,13 @@
             globalState.favoriteProductIds = []; // Limpa a lista se a resposta não for um array
           }
         } catch (error) {
-          console.error('Erro ao buscar favoritos:', error.message);
-          globalState.favoriteProductIds = []; // Limpa a lista em caso de erro na requisição
+          if (error.response && error.response.status === 401) {
+            console.log('Authentication required for favorites access');
+            globalState.favoriteProductIds = [];
+          } else {
+            console.error('Erro ao buscar favoritos:', error.message);
+            globalState.favoriteProductIds = []; // Limpa a lista em caso de erro na requisição
+          }
         }
       },
       // Precisa criar a rota /list no carrinho pra funcionar
